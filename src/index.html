@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CRG Data Tool</title>
+        <link rel="stylesheet" href="../node_modules/typeface-raleway/index.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../css/index.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row mb-4 my-ui-text">
+                <div class="col">
+                <h1><strong>CRG Data Tool</strong></h1>
+                <P>This is a tool for working with Game Data files from CRG Scoreboard.</P>
+                </div>
+            </div>
+            <div class="row mb-4 my-ui-text">
+                <div class="col">
+                    <div id="drag-file">
+                        <input type="file" name="file" id="file-select" class="inputfile" accept=".xlsx" />
+                        <label for="file-select">Choose a file <span class="box__dragndrop"> or drag it here.</span></label>
+                    </div>
+                </div>
+                <div class="col">
+                    <H5>File Info:</H5>
+                    <div id="file-info-box">
+                        No File Loaded
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                        <div id="output-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.jQuery = window.$ = require('jquery');
+        </script>
+        <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    </body>
+<script src="index.js"></script>
+</html>
