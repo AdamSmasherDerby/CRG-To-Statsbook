@@ -19,6 +19,7 @@
     "popper.js": "1.14.0",
     "typeface-raleway": "^0.0.54",
     "xlsx": "^0.12.10",
+    "xlsx-populate": "^1.14.0",
     "xlsx-style": "^0.8.13"
   }
 }

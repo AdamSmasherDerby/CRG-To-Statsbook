@@ -1,5 +1,6 @@
 //const electron = require('electron')
 const XLSX = require('xlsx')
+const XLP = require('xlsx-populate')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -91,17 +92,24 @@ let readCRGData = (e) => {
 
     // Read in a statsbook to populate
     statsbook = XLSX.readFile(statsbookFileName)
+    XLP.fromFileAsync(statsbookFileName).then(
+        workbook => {
+            return workbook.toFileAsync('./test.xlsx')
+        }
+    )
 
-    updateGameData()
-    updateSkaters()
-    updatePenalties()
-    createSaveNewButton()
+    //updateGameData()
+    //updateSkaters()
+    //updatePenalties()
+    //createSaveNewButton()
+    
 
     // Display Output
     if(outBox.lastElementChild){
         outBox.removeChild(outBox.lastElementChild)
     }
-    outBox.innerHTML = XLSX.utils.sheet_to_html(statsbook.Sheets['Penalties'])
+    //outBox.innerHTML = XLSX.utils.sheet_to_html(statsbook.Sheets['Penalties'])
+    outBox.innerHTML = 'Statsbook File Loaded'
 }
 
 let updateFileInfoBox = () => {
