@@ -91,16 +91,17 @@ let readCRGData = (e) => {
     updateFileInfoBox()
 
     // Read in a statsbook to populate
-    statsbook = XLSX.readFile(statsbookFileName)
+    //statsbook = XLSX.readFile(statsbookFileName)
     XLP.fromFileAsync(statsbookFileName).then(
         workbook => {
+            workbook = updateGameData(workbook)
+            workbook = updateSkaters(workbook)
+            workbook = updatePenalties(workbook)
+            workbook = updateScores(workbook)
             return workbook.toFileAsync('./test.xlsx')
         }
     )
 
-    //updateGameData()
-    //updateSkaters()
-    //updatePenalties()
     //createSaveNewButton()
     
 
@@ -111,6 +112,8 @@ let readCRGData = (e) => {
     //outBox.innerHTML = XLSX.utils.sheet_to_html(statsbook.Sheets['Penalties'])
     outBox.innerHTML = 'Statsbook File Loaded'
 }
+
+
 
 let updateFileInfoBox = () => {
     // Update File Info Box
@@ -130,26 +133,26 @@ let createSaveNewButton = () => {
     }
 }
 
-let updateGameData = () => {
+let updateGameData = (workbook) => {
     // Update the general game data - Time, Date, and Team Names
     let sheet = sbTemplate.mainSheet
-    statsbook = insert(statsbook, sheet, sbTemplate.date, crgData.identifier.substr(0,10), 'd')
-    statsbook = insert(statsbook, sheet, sbTemplate.time, crgData.identifier.slice(12,16), 's')
-    for(let t in crgData.teams){
+    workbook.sheet(sheet).cell(sbTemplate.date).value(crgData.identifier.substr(0,10))
+    workbook.sheet(sheet).cell(sbTemplate.time).value(crgData.identifier.slice(11,16))
+    for (let t in crgData.teams){
         let name = crgData.teams[t].name
         let nameCell = sbTemplate.teams[teamNames[t]].league
-        statsbook = insert(statsbook, sheet, nameCell, name, 's')
+        workbook.sheet(sheet).cell(nameCell).value(name)
     }
-
+    return workbook
 }
 
-let updateSkaters = () => {
+let updateSkaters = (workbook) => {
     // read the list of skaters the crgData
     for(let t in crgData.teams){
         let team = {}
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
-        let numberCell = XLSX.utils.decode_cell(sbTemplate.teams[teamNames[t]].firstNumber)
-        let nameCell = XLSX.utils.decode_cell(sbTemplate.teams[teamNames[t]].firstName)
+        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
+        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
 
         for(let s in crgData.teams[t].skaters){
             // For each skater get information
@@ -163,18 +166,18 @@ let updateSkaters = () => {
             }
 
             // Add it to the IGRF
-            let numCellString = [XLSX.utils.encode_cell(numberCell)]
-            let nameCellString = [XLSX.utils.encode_cell(nameCell)]
-            statsbook = insert(statsbook,teamSheet,numCellString,number,'s')
-            statsbook = insert(statsbook,teamSheet,nameCellString,name,'s')
+            workbook.sheet(teamSheet).row(numberCell.r).cell(numberCell.c).value(number)
+            workbook.sheet(teamSheet).row(nameCell.r).cell(nameCell.c).value(name)
             numberCell.r += 1
             nameCell.r += 1
         }
         skaters[teamNames[t]] = team
     }
+
+    return workbook
 }
 
-let updatePenalties = () => {
+let updatePenalties = (workbook) => {
     // Update the penalty data in the statsbook from the CRG data
     let sheet = sbTemplate.penalties.sheetName
 
@@ -182,15 +185,11 @@ let updatePenalties = () => {
     // For each team
 
         for (let p=1; p<3; p++){
-        // For each period            
-            let penaltyCell = XLSX.utils.decode_cell(
-                sbTemplate.penalties[p][teamNames[t]].firstPenalty
-            )
+        // For each period
+            let penaltyCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstPenalty)            
             let pFirstCol = penaltyCell.c
             
-            let jamCell = XLSX.utils.decode_cell(
-                sbTemplate.penalties[p][teamNames[t]].firstJam
-            )
+            let jamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstJam)
             let jFirstCol = jamCell.c
 
             for (let s in crgData.teams[t].skaters){
@@ -206,10 +205,8 @@ let updatePenalties = () => {
                         let code = plist[pen].code
                         let jam = plist[pen].jam
 
-                        let penCellString = XLSX.utils.encode_cell(penaltyCell)
-                        let jamCellString = XLSX.utils.encode_cell(jamCell)
-                        statsbook = insert(statsbook,sheet,penCellString,code,'s')
-                        statsbook = insert(statsbook,sheet,jamCellString,jam,'n')
+                        workbook.sheet(sheet).row(penaltyCell.r).cell(penaltyCell.c).value(code)
+                        workbook.sheet(sheet).row(jamCell.r).cell(jamCell.c).value(jam)
 
                         penaltyCell.c += 1
                         jamCell.c += 1
@@ -226,15 +223,117 @@ let updatePenalties = () => {
             }
         }
     }
+
+    return workbook
 }
 
-let insert = (book, sheet, cell, data, type) => {
-    // Given a workbook, a sheet name, a cell in 'A4' form and data, 
-    // insert the data at the given location.
-    if (!book.Sheets[sheet][cell]){
-        book.Sheets[sheet][cell] = {}
-    }
-    book.Sheets[sheet][cell].v = data
-    book.Sheets[sheet][cell].t = type
-    return book
+let updateScores = (workbook) => {
+    // Process scores.
+    // For the time being, that just means jammers and jam numbers.
+    let scoreSheet = sbTemplate.score.sheetName
+    let lineupSheet = sbTemplate.lineups.sheetName
+    let jamCells = {home: {}, away: {}}
+    let jammerCells = {home: {}, away: {}}
+    let lineupJamCells = {home: {}, away: {}}
+    let lineupJammerCells = {home: {}, away: {}}
+
+    for (let p in crgData.periods){
+        // For each period
+        period = crgData.periods[p].period
+
+        // Get the starting cells for jam number and jammer         
+        teamNames.forEach(team => {
+            jamCells[team] = rowcol(sbTemplate.score[period][team].firstJamNumber)
+            lineupJamCells[team] = rowcol(sbTemplate.lineups[period][team].firstJamNumber)
+            jammerCells[team] = rowcol(sbTemplate.score[period][team].firstJammerNumber)
+            lineupJammerCells[team] = rowcol(sbTemplate.lineups[period][team].firstJammer)
+        })
+
+        for (let j in crgData.periods[p].jams){
+            // For each jam
+
+            // Retrieve the common jam number.
+            let jamNumber = crgData.periods[p].jams[j].jam
+            let starPass = [false, false]
+            
+            for (let t in teamNames){
+                // For each team
+                let team = teamNames[t]
+
+                // TODO - don't barf if jammer wasn't entered
+                // Retrieve the jammer number and check for presence of a star pass
+                let jammerID = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                    x => x.position == 'Jammer'
+                )[0].id
+                let jammerNumber = skaters[teamNames[t]][jammerID].number
+
+                // Add the jam number and jammer number to scores and lineups
+                workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
+                workbook.sheet(lineupSheet).row(lineupJamCells[team].r).cell(lineupJamCells[team].c).value(jamNumber)
+                workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(jammerNumber)
+                workbook.sheet(lineupSheet).row(lineupJammerCells[team].r).cell(lineupJammerCells[team].c).value(jammerNumber)
+
+                // check for star pass
+                starPass[t] = crgData.periods[p].jams[j].teams[t].starPass
+
+                // If there's a star pass on THIS team, add an SP and the pivot's number to scores and lineups
+                if (starPass[t]){
+                    jamCells[team].r += 1
+                    lineupJamCells[team].r += 1
+                    jammerCells[team].r += 1
+                    lineupJammerCells[team].r += 1
+
+                    // TODO - account for missing pivot number.
+                    let pivotID = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                        x => x.position == 'Pivot'
+                    )[0].id
+                    let pivotNumber = skaters[teamNames[t]][pivotID].number    
+
+                    workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP')
+                    workbook.sheet(lineupSheet).row(lineupJamCells[team].r).cell(lineupJamCells[team].c).value('SP')
+                    workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(pivotNumber)
+                    workbook.sheet(lineupSheet).row(lineupJammerCells[team].r).cell(lineupJammerCells[team].c).value(pivotNumber)
+                }
+            }
+
+            // Check for opposite team star passes
+            if(starPass.includes(true)){
+                for(let t in teamNames){
+                    if(!starPass[t]){
+                        // If one team does NOT have a star pass, but a star pass exists:
+                        let team = teamNames[t]
+
+                        jamCells[team].r += 1
+                        lineupJamCells[team].r += 1
+                        jammerCells[team].r += 1
+                        lineupJammerCells[team].r += 1
+    
+                        workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP*')
+                        workbook.sheet(lineupSheet).row(lineupJamCells[team].r).cell(lineupJamCells[team].c).value('SP*')
+
+                    }
+                }
+            }
+
+            for (let t in teamNames){
+                let team = teamNames[t]
+                jamCells[team].r += 1
+                lineupJamCells[team].r += 1
+                jammerCells[team].r += 1
+                lineupJammerCells[team].r += 1        
+            }
+
+        }
+    }    
+
+    return workbook
+}
+
+let rowcol = (rcstring) => {
+    // Return row and col as 1 indexed numbers
+    let [_, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
+    let row = parseInt(rowstr)
+    let col = colstr.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)
+    let robj = {r: row, c: col}
+    return robj
 }
