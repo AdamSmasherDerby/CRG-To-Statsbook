@@ -1,12 +1,12 @@
-//const electron = require('electron')
-const XLSX = require('xlsx')
 const XLP = require('xlsx-populate')
+const moment = require('moment')
+const {dialog} = require('electron').remote
 
 // Page Elements
 let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
-let fileInfoBox = document.getElementById('file-info-box')
-let outBox = document.getElementById('output-box')
+let rightBox = document.getElementById('right-box')
+let bottomBox = document.getElementById('bottom-box')
 let saveNewButton = {}
 
 // Setup Globals
@@ -14,7 +14,6 @@ let crgFilename = '',
     crgData = {},
     statsbookFileName = 'assets/wftda-statsbook-base-us-letter.xlsx',
     sbTemplate = require('../assets/2018statsbook.json'),
-    statsbook = {},
     skaters = {}
 
 const teamNames = ['home','away']
@@ -28,7 +27,7 @@ fileSelect.onchange = (e) => {
     e.stopPropagation
 
     if (e.target.files.length > 1){
-        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
+        rightBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -58,7 +57,7 @@ holder.ondrop = (e) => {
     e.stopPropagation
 
     if (e.dataTransfer.files.length > 1){
-        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
+        rightBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -98,38 +97,39 @@ let readCRGData = (e) => {
             workbook = updateSkaters(workbook)
             workbook = updatePenalties(workbook)
             workbook = updateScores(workbook)
-            return workbook.toFileAsync('./test.xlsx')
+            //return workbook.toFileAsync('./test.xlsx')
+            rightBox.innerHTML = 'Statsbook File Loaded<BR>'
+            createSaveNewButton(workbook)
+            return workbook
         }
     )
-
-    //createSaveNewButton()
     
-
-    // Display Output
-    if(outBox.lastElementChild){
-        outBox.removeChild(outBox.lastElementChild)
-    }
     //outBox.innerHTML = XLSX.utils.sheet_to_html(statsbook.Sheets['Penalties'])
-    outBox.innerHTML = 'Statsbook File Loaded'
+ 
 }
-
-
 
 let updateFileInfoBox = () => {
     // Update File Info Box
-    fileInfoBox.innerHTML = `<strong>Filename:</strong> ${crgFilename}<br>`
-    fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${crgData.identifier.substr(0,10)}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${crgData.teams[0].name}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${crgData.teams[1].name}<br>`
+
+    bottomBox.innerHTML = `<strong>Filename:</strong> ${crgFilename}<br>`
+    bottomBox.innerHTML += `<strong>Game Date:</strong> ${crgData.identifier.substr(0,10)}<br>`
+    bottomBox.innerHTML += `<strong>Team 1:</strong> ${crgData.teams[0].name}<br>`
+    bottomBox.innerHTML += `<strong>Team 2:</strong> ${crgData.teams[1].name}<br>`
+    bottomBox.innerHTML += `<strong>File Loaded:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
 }
 
-let createSaveNewButton = () => {
+let createSaveNewButton = (workbook) => {
 
-    fileInfoBox.innerHTML += '<strong>Save To:</strong> <button id="refresh" type="button" class="btn btn-sm">Blank SB</button>'
-    saveNewButton = document.getElementById('refresh')
+    rightBox.innerHTML += '<strong>Save To:</strong> <button id="save-blank" type="button" class="btn btn-sm">Blank SB</button>'
+    saveNewButton = document.getElementById('save-blank')
 
     saveNewButton.onclick = () => {
-        XLSX.writeFile(statsbook, 'test.xlsx')
+        dialog.showSaveDialog({defaultPath: 'statsbook.xlsx'}, (fileName) => {
+            if (fileName === undefined){
+                return
+            }        
+            workbook.toFileAsync(fileName)
+        })
     }
 }
 
@@ -236,10 +236,11 @@ let updateScores = (workbook) => {
     let jammerCells = {home: {}, away: {}}
     let lineupJamCells = {home: {}, away: {}}
     let lineupJammerCells = {home: {}, away: {}}
+    let lineupNoPivotCells = {home: {}, away: {}}
 
     for (let p in crgData.periods){
         // For each period
-        period = crgData.periods[p].period
+        let period = crgData.periods[p].period
 
         // Get the starting cells for jam number and jammer         
         teamNames.forEach(team => {
@@ -247,6 +248,7 @@ let updateScores = (workbook) => {
             lineupJamCells[team] = rowcol(sbTemplate.lineups[period][team].firstJamNumber)
             jammerCells[team] = rowcol(sbTemplate.score[period][team].firstJammerNumber)
             lineupJammerCells[team] = rowcol(sbTemplate.lineups[period][team].firstJammer)
+            lineupNoPivotCells[team] = rowcol(sbTemplate.lineups[period][team].firstNoPivot)
         })
 
         for (let j in crgData.periods[p].jams){
@@ -260,12 +262,12 @@ let updateScores = (workbook) => {
                 // For each team
                 let team = teamNames[t]
 
-                // TODO - don't barf if jammer wasn't entered
                 // Retrieve the jammer number and check for presence of a star pass
-                let jammerID = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                let jammerList = crgData.periods[p].jams[j].teams[t].skaters.filter(
                     x => x.position == 'Jammer'
-                )[0].id
-                let jammerNumber = skaters[teamNames[t]][jammerID].number
+                )
+                let jammerID = (jammerList.length > 0 ? jammerList[0].id : undefined)
+                let jammerNumber = (jammerID ? skaters[teamNames[t]][jammerID].number : '')
 
                 // Add the jam number and jammer number to scores and lineups
                 workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
@@ -282,17 +284,19 @@ let updateScores = (workbook) => {
                     lineupJamCells[team].r += 1
                     jammerCells[team].r += 1
                     lineupJammerCells[team].r += 1
+                    lineupNoPivotCells[team].r += 1  
 
-                    // TODO - account for missing pivot number.
-                    let pivotID = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                    let pivotList = crgData.periods[p].jams[j].teams[t].skaters.filter(
                         x => x.position == 'Pivot'
-                    )[0].id
-                    let pivotNumber = skaters[teamNames[t]][pivotID].number    
+                    )
+                    let pivotID = (pivotList.length > 0 ? pivotList[0].id : undefined)
+                    let pivotNumber = (pivotID ? skaters[teamNames[t]][pivotID].number : '')
 
                     workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP')
                     workbook.sheet(lineupSheet).row(lineupJamCells[team].r).cell(lineupJamCells[team].c).value('SP')
                     workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(pivotNumber)
                     workbook.sheet(lineupSheet).row(lineupJammerCells[team].r).cell(lineupJammerCells[team].c).value(pivotNumber)
+                    workbook.sheet(lineupSheet).row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X')
                 }
             }
 
@@ -307,6 +311,7 @@ let updateScores = (workbook) => {
                         lineupJamCells[team].r += 1
                         jammerCells[team].r += 1
                         lineupJammerCells[team].r += 1
+                        lineupNoPivotCells[team].r += 1
     
                         workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP*')
                         workbook.sheet(lineupSheet).row(lineupJamCells[team].r).cell(lineupJamCells[team].c).value('SP*')
@@ -320,7 +325,8 @@ let updateScores = (workbook) => {
                 jamCells[team].r += 1
                 lineupJamCells[team].r += 1
                 jammerCells[team].r += 1
-                lineupJammerCells[team].r += 1        
+                lineupJammerCells[team].r += 1
+                lineupNoPivotCells[team].r += 1        
             }
 
         }
@@ -331,7 +337,7 @@ let updateScores = (workbook) => {
 
 let rowcol = (rcstring) => {
     // Return row and col as 1 indexed numbers
-    let [_, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
+    let [, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
     let row = parseInt(rowstr)
     let col = colstr.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)
     let robj = {r: row, c: col}
