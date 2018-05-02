@@ -97,14 +97,11 @@ let readCRGData = (e) => {
             workbook = updateSkaters(workbook)
             workbook = updatePenalties(workbook)
             workbook = updateScores(workbook)
-            //return workbook.toFileAsync('./test.xlsx')
-            rightBox.innerHTML = 'Statsbook File Loaded<BR>'
+            rightBox.innerHTML = 'Statsbook File Loaded<br />'
             createSaveNewButton(workbook)
             return workbook
         }
     )
-    
-    //outBox.innerHTML = XLSX.utils.sheet_to_html(statsbook.Sheets['Penalties'])
  
 }
 
