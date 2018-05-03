@@ -93,20 +93,23 @@ let readCRGData = (e) => {
 
     // Update the "File Information" box
     updateFileInfoBox()
+    createSaveArea()
 
-    // Read in a statsbook to populate
-    //statsbook = XLSX.readFile(statsbookFileName)
-    XLP.fromFileAsync(statsbookFileName).then(
+}
+
+let writeToNewSb = (outFileName) => {
+    // Given an oututput file name, write the game data to a fresh statsbook file.
+    let workbook = XLP.fromFileAsync(statsbookFileName).then(
         workbook => {
             workbook = updateGameData(workbook)
             workbook = updateSkaters(workbook)
             workbook = updatePenalties(workbook)
             workbook = updateScores(workbook)
-            createSaveNewButton(workbook)
+            workbook.toFileAsync(outFileName)
             return workbook
         }
     )
- 
+    return workbook
 }
 
 let updateFileInfoBox = () => {
@@ -119,7 +122,7 @@ let updateFileInfoBox = () => {
     bottomBox.innerHTML += `<strong>File Loaded:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
 }
 
-let createSaveNewButton = (workbook) => {
+let createSaveArea = () => {
 
     rightBox.innerHTML = '<div class="col-12 text-center"><strong>Save To:</strong>&nbsp;<button id="save-blank" type="button" class="btn btn-sm">New StatsBook</button></div>'
     rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
@@ -134,16 +137,16 @@ let createSaveNewButton = (workbook) => {
     rightBox.appendChild(sbBox)
     sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
 
-
-
     saveNewButton = document.getElementById('save-blank')
 
     saveNewButton.onclick = () => {
         dialog.showSaveDialog({defaultPath: 'statsbook.xlsx'}, (fileName) => {
             if (fileName === undefined){
                 return
-            }        
-            workbook.toFileAsync(fileName)
+            }
+            let workbook = writeToNewSb(fileName)        
+            $('*:focus').blur()
+
         })
     }
 }
