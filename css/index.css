@@ -14,6 +14,24 @@ body {
     border-color: #555;
 }
 
+#right-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto
+}
+
+#drag-sb-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    text-align: center;
+    border-style: dashed;
+    border-color: #555;
+    height: 100px;
+}
+
 .box__dragndrop {
     color: #999;
     display: inline;

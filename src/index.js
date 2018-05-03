@@ -20,9 +20,13 @@ const teamNames = ['home','away']
 
 
 fileSelect.onchange = (e) => {
-    if (e.target.value == undefined){
+    
+    $('*:focus').blur()
+
+    if (e.target.value == ''){
         return false
     }
+
     e.preventDefault()
     e.stopPropagation
 
@@ -34,6 +38,7 @@ fileSelect.onchange = (e) => {
     let sbFile = e.target.files[0]
 
     makeReader(sbFile)
+    
     return false
 }
 
@@ -97,7 +102,6 @@ let readCRGData = (e) => {
             workbook = updateSkaters(workbook)
             workbook = updatePenalties(workbook)
             workbook = updateScores(workbook)
-            rightBox.innerHTML = 'Statsbook File Loaded<br />'
             createSaveNewButton(workbook)
             return workbook
         }
@@ -117,7 +121,21 @@ let updateFileInfoBox = () => {
 
 let createSaveNewButton = (workbook) => {
 
-    rightBox.innerHTML += '<strong>Save To:</strong> <button id="save-blank" type="button" class="btn btn-sm">Blank SB</button>'
+    rightBox.innerHTML = '<div class="col-12 text-center"><strong>Save To:</strong>&nbsp;<button id="save-blank" type="button" class="btn btn-sm">New StatsBook</button></div>'
+    rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
+    let sbBox = document.createElement('div')
+    $(sbBox).attr({'class':'col-md-10','id':'drag-sb-file'})
+    let inputArea = document.createElement('input')
+    $(inputArea).attr({'type':'file','name':'sbfile', 'id': 'sbfile-select','class':'inputfile','accept':'.xlsx'})
+    let sbInputLabel = document.createElement('label')
+    sbInputLabel.setAttribute('for','sbfile-select')
+    sbBox.appendChild(inputArea)
+    sbBox.appendChild(sbInputLabel)
+    rightBox.appendChild(sbBox)
+    sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
+
+
+
     saveNewButton = document.getElementById('save-blank')
 
     saveNewButton.onclick = () => {
