@@ -8,6 +8,8 @@ let fileSelect = document.getElementById('file-select')
 let rightBox = document.getElementById('right-box')
 let bottomBox = document.getElementById('bottom-box')
 let saveNewButton = {}
+let sbHolder = {}
+let sbFileSelect = {}
 
 // Setup Globals
 let crgFilename = '',
@@ -31,7 +33,7 @@ fileSelect.onchange = (e) => {
     e.stopPropagation
 
     if (e.target.files.length > 1){
-        rightBox.innerHTML = 'Error: Multiple Files Selected.'
+        bottomBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -62,7 +64,7 @@ holder.ondrop = (e) => {
     e.stopPropagation
 
     if (e.dataTransfer.files.length > 1){
-        rightBox.innerHTML = 'Error: Multiple Files Selected.'
+        bottomBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -95,6 +97,30 @@ let readCRGData = (e) => {
     updateFileInfoBox()
     createSaveArea()
 
+}
+
+let saveToExisting = (outFileName) => {
+    // Given an existing StatsBook file, populate with the CRG Data
+
+    // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
+    // TODO - Parse the skater list in the file and 
+    //  throw warnings for mismatched skater lists
+    // TODO - Parse the skater list in the file and match
+    //  the lines in the IGRF
+
+    // For now, just overwrite the existing file
+
+    let workbook = XLP.fromFileAsync(outFileName).then(
+        workbook => {
+            workbook = updateGameData(workbook)
+            workbook = updateSkaters(workbook)
+            workbook = updatePenalties(workbook)
+            workbook = updateScores(workbook)
+            workbook.toFileAsync(outFileName)
+            return workbook
+        }
+    )
+    return workbook
 }
 
 let writeToNewSb = (outFileName) => {
@@ -138,6 +164,8 @@ let createSaveArea = () => {
     sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
 
     saveNewButton = document.getElementById('save-blank')
+    sbHolder = document.getElementById('drag-sb-file')
+    sbFileSelect = document.getElementById('sbfile-select')
 
     saveNewButton.onclick = () => {
         dialog.showSaveDialog({defaultPath: 'statsbook.xlsx'}, (fileName) => {
@@ -148,6 +176,52 @@ let createSaveArea = () => {
             $('*:focus').blur()
 
         })
+    }
+
+    sbFileSelect.onchange = (e) => {
+        // When 'Select Existing Statsbook File' is clicked
+
+        $('*:focus').blur()
+
+        if (e.target.value == ''){
+            return false
+        }
+
+        e.preventDefault()
+        e.stopPropagation
+
+        let sbFile = e.target.files[0]
+
+        saveToExisting(sbFile.path)
+
+        return false
+    }
+
+    sbHolder.ondrop = (e) => {
+        // When a statsbook file is dropped into the drop zone
+
+        holder.classList.remove('box__ondragover')
+        e.preventDefault()
+        e.stopPropagation
+
+        let sbFile = e.dataTransfer.files[0]
+
+        saveToExisting(sbFile.path)
+        return false
+    }
+
+    sbHolder.ondragover = () => {
+        holder.classList.add('box__ondragover')
+        return false
+    }
+
+    sbHolder.ondragleave = () => {
+        holder.classList.remove('box__ondragover')
+        return false
+    }
+
+    sbHolder.ondragend = () => {
+        return false
     }
 }
 
