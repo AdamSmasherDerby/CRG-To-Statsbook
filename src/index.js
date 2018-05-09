@@ -239,12 +239,22 @@ let updateGameData = (workbook) => {
 }
 
 let updateSkaters = (workbook) => {
-    // read the list of skaters the crgData
+    // Update the skater information.
+
+    // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
         let team = {}
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+        let igrfSkaterList = []
+
+        for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+            // For each line in the sb file, push the number onto a list.
+
+            let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value().toString()
+            igrfSkaterList.push(number)
+        }
 
         for(let s in crgData.teams[t].skaters){
             // For each skater get information
