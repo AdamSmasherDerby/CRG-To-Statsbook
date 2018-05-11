@@ -16,7 +16,8 @@ let crgFilename = '',
     crgData = {},
     statsbookFileName = 'assets/wftda-statsbook-base-us-letter.xlsx',
     sbTemplate = require('../assets/2018statsbook.json'),
-    skaters = {}
+    skaters = {},
+    newSB = true
 
 const teamNames = ['home','away']
 
@@ -102,6 +103,8 @@ let readCRGData = (e) => {
 let saveToExisting = (outFileName) => {
     // Given an existing StatsBook file, populate with the CRG Data
 
+    newSB = false
+
     // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
     // TODO - Parse the skater list in the file and 
     //  throw warnings for mismatched skater lists
@@ -125,6 +128,9 @@ let saveToExisting = (outFileName) => {
 
 let writeToNewSb = (outFileName) => {
     // Given an oututput file name, write the game data to a fresh statsbook file.
+
+    newSB = true
+
     let workbook = XLP.fromFileAsync(statsbookFileName).then(
         workbook => {
             workbook = updateGameData(workbook)
@@ -249,11 +255,14 @@ let updateSkaters = (workbook) => {
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let igrfSkaterList = []
 
-        for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
-            // For each line in the sb file, push the number onto a list.
+        if (!newSB){
+            // If we're writing to an existing statsbook:
 
-            let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value().toString()
-            igrfSkaterList.push(number)
+            for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+                // For each line in the sb file, push the number onto a list.
+                let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
+                if (number != undefined){igrfSkaterList.push(number.toString())}
+                }
         }
 
         for(let s in crgData.teams[t].skaters){
@@ -265,6 +274,13 @@ let updateSkaters = (workbook) => {
             team[crgData.teams[t].skaters[s].id] = {
                 name: name,
                 number: number
+            }
+
+            if(!newSB){
+                // Add the row number on the IGRF for each skater. (zero indexed)
+                let row = igrfSkaterList.indexOf(number)
+                //TODO - throw error for skater on IGRF not in CRG (row = -1)
+                team[crgData.teams[t].skaters[s].id].row = row
             }
 
             // Add it to the IGRF
