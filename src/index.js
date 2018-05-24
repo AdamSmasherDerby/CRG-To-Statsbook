@@ -178,7 +178,7 @@ let createSaveArea = () => {
             if (fileName === undefined){
                 return
             }
-            let workbook = writeToNewSb(fileName)        
+            writeToNewSb(fileName)        
             $('*:focus').blur()
 
         })
@@ -254,6 +254,7 @@ let updateSkaters = (workbook) => {
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let igrfSkaterList = []
+        let row = 0
 
         if (!newSB){
             // If we're writing to an existing statsbook:
@@ -262,7 +263,7 @@ let updateSkaters = (workbook) => {
                 // For each line in the sb file, push the number onto a list.
                 let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
                 if (number != undefined){igrfSkaterList.push(number.toString())}
-                }
+            }
         }
 
         for(let s in crgData.teams[t].skaters){
@@ -278,10 +279,14 @@ let updateSkaters = (workbook) => {
 
             if(!newSB){
                 // Add the row number on the IGRF for each skater. (zero indexed)
-                let row = igrfSkaterList.indexOf(number)
-                //TODO - throw error for skater on IGRF not in CRG (row = -1)
-                team[crgData.teams[t].skaters[s].id].row = row
+                row = igrfSkaterList.indexOf(number)
+                //TODO - throw warning for skater on IGRF not in CRG (row = -1)
+                //TODO - throw error for skater in CRG not on the IGRF
+            } else {
+                // If we're making a new statsbook, just assign the row numbers in order
+                row = s
             }
+            team[crgData.teams[t].skaters[s].id].row = row
 
             // Add it to the IGRF
             workbook.sheet(teamSheet).row(numberCell.r).cell(numberCell.c).value(number)
@@ -304,40 +309,44 @@ let updatePenalties = (workbook) => {
 
         for (let p=1; p<3; p++){
         // For each period
-            let penaltyCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstPenalty)            
-            let pFirstCol = penaltyCell.c
+            let firstPenaltyCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstPenalty)            
+            let pFirstCol = firstPenaltyCell.c
             
-            let jamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstJam)
-            let jFirstCol = jamCell.c
+            let firstJamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstJam)
+            let jFirstCol = firstJamCell.c
 
             for (let s in crgData.teams[t].skaters){
             // For each skater on the team
+
+                let skaterID = crgData.teams[t].skaters[s].id
+                let skaterData = skaters[teamNames[t]][skaterID]
+                let penaltyRow = firstPenaltyCell.r + (skaterData.row * 2)
+                let jamRow = firstJamCell.r + (skaterData.row * 2)
 
                 if(crgData.teams[t].skaters[s].penalties.length > 0){
                     // If they have any penalties, add them
 
                     let plist = crgData.teams[t].skaters[s].penalties
+                    let priorPenalties = plist.filter(x => x.period < p).length
+                    let penaltyCol = pFirstCol + priorPenalties
+                    let jamCol = jFirstCol + priorPenalties
                     plist = plist.filter(x => x.period == p)
+
 
                     for (let pen in plist){
                         let code = plist[pen].code
                         let jam = plist[pen].jam
 
-                        workbook.sheet(sheet).row(penaltyCell.r).cell(penaltyCell.c).value(code)
-                        workbook.sheet(sheet).row(jamCell.r).cell(jamCell.c).value(jam)
+                        workbook.sheet(sheet).row(penaltyRow).cell(penaltyCol).value(code)
+                        workbook.sheet(sheet).row(jamRow).cell(jamCol).value(jam)
 
-                        penaltyCell.c += 1
-                        jamCell.c += 1
+                        penaltyCol += 1
+                        jamCol += 1
                     }
 
                     // If they have a FO or EXP, 
                     // Add that
                 }
-
-                penaltyCell.c = pFirstCol
-                penaltyCell.r += 2
-                jamCell.c = jFirstCol
-                jamCell.r += 2
             }
         }
     }
