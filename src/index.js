@@ -106,10 +106,6 @@ let saveToExisting = (outFileName) => {
     newSB = false
 
     // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
-    // TODO - Parse the skater list in the file and 
-    //  throw warnings for mismatched skater lists
-    // TODO - Parse the skater list in the file and match
-    //  the lines in the IGRF
 
     // For now, just overwrite the existing file
 
@@ -121,8 +117,11 @@ let saveToExisting = (outFileName) => {
             workbook = updateScores(workbook)
             workbook.toFileAsync(outFileName)
             return workbook
-        }
-    )
+    }).catch(e => {
+        //TODO Make this a dialog
+        console.log(e)
+        return
+    })
     return workbook
 }
 
@@ -131,6 +130,7 @@ let writeToNewSb = (outFileName) => {
 
     newSB = true
 
+ 
     let workbook = XLP.fromFileAsync(statsbookFileName).then(
         workbook => {
             workbook = updateGameData(workbook)
@@ -139,9 +139,7 @@ let writeToNewSb = (outFileName) => {
             workbook = updateScores(workbook)
             workbook.toFileAsync(outFileName)
             return workbook
-        }
-    )
-    return workbook
+        })
 }
 
 let updateFileInfoBox = () => {
@@ -280,13 +278,16 @@ let updateSkaters = (workbook) => {
             if(!newSB){
                 // Add the row number on the IGRF for each skater. (zero indexed)
                 row = igrfSkaterList.indexOf(number)
-                //TODO - throw warning for skater on IGRF not in CRG (row = -1)
-                //TODO - throw error for skater in CRG not on the IGRF
+                if (row == -1){
+                    throw `Skater ${number} on team ${t +1} in CRG is not present on the IGRF`
+                }
             } else {
                 // If we're making a new statsbook, just assign the row numbers in order
                 row = s
             }
             team[crgData.teams[t].skaters[s].id].row = row
+
+            //TODO - throw warning for skater on IGRF not in CRG
 
             // Add it to the IGRF
             workbook.sheet(teamSheet).row(numberCell.r).cell(numberCell.c).value(number)
