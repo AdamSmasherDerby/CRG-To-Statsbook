@@ -109,19 +109,29 @@ let saveToExisting = (outFileName) => {
 
     // For now, just overwrite the existing file
 
-    let workbook = XLP.fromFileAsync(outFileName).then(
-        workbook => {
-            workbook = updateGameData(workbook)
-            workbook = updateSkaters(workbook)
-            workbook = updatePenalties(workbook)
-            workbook = updateScores(workbook)
-            workbook.toFileAsync(outFileName)
-            return workbook
-    }).catch(e => {
-        //TODO Make this a dialog
-        console.log(e)
-        return
-    })
+    let workbook = XLP.fromFileAsync(outFileName)
+        .then(
+            workbook => {
+                workbook = updateGameData(workbook)
+                workbook = updateSkaters(workbook)
+                return workbook
+        })
+        .catch(e => {
+                console.log(e)
+                // Get confirmation from user, if yes, return workbook
+                // if no, throw an error to keep code moving
+                throw 'Next Error'
+        })
+        .then(
+                workbook => {
+                workbook = updatePenalties(workbook)
+                workbook = updateScores(workbook)
+                workbook.toFileAsync(outFileName)
+                return workbook
+        })
+        .catch(e => {
+            console.log(e)
+        })
     return workbook
 }
 
