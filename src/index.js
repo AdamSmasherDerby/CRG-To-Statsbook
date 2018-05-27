@@ -117,9 +117,8 @@ let saveToExisting = (outFileName) => {
                 return workbook
         })
         .catch(e => {
+                // This is where you break out if user doesn't want to integrate missing skaters
                 console.log(e)
-                // Get confirmation from user, if yes, return workbook
-                // if no, throw an error to keep code moving
                 throw 'Next Error'
         })
         .then(
@@ -254,6 +253,7 @@ let updateGameData = (workbook) => {
 
 let updateSkaters = (workbook) => {
     // Update the skater information.
+    let skatersNotOnIGRF = []
 
     // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
@@ -286,26 +286,46 @@ let updateSkaters = (workbook) => {
             }
 
             if(!newSB){
-                // Add the row number on the IGRF for each skater. (zero indexed)
+                // If we are updating a new statsbook,
+                // Record the row number on the IGRF for each skater. (zero indexed)
                 row = igrfSkaterList.indexOf(number)
+
                 if (row == -1){
-                    throw `Skater ${number} on team ${t +1} in CRG is not present on the IGRF`
+                    skatersNotOnIGRF.push({team: t+1, number: number})
                 }
+
+                //TODO - throw warning for skater on IGRF not in CRG?
             } else {
                 // If we're making a new statsbook, just assign the row numbers in order
-                row = s
+                row = parseInt(s)
+
+                // Add it to the IGRF
+                workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
+                workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
             }
+
             team[crgData.teams[t].skaters[s].id].row = row
 
-            //TODO - throw warning for skater on IGRF not in CRG
-
-            // Add it to the IGRF
-            workbook.sheet(teamSheet).row(numberCell.r).cell(numberCell.c).value(number)
-            workbook.sheet(teamSheet).row(nameCell.r).cell(nameCell.c).value(name)
-            numberCell.r += 1
-            nameCell.r += 1
         }
+
         skaters[teamNames[t]] = team
+    }
+
+    if (skatersNotOnIGRF.length > 0) {
+        // Throw an error if there are skaters in the scoreboard not on the IGRF
+        let errorMsg = ''
+        for (s in skatersNotOnIGRF){
+            errorMsg += `Team: ${skatersNotOnIGRF[s].team} Number: ${skatersNotOnIGRF[s].number}\n`
+        }
+        dialog.showMessageBox({
+            type: 'question',
+            buttons: ['Add','Cancel'],
+            title: 'CRG to Statsbook',
+            message: 'The following skaters are in the game data, but not present on the IGRF.  Would you like to add them to the IGRF or quit?',
+            detail: errorMsg
+        })
+        // Fix if user wants, throw error if not
+        throw errorMsg
     }
 
     return workbook
