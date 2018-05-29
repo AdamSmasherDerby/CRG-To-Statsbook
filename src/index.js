@@ -286,12 +286,12 @@ let updateSkaters = (workbook) => {
             }
 
             if(!newSB){
-                // If we are updating a new statsbook,
+                // If we are updating an existing statsbook,
                 // Record the row number on the IGRF for each skater. (zero indexed)
                 row = igrfSkaterList.indexOf(number)
 
                 if (row == -1){
-                    skatersNotOnIGRF.push({team: t+1, number: number})
+                    skatersNotOnIGRF.push({team: t, number: number})
                 }
 
                 //TODO - throw warning for skater on IGRF not in CRG?
@@ -313,22 +313,54 @@ let updateSkaters = (workbook) => {
 
     if (skatersNotOnIGRF.length > 0) {
         // Throw an error if there are skaters in the scoreboard not on the IGRF
-        let errorMsg = ''
+        let errorMsg = ''        
+        let emptyRosterSpots = []
+        let neededRosterSpots = []
+        let enoughSpots = []
+
         for (s in skatersNotOnIGRF){
-            errorMsg += `Team: ${skatersNotOnIGRF[s].team} Number: ${skatersNotOnIGRF[s].number}\n`
+            errorMsg += `Team: ${parseInt(skatersNotOnIGRF[s].team)+1} Number: ${skatersNotOnIGRF[s].number}\n`
         }
-        dialog.showMessageBox({
-            type: 'question',
-            buttons: ['Add','Cancel'],
-            title: 'CRG to Statsbook',
-            message: 'The following skaters are in the game data, but not present on the IGRF.  Would you like to add them to the IGRF or quit?',
-            detail: errorMsg
-        })
-        // Fix if user wants, throw error if not
-        throw errorMsg
+
+        for (t in teamNames){
+            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - Object.keys(skaters[teamNames[t]]).length
+            neededRosterSpots[t] = skatersNotOnIGRF.filter(x => x.team == t).length
+            enoughSpots[t] = (true ? emptyRosterSpots[t] >= neededRosterSpots[t] : false)
+        }
+
+        if(enoughSpots.every(x => x == true)){
+            let addSkaters = addSkatersDialog(errorMsg)
+            if (addSKaters){
+                console.log('Do stuff to add skaters')
+            }
+        } else {
+            dialog.showMessageBox({
+                type: 'error',
+                buttons: ['Cancel'],
+                title: 'CRG to Statsbook',
+                message: 'The following skaters are in the scoreboard data,' + 
+                'but not present on the IGRF. There is not enough room on the IGRF to add them.',
+                detail: errorMsg
+            })
+            throw 'MissingSkatersNoRoom'
+        }
     }
 
     return workbook
+}
+
+let addSkatersDialog = (errorMsg) => {
+
+    let addSkaters = dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Add','Cancel'],
+        title: 'CRG to Statsbook',
+        message: 'The following skaters are in the scoreboard data, ' + 
+        'but not present on the IGRF.  Would you like to add them to the IGRF or Cancel?',
+        detail: errorMsg
+    })
+
+    return (true ? addSkaters == 0 : false)
 }
 
 let updatePenalties = (workbook) => {
@@ -501,3 +533,5 @@ let rowcol = (rcstring) => {
     let robj = {r: row, c: col}
     return robj
 }
+
+// TODO - Figure out why the second run doesn't work
