@@ -104,6 +104,7 @@ let saveToExisting = (outFileName) => {
     // Given an existing StatsBook file, populate with the CRG Data
 
     newSB = false
+    skaters = {}
 
     // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
 
@@ -115,19 +116,19 @@ let saveToExisting = (outFileName) => {
                 workbook = updateGameData(workbook)
                 workbook = updateSkaters(workbook)
                 return workbook
-        })
+            })
         .catch(e => {
-                // This is where you break out if user doesn't want to integrate missing skaters
-                console.log(e)
-                throw 'Next Error'
+            // This is where you break out if user doesn't want to integrate missing skaters
+            //console.log(e)
+            throw e
         })
         .then(
-                workbook => {
+            workbook => {
                 workbook = updatePenalties(workbook)
                 workbook = updateScores(workbook)
                 workbook.toFileAsync(outFileName)
                 return workbook
-        })
+            })
         .catch(e => {
             console.log(e)
         })
@@ -138,7 +139,7 @@ let writeToNewSb = (outFileName) => {
     // Given an oututput file name, write the game data to a fresh statsbook file.
 
     newSB = true
-
+    skaters = {}
  
     let workbook = XLP.fromFileAsync(statsbookFileName).then(
         workbook => {
@@ -149,6 +150,10 @@ let writeToNewSb = (outFileName) => {
             workbook.toFileAsync(outFileName)
             return workbook
         })
+        .catch(e => {
+            console.log(e)
+        })
+    return workbook
 }
 
 let updateFileInfoBox = () => {
@@ -263,6 +268,17 @@ let updateSkaters = (workbook) => {
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let igrfSkaterList = []
         let row = 0
+        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+
+        if (crgData.teams[t].skaters.length > maxNum){
+            dialog.showMessageBox({
+                type: 'error',
+                buttons: ['Cancel'],
+                title: 'CRG to Statsbook',
+                message: `There are more than ${maxNum} skaters present in the scoreboard data, the maximum allowable on the IGRF`
+            })
+            throw 'Too Many Skaters'
+        }
 
         if (!newSB){
             // If we're writing to an existing statsbook, record the list of skaters present on the IGRF:
@@ -325,7 +341,7 @@ let updateSkaters = (workbook) => {
             // Determine if there is room to add the missing skaters
             emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - Object.keys(skaters[teamNames[t]]).length
             neededRosterSpots[t] = skatersNotOnIGRF.filter(x => x.team == t).length
-            enoughSpots[t] = (true ? emptyRosterSpots[t] >= neededRosterSpots[t] : false)
+            enoughSpots[t] = (emptyRosterSpots[t] >= neededRosterSpots[t] ? true : false)
         }
 
         if(enoughSpots.every(x => x == true)){
@@ -334,13 +350,8 @@ let updateSkaters = (workbook) => {
             if (addSkaters){
                 // If the user choses to add the skaters, do so
                 for (let t in teamNames){
-                    if (neededRosterSpots[t] == 0) {continue}
                     let row = Object.keys(skaters[teamNames[t]]).length
                     let newSkaters = skatersNotOnIGRF.filter(x => x.team == t)
-                    
-                    let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
-                    let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-                    let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
 
                     for (let s in newSkaters){
                         // Add each new skater to the internal table and assign them the next available row number
@@ -353,7 +364,7 @@ let updateSkaters = (workbook) => {
                     }
 
                     // Get array of skater numbers on this team
-                    let allNumbers = Object.entries(skaters[teamNames[t]]).map(([k,v]) => (v.number))
+                    let allNumbers = Object.values(skaters[teamNames[t]]).map((v) => (v.number))
                     
                     // Put the list in roster order
                     allNumbers.sort()
@@ -361,16 +372,10 @@ let updateSkaters = (workbook) => {
                     // Go through list of skaters on this team.
                     for (let s in Object.keys(skaters[teamNames[t]])){
                         let id = Object.keys(skaters[teamNames[t]])[s]
-                        let name = skaters[teamNames[t]][id].name
-                        let number = skaters[teamNames[t]][id].number
                         
                         // Reassign row number to be index of skater number in sorted list
                         let row = allNumbers.indexOf(skaters[teamNames[t]][id].number)
                         skaters[teamNames[t]][id].row = row
-                        
-                        // Repopulate the IGRF
-                        workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
-                        workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
                     }
 
                 }
@@ -384,7 +389,30 @@ let updateSkaters = (workbook) => {
                 'but not present on the IGRF. There is not enough room on the IGRF to add them.',
                 detail: errorMsg
             })
-            throw 'MissingSkatersNoRoom'
+            throw 'Missing Skaters without room to add'
+        }
+    }
+
+    if (!newSB) {
+        // If this is an existing statsbook rewrite all the names and numbers
+        // *even if there were no errors*.  I have no idea why this is necessary,
+        // but it breaks conditional formatting if you dont' do it.
+        for (let t in teamNames){
+            let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
+            let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
+            let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+
+            // Go through list of skaters on this team.
+            for (let s in Object.keys(skaters[teamNames[t]])){
+                let id = Object.keys(skaters[teamNames[t]])[s]
+                let name = skaters[teamNames[t]][id].name
+                let number = skaters[teamNames[t]][id].number
+                let row = skaters[teamNames[t]][id].row
+                
+                // Repopulate the IGRF
+                workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
+                workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
+            }
         }
     }
 
@@ -402,7 +430,7 @@ let addSkatersDialog = (errorMsg) => {
         detail: errorMsg
     })
 
-    return (true ? addSkaters == 0 : false)
+    return (addSkaters == 0 ? true : false)
 }
 
 let updatePenalties = (workbook) => {
