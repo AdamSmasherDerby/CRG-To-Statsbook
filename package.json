@@ -22,5 +22,40 @@
     "xlsx": "^0.12.10",
     "xlsx-populate": "^1.14.0",
     "xlsx-style": "^0.8.13"
+  },
+  "build": {
+    "appId": "crgdatatool",
+    "productName": "CRG Data Tool",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "icon": "build/flamingo-white.png",
+      "target": [
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/flamingo-white.ico"
+    },
+    "nsis": {
+      "license": "LICENSE"
+    }
   }
 }
