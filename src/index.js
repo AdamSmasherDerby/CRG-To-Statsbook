@@ -130,6 +130,7 @@ let saveToExisting = (outFileName) => {
                 workbook = updatePenalties(workbook)
                 workbook = updateScores(workbook)
                 workbook.toFileAsync(outFileName)
+                writeCompleteDialog(outFileName)
                 return workbook
             })
         .catch(e => {
@@ -151,12 +152,22 @@ let writeToNewSb = (outFileName) => {
             workbook = updatePenalties(workbook)
             workbook = updateScores(workbook)
             workbook.toFileAsync(outFileName)
+            writeCompleteDialog(outFileName)
             return workbook
         })
         .catch(e => {
             console.log(e)
         })
     return workbook
+}
+
+let writeCompleteDialog = (outFileName) => {
+    dialog.showMessageBox({
+        type: 'info',
+        buttons: ['OK'],
+        title: 'CRG to Statsbook',
+        message: `Scoreboard data successfully written to ${outFileName}`
+    })
 }
 
 let updateFileInfoBox = () => {
