@@ -259,6 +259,7 @@ let updateGameData = (workbook) => {
 let updateSkaters = (workbook) => {
     // Update the skater information.
     let skatersNotOnIGRF = []
+    let skatersOnIGRF = {}
 
     // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
@@ -266,9 +267,9 @@ let updateSkaters = (workbook) => {
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
-        let igrfSkaterList = []
         let row = 0
         let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+        skatersOnIGRF[teamNames[t]] = []
 
         if (crgData.teams[t].skaters.length > maxNum){
             dialog.showMessageBox({
@@ -284,7 +285,7 @@ let updateSkaters = (workbook) => {
             // If we're writing to an existing statsbook, record the list of skaters present on the IGRF:
             for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
                 let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
-                if (number != undefined){igrfSkaterList.push(number.toString())}
+                if (number != undefined){skatersOnIGRF[teamNames[t]].push(number.toString())}
             }
         }
 
@@ -297,7 +298,7 @@ let updateSkaters = (workbook) => {
             if(!newSB){
                 // If we are updating an existing statsbook,
                 // Record the row number on the IGRF for each skater. (zero indexed)
-                row = igrfSkaterList.indexOf(number)
+                row = skatersOnIGRF[teamNames[t]].indexOf(number)
 
                 if (row == -1){
                     skatersNotOnIGRF.push({team: t, number: number, name:name, id: id})
@@ -339,7 +340,7 @@ let updateSkaters = (workbook) => {
 
         for (let t in teamNames){
             // Determine if there is room to add the missing skaters
-            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - Object.keys(skaters[teamNames[t]]).length
+            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - skatersOnIGRF[teamNames[t]].length
             neededRosterSpots[t] = skatersNotOnIGRF.filter(x => x.team == t).length
             enoughSpots[t] = (emptyRosterSpots[t] >= neededRosterSpots[t] ? true : false)
         }
