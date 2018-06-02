@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.1.0",
+    "electron-debug": "^2.0.0",
     "jquery": "^3.3.1",
     "moment": "^2.22.1",
     "popper.js": "1.14.0",
@@ -58,7 +59,12 @@
       "icon": "build/flamingo-white.ico"
     },
     "nsis": {
-      "license": "LICENSE"
-    }
+      "license": "LICENSE",
+      "createDesktopShortcut": false
+    },
+    "extraFiles": [
+      "assets/wftda-statsbook-base-us-letter.xlsx",
+      "assets/2018statsbook.json"
+    ]
   }
 }

@@ -1,7 +1,7 @@
 const {app, BrowserWindow, Menu, dialog} = require('electron')
 const path = require('path')
 const url = require('url')
-//const ipc = require('electron').ipcMain
+require('electron-debug')({enabled: false})
 
 let menu,
     win
