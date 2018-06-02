@@ -23,6 +23,7 @@ const teamNames = ['home','away']
 
 
 fileSelect.onchange = (e) => {
+    // When a CRG file is selected by clicking.
     
     $('*:focus').blur()
 
@@ -60,6 +61,8 @@ holder.ondragend = () => {
 }
 
 holder.ondrop = (e) => {
+    // When a CRG File is dropped into the drop zone.
+
     holder.classList.remove('box__ondragover')
     e.preventDefault()
     e.stopPropagation

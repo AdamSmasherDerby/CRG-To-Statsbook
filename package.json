@@ -63,8 +63,7 @@
       "createDesktopShortcut": false
     },
     "extraFiles": [
-      "assets/wftda-statsbook-base-us-letter.xlsx",
-      "assets/2018statsbook.json"
+      "assets/wftda-statsbook-base-us-letter.xlsx"
     ]
   }
 }
