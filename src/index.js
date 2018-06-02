@@ -463,6 +463,9 @@ let updatePenalties = (workbook) => {
             let firstJamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstJam)
             let jFirstCol = firstJamCell.c
 
+            let firstFOCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstFO)
+            let firstFOJamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstFOJam)
+
             for (let s in crgData.teams[t].skaters){
             // For each skater on the team
 
@@ -470,16 +473,18 @@ let updatePenalties = (workbook) => {
                 let skaterData = skaters[teamNames[t]][skaterID]
                 let penaltyRow = firstPenaltyCell.r + (skaterData.row * 2)
                 let jamRow = firstJamCell.r + (skaterData.row * 2)
+                let lastPenaltyCode = 'EXP'
 
                 if(crgData.teams[t].skaters[s].penalties.length > 0){
                     // If they have any penalties, add them
 
                     let plist = crgData.teams[t].skaters[s].penalties
+                    lastPenaltyCode = plist[plist.length-1].code
+
                     let priorPenalties = plist.filter(x => x.period < p).length
                     let penaltyCol = pFirstCol + priorPenalties
                     let jamCol = jFirstCol + priorPenalties
                     plist = plist.filter(x => x.period == p)
-
 
                     for (let pen in plist){
                         let code = plist[pen].code
@@ -492,8 +497,20 @@ let updatePenalties = (workbook) => {
                         jamCol += 1
                     }
 
-                    // If they have a FO or EXP, 
-                    // Add that
+                }
+
+                if(crgData.teams[t].skaters[s].hasOwnProperty('fo_exp')){
+                    let code = ''
+                    if (crgData.teams[t].skaters[s].fo_exp.code == 'FO'){
+                        code = 'FO'
+                    } else if (crgData.teams[t].skaters[s].fo_exp.code == 'EXP'){
+                        code = lastPenaltyCode
+                    } else {
+                        code = '??'
+                    }
+                    let jam = crgData.teams[t].skaters[s].fo_exp.jam
+                    workbook.sheet(sheet).row(penaltyRow).cell(firstFOCell.c).value(code)
+                    workbook.sheet(sheet).row(jamRow).cell(firstFOJamCell.c).value(jam)
                 }
             }
         }
