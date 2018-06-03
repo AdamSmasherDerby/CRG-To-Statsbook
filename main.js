@@ -1,15 +1,18 @@
 const {app, BrowserWindow, Menu, dialog} = require('electron')
 const path = require('path')
 const url = require('url')
+const ipc = require('electron').ipcMain
+const isDev = require('electron-is-dev')
 require('electron-debug')({enabled: false})
 
 let menu,
-    win
+    win,
+    aboutWin
 
 let createWindow = () => {
     win = new BrowserWindow({
         title: 'CRG Data Tool',
-        //icon: __dirname + '/build/flamingo-white.png',
+        icon: __dirname + '/build/flamingo-white.png',
         width: 800, 
         height: 600
     })
@@ -20,12 +23,28 @@ let createWindow = () => {
         slashes: true
     }))
 
-    if (isDev()){
+    if (isDev){
         win.webContents.openDevTools()
     }
 
     win.on('closed', ()=> {
         win=null
+    })
+
+    win.webContents.on('crashed', ()=> {
+        dialog.showMessageBox(win, {
+            type: 'error',
+            title: 'CRG Data Tool',
+            message: 'CRG Data Tool has crashed.  This should probably not surprise you.'
+        })
+    })
+
+    win.on('unresponsive', ()=> {
+        dialog.showMessageBox(win, {
+            type: 'error',
+            title: 'CRG Data Tool',
+            message: 'CRG Data Tool has become unresponsive.  Perhaps you should give it some personal space.'
+        })
     })
 
     menu = Menu.buildFromTemplate([
@@ -45,14 +64,7 @@ let createWindow = () => {
             submenu: [
                 {   label: 'About',
                     click: function(){
-                        dialog.showMessageBox({
-                            type: 'info',
-                            title: 'CRG Data Tool',
-                            message: (`CRG Data Tool Version: ${app.getVersion()}\n` +
-                                'by: Adam Smasher (Daniel Alt)\n' +
-                                'https://github.com/AdamSmasherDerby/CRGDataTool/releases/' 
-                            )
-                        })
+                        openAbout()
                     }
                 }
             ]    
@@ -77,7 +89,58 @@ app.on('activate',() => {
     }
 })
 
-let isDev = () => {
-    return process.mainModule.filename.indexOf('app.asar') === -1
+let openAbout = () => {
+    aboutWin = new BrowserWindow({
+        parent: win,
+        title: 'CRG Data Tool',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 300,
+        height: 300,
+        x: win.getPosition()[0] + 250,
+        y: win.getPosition()[1] + 150
+    })
+
+    aboutWin.setMenu(null)
+
+    aboutWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'src/about.html'),
+        protocol: 'file',
+        slashes: true
+    }))
+
+    aboutWin.webContents.on('new-window', function(e, url) {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
+
+    aboutWin.on('closed', () => {
+        aboutWin = null
+    })
+
+    aboutWin.webContents.on('did-finish-load', () => {
+        aboutWin.webContents.send('set-version', app.getVersion())
+    })
+    
 }
 
+ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
+    dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'CRG Data Tool',
+        message: `CRG Data Tool has encountered an error.
+        Here's some details:
+        Message: ${msg}
+        URL: ${url}
+        Line Number: ${lineNo}
+        Column Number: ${columnNo}
+        Does this help?  It probably doesn't help.`
+    })
+})
+
+process.on('uncaughtException', (err) => {
+    dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'CRG Data Tool',
+        message: `CRG Data Tool has had an uncaught exception in main.js.  Does this help? (Note: will probably not help.) ${err}`
+    })       
+})

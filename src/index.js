@@ -1,6 +1,7 @@
 const XLP = require('xlsx-populate')
 const moment = require('moment')
 const {dialog} = require('electron').remote
+const {ipc} = require('electron').ipcRenderer
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -631,6 +632,11 @@ let rowcol = (rcstring) => {
     let col = colstr.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)
     let robj = {r: row, c: col}
     return robj
+}
+
+window.onerror = (msg, url, lineNo, columnNo) => {
+    ipc.send('error-thrown', msg, url, lineNo, columnNo)
+    return false
 }
 
 // TODO - Figure out why the second run doesn't work
