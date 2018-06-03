@@ -117,7 +117,9 @@ let saveToExisting = (outFileName) => {
     let workbook = XLP.fromFileAsync(outFileName)
         .then(
             workbook => {
-                workbook = updateGameData(workbook)
+                // Do not update general game data in this case,
+                // as the manually entered data will almost certainly be
+                // more accurate.
                 workbook = updateSkaters(workbook)
                 return workbook
             })
@@ -130,6 +132,7 @@ let saveToExisting = (outFileName) => {
             workbook => {
                 workbook = updatePenalties(workbook)
                 workbook = updateScores(workbook)
+                workbook = updateGameClock(workbook)
                 workbook.toFileAsync(outFileName)
                 writeCompleteDialog(outFileName)
                 return workbook
@@ -146,16 +149,26 @@ let writeToNewSb = (outFileName) => {
     newSB = true
     skaters = {}
  
-    let workbook = XLP.fromFileAsync(statsbookFileName).then(
-        workbook => {
-            workbook = updateGameData(workbook)
-            workbook = updateSkaters(workbook)
-            workbook = updatePenalties(workbook)
-            workbook = updateScores(workbook)
-            workbook.toFileAsync(outFileName)
-            writeCompleteDialog(outFileName)
-            return workbook
+    let workbook = XLP.fromFileAsync(statsbookFileName)
+        .then(
+            workbook => {
+                workbook = updateGameData(workbook)
+                return workbook
+            })
+        .catch(e => {
+            // Throw errors in the first write. (e.g., file already open.)
+            throw e
         })
+        .then(
+            workbook => {
+                workbook = updateSkaters(workbook)
+                workbook = updatePenalties(workbook)
+                workbook = updateScores(workbook)
+                workbook = updateGameClock(workbook)
+                workbook.toFileAsync(outFileName)
+                writeCompleteDialog(outFileName)
+                return workbook
+            })
         .catch(e => {
             console.log(e)
         })
@@ -621,6 +634,29 @@ let updateScores = (workbook) => {
 
         }
     }    
+
+    return workbook
+}
+
+let updateGameClock = (workbook) => {
+    // Update Game Clock sheet
+    let clockSheet = sbTemplate.clock.sheetName
+    let timeRe = /(\d):(\d\d)(\.\d+)*/
+
+    for (let p in crgData.periods){
+    // For each period
+        let period = crgData.periods[p].period
+        let jamTimeCell = rowcol(sbTemplate.clock[period].firstJamTime)
+
+        for (let j in crgData.periods[p].jams){
+        // For each jam
+            let rawJamTime = crgData.periods[p].jams[j].jamLength
+            let jamTimeReResult = timeRe.exec(rawJamTime)
+            let jamTime = `${jamTimeReResult[1]}:${jamTimeReResult[2]}`
+            workbook.sheet(clockSheet).row(jamTimeCell.r).cell(jamTimeCell.c).value(jamTime)
+            jamTimeCell.r += 1
+        }
+    }
 
     return workbook
 }

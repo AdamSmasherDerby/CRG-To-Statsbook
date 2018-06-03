@@ -17,6 +17,7 @@ At present, this tool can populate the following information from the game data 
 * Team Rosters with name and number
 * Jam Numbers, including star passes if entered
 * Jammer numbers, if entered
+* Pivot numbers, if entered
 * Penalty codes, if entered
 * Foul Outs, if entered
 * Expulsions, sort of.
