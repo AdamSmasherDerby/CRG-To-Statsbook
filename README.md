@@ -6,7 +6,7 @@ Although the software uses data from both CRG Scoreboard and WFTDA, it is not pr
 
 ## Limitations
 
-At present, CRG Scoreboard does not record enough data for a full statsbook, and in particular, does not recordpoints per scoring trip.  As such, it is not possible to use this data file to fully populate the score sheet of the StatsBook at this time.  
+At present, CRG Scoreboard does not record enough data for a full statsbook, and in particular, does not record points per scoring trip.  As such, it is not possible to use this data file to fully populate the score sheet of the StatsBook at this time.  
 
 ## Current Abilities
 
