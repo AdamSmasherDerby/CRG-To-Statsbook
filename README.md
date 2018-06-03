@@ -22,14 +22,20 @@ At present, this tool can populate the following information from the game data 
 * Foul Outs, if entered
 * Expulsions, sort of.
     * Note that CRG does not currently record the penalty code for expulsions.  The tool will assume that the last penalty recorded for an expelled skater is the one for which they were expelled.  The user should manually verify that this (and frankly, every other darn thing this program does) is correct.
+* Jam times on the Game Clock sheet.  Because why not?
 
-
+Flamingo icon from http://www.iconsmind.com
 
 Installable binaries are located at:
 https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 
+## Installation instructions:
 
-Flamingo icon from http://www.iconsmind.com
+*Windows:* Download and run <code>CRG Data Tool Setup.x.x.x-Windows.exe</code>
+
+*Mac:* Download and run the <code>CRG Data Tool-x.x.x.dmg</code> file. Drag the flamingo onto the folder. Right or control click the StatsBook Tool program and select "open." Agree to run the software, despite dire warnings of awful consequences. (The awful consequences are that I have not ponied up $100 for a Developer certificate to sign the code.)
+
+*Linux:* Download <code>crgdataktool-x.x.x-x86_64.AppImage</code>, then type "chmod a+x crgdatatool-x.x.x-x86_64.AppImage" to make the file executable. 
 
 ### Release Notes
 
