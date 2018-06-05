@@ -2,6 +2,9 @@ const XLP = require('xlsx-populate')
 const moment = require('moment')
 const {dialog} = require('electron').remote
 const {ipc} = require('electron').ipcRenderer
+const remote = require('electron').remote
+const path = require('path')
+const BrowserWindow = remote.BrowserWindow
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -101,7 +104,24 @@ let readCRGData = (e) => {
     // Update the "File Information" box
     updateFileInfoBox()
     createSaveArea()
+    editSkatersWindow(crgData)
+}
 
+let editSkatersWindow = (crgData) => {
+    const modalPath = path.join('file://', __dirname, 'editskaters.html')
+    let win = new BrowserWindow({ 
+        frame: false,
+        parent: remote.getCurrentWindow(),
+        modal: true 
+    })
+    win.on('close', function () { win = null })
+    win.loadURL(modalPath)
+    win.webContents.openDevTools()
+    win.show()
+
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.send('send-skater-list', JSON.stringify(crgData))
+    })
 }
 
 let saveToExisting = (outFileName) => {
