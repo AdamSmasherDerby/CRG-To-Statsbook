@@ -1,7 +1,7 @@
 const XLP = require('xlsx-populate')
 const moment = require('moment')
 const {dialog} = require('electron').remote
-const {ipc} = require('electron').ipcRenderer
+const ipc = require('electron').ipcRenderer
 const remote = require('electron').remote
 const path = require('path')
 const BrowserWindow = remote.BrowserWindow
@@ -104,24 +104,6 @@ let readCRGData = (e) => {
     // Update the "File Information" box
     updateFileInfoBox()
     createSaveArea()
-    editSkatersWindow(crgData)
-}
-
-let editSkatersWindow = (crgData) => {
-    const modalPath = path.join('file://', __dirname, 'editskaters.html')
-    let win = new BrowserWindow({ 
-        frame: false,
-        parent: remote.getCurrentWindow(),
-        modal: true 
-    })
-    win.on('close', function () { win = null })
-    win.loadURL(modalPath)
-    win.webContents.openDevTools()
-    win.show()
-
-    win.webContents.on('did-finish-load', () => {
-        win.webContents.send('send-skater-list', JSON.stringify(crgData))
-    })
 }
 
 let saveToExisting = (outFileName) => {
@@ -131,8 +113,6 @@ let saveToExisting = (outFileName) => {
     skaters = {}
 
     // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
-
-    // For now, just overwrite the existing file
 
     let workbook = XLP.fromFileAsync(outFileName)
         .then(
@@ -304,7 +284,38 @@ let updateGameData = (workbook) => {
     return workbook
 }
 
-let updateSkaters = (workbook) => {
+let editSkatersWindow = (crgData, skatersOnIGRF) => new Promise((resolve) => {
+    const modalPath = path.join('file://', __dirname, 'editskaters.html')
+    let win = new BrowserWindow({ 
+        parent: remote.getCurrentWindow(),
+        modal: true,
+        icon: __dirname + '/build/flamingo-white.png'
+    })
+    win.setMenu(null)
+    win.on('close', function () { 
+        win = null
+        ipc.send('skater-window-closed')
+    })
+    win.loadURL(modalPath)
+    win.webContents.openDevTools()
+    win.show()
+
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF))
+    })
+
+    ipc.on('table-generated', () => {
+        console.log('Table Generated!')
+    })
+
+    ipc.on('skater-window-closed', () => {
+        console.log('Skater window closed')
+        resolve()
+    })
+})
+
+
+let updateSkaters = async (workbook) => {
     // Update the skater information.
     let skatersNotOnIGRF = []
     let skatersOnIGRF = {}
@@ -372,6 +383,10 @@ let updateSkaters = (workbook) => {
 
         // Add each team to the "skaters" object
         skaters[teamNames[t]] = team
+    }
+
+    if (!newSB){
+        await editSkatersWindow(crgData,skatersOnIGRF)  // Eventually move somewhere else
     }
 
     if (skatersNotOnIGRF.length > 0) {

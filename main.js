@@ -132,6 +132,14 @@ let openAbout = () => {
     
 }
 
+ipc.on('table-generated', () => {
+    win.webContents.send('table-generated')
+})
+
+ipc.on('skater-window-closed', () => {
+    win.webContents.send('skater-window-closed')
+})
+
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
     dialog.showMessageBox(win, {
         type: 'error',
