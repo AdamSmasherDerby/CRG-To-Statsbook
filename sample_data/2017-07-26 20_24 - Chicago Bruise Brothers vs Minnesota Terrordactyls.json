@@ -1,0 +1,1997 @@
+{
+  "identifier": "2017-07-26 20:24 - Chicago Bruise Brothers vs Minnesota Terrordactyls",
+  "teams": [
+    {
+      "alternateNames": {"scoreboard": ""},
+      "name": "Chicago Bruise Brothers",
+      "logo": "/images/teamlogo/Chicago Bruise Brothers.png",
+      "team": "1",
+      "skaters": [
+        {
+          "number": "0966",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 6,
+              "id": "0f51a6b0-08e5-42ea-9c23-f8da17cdd558"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 7,
+              "id": "5e945636-de32-41f0-b7da-0a44b400c967"
+            }
+          ],
+          "name": "Mickey Phoenix",
+          "flags": "",
+          "id": "3ee0628b-1167-42b8-be73-742261c2da94"
+        },
+        {
+          "number": "119",
+          "penalties": [],
+          "name": "Alex in Wonderslam",
+          "flags": "",
+          "id": "b10c3ae7-cf97-4f1a-8855-f7fe0e06dfe0"
+        },
+        {
+          "number": "14",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "X",
+              "jam": 12,
+              "id": "6bbcc64c-9a53-4703-98aa-490808496669"
+            },
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 6,
+              "id": "9211fed6-fdba-406d-b736-041b42c70a59"
+            }
+          ],
+          "name": "The Senator",
+          "flags": "",
+          "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa"
+        },
+        {
+          "fo_exp": {
+            "period": 2,
+            "code": "EXP",
+            "jam": 3,
+            "id": "8cf8687a-7cee-4067-9091-65d113eb9485"
+          },
+          "number": "15",
+          "penalties": [{
+            "period": 1,
+            "code": "B",
+            "jam": 14,
+            "id": "7cbff244-7fef-437f-936b-d5664ee8d257"
+          }],
+          "name": "Smacaroni",
+          "flags": "",
+          "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787"
+        },
+        {
+          "number": "16",
+          "penalties": [
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 7,
+              "id": "da275843-8ff5-4e22-a940-f60167059d07"
+            },
+            {
+              "period": 2,
+              "code": "M",
+              "jam": 15,
+              "id": "de26b0d4-2861-4d51-8c92-8ff964b3aa28"
+            }
+          ],
+          "name": "Markimedes",
+          "flags": "",
+          "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26"
+        },
+        {
+          "number": "19",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 12,
+              "id": "a695f9b2-8e55-46db-839c-9477dcdc8818"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 14,
+              "id": "fa0504f7-2452-4d50-b670-0fe33184ebc0"
+            }
+          ],
+          "name": "Ragna Rocker",
+          "flags": "",
+          "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd"
+        },
+        {
+          "number": "1928",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "B",
+              "jam": 9,
+              "id": "630b0d6b-a3ca-470f-a3a2-fb08f7a39891"
+            },
+            {
+              "period": 1,
+              "code": "L",
+              "jam": 15,
+              "id": "9b1247c6-3fcc-40b9-9676-76a04070d080"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 11,
+              "id": "48b8410e-22f3-441a-8d0f-b0511f8b289a"
+            }
+          ],
+          "name": "Steampunk Willie",
+          "flags": "",
+          "id": "40b8f6fa-5c40-4f0e-8449-ea659cbbd78c"
+        },
+        {
+          "number": "27",
+          "penalties": [{
+            "period": 2,
+            "code": "X",
+            "jam": 4,
+            "id": "55707010-df8e-4b4a-acf9-19679aedba46"
+          }],
+          "name": "Deacon Struct",
+          "flags": "",
+          "id": "d8980763-30dd-4581-a914-f3b1ed1b8a44"
+        },
+        {
+          "number": "333",
+          "penalties": [],
+          "name": "Orange Whip",
+          "flags": "",
+          "id": "d10df43a-e72b-485b-a0a2-81ea3213242a"
+        },
+        {
+          "number": "411",
+          "penalties": [{
+            "period": 2,
+            "code": "X",
+            "jam": 8,
+            "id": "1b43a73d-66c3-4663-848e-66bd30531ac7"
+          }],
+          "name": "Trivy Al Pursuit",
+          "flags": "",
+          "id": "b12a0e7d-7123-473d-8235-a01729f4608a"
+        },
+        {
+          "number": "627",
+          "penalties": [
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 7,
+              "id": "7b6c6d11-f769-4939-b4db-14450cd5b7ef"
+            },
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 16,
+              "id": "b41492dd-caa0-4c1b-af20-fd5ef9ebaaa6"
+            }
+          ],
+          "name": "Princess A. Pauling",
+          "flags": "",
+          "id": "e4640d63-0dff-4578-8434-5ec562d8c87d"
+        },
+        {
+          "number": "67",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 14,
+              "id": "68712c6c-7d34-42ad-ac09-c3716fd06874"
+            },
+            {
+              "period": 1,
+              "code": "L",
+              "jam": 16,
+              "id": "6eea04d2-2c4b-468a-a7b8-3195c326e25a"
+            },
+            {
+              "period": 2,
+              "code": "C",
+              "jam": 15,
+              "id": "6b63862d-dfcf-4461-bbef-886d21e0f4d6"
+            }
+          ],
+          "name": "June Gloom",
+          "flags": "",
+          "id": "d7899dee-bb36-4aed-9b18-0791ffc6875b"
+        },
+        {
+          "number": "88",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 17,
+              "id": "ffad4e13-9bd6-4673-b335-7b8c1ec1d8d2"
+            },
+            {
+              "period": 2,
+              "code": "O",
+              "jam": 5,
+              "id": "9c2634f7-e4a5-43c4-9b7d-909692b5f4b3"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 11,
+              "id": "26cb8e5d-c2ee-448a-837c-7f0cc8f7cb88"
+            }
+          ],
+          "name": "Up and Adam",
+          "flags": "",
+          "id": "daa25cab-7253-4d21-b434-990b44dd6d46"
+        }
+      ],
+      "colors": {}
+    },
+    {
+      "alternateNames": {"scoreboard": ""},
+      "name": "Twin City Terrordactyls",
+      "logo": "/images/teamlogo/TwinCityTerrordactyls.png",
+      "team": "2",
+      "skaters": [
+        {
+          "number": "0406",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "C",
+              "jam": 13,
+              "id": "ae5e543c-6944-46cd-a0f8-d5b6c3ffd87c"
+            },
+            {
+              "period": 1,
+              "code": "B",
+              "jam": 15,
+              "id": "34600315-fec2-4052-a5f4-069ac4410c2b"
+            },
+            {
+              "period": 2,
+              "code": "F",
+              "jam": 15,
+              "id": "2f60c29d-ebec-4e73-8f20-6c2a0bfc9688"
+            },
+            {
+              "period": 2,
+              "code": "F",
+              "jam": 15,
+              "id": "8d8b9dc2-3c3e-4e02-9af8-83189237a02a"
+            }
+          ],
+          "name": "Paul of Duty",
+          "flags": "",
+          "id": "62f4c43b-cdd2-450c-9ae5-74e489b95bff"
+        },
+        {
+          "number": "1775",
+          "penalties": [
+            {
+              "period": 2,
+              "code": "C",
+              "jam": 4,
+              "id": "942f6f6a-ed65-42c3-97d3-b3f957fdc465"
+            },
+            {
+              "period": 2,
+              "code": "I",
+              "jam": 9,
+              "id": "ec406e1c-2938-4535-a719-fea47c0b8299"
+            },
+            {
+              "period": 2,
+              "code": "M",
+              "jam": 12,
+              "id": "1ce6dc8d-68b4-477e-a329-4f5623cd90e4"
+            }
+          ],
+          "name": "Tyler Derbin",
+          "flags": "",
+          "id": "d5747928-3ed8-46e6-926b-cbe581a20937"
+        },
+        {
+          "number": "187",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "L",
+              "jam": 3,
+              "id": "47c94618-eca1-4582-9594-771d9e9798bd"
+            },
+            {
+              "period": 1,
+              "code": "X",
+              "jam": 12,
+              "id": "abadd863-14fe-4a3a-890c-a35303bdb618"
+            },
+            {
+              "period": 1,
+              "code": "M",
+              "jam": 15,
+              "id": "73cf5285-196c-4a44-8a0d-7aec3fe8904e"
+            }
+          ],
+          "name": "Citizen Canine",
+          "flags": "",
+          "id": "ed026344-c091-4ca5-b3bc-d31bb99286c1"
+        },
+        {
+          "number": "2",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 12,
+              "id": "4787cc82-7214-4668-b47b-110a7bb357aa"
+            },
+            {
+              "period": 2,
+              "code": "M",
+              "jam": 10,
+              "id": "aafb3130-e647-4933-82a8-2973cd3d379e"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 16,
+              "id": "68cdf832-eba2-4250-80f2-553e78536502"
+            }
+          ],
+          "name": "E Nigma",
+          "flags": "",
+          "id": "ab55ddc7-b6cf-423d-b656-760b4958a699"
+        },
+        {
+          "number": "2000",
+          "penalties": [{
+            "period": 2,
+            "code": "O",
+            "jam": 11,
+            "id": "6d589647-6402-4d4a-80d6-9b022890137b"
+          }],
+          "name": "David Smashelhoff",
+          "flags": "",
+          "id": "cf863c04-17a9-4775-b0b4-929a716bbd5f"
+        },
+        {
+          "number": "22",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "L",
+              "jam": 6,
+              "id": "81f6d3e2-83b8-4a8d-89ed-a2d0b906ff32"
+            },
+            {
+              "period": 1,
+              "code": "I",
+              "jam": 6,
+              "id": "b8d47ca9-9fae-40b8-8988-d414dfa86cd3"
+            },
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 4,
+              "id": "8c24033f-68ae-4a28-9eb6-a57bdf6347ac"
+            },
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 4,
+              "id": "8d184a6f-412d-48e5-bbf0-13f72b178108"
+            }
+          ],
+          "name": "Live Bait",
+          "flags": "",
+          "id": "cb0cd3dd-56f3-4392-a86f-0ccb9e669215"
+        },
+        {
+          "number": "230",
+          "penalties": [],
+          "name": "Scary Busey",
+          "flags": "",
+          "id": "1775b994-ea80-45c0-90cf-7eae66417de2"
+        },
+        {
+          "number": "317",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "P",
+              "jam": 3,
+              "id": "60a90ca1-ec1c-4f66-8f9b-ec5d9312fad2"
+            },
+            {
+              "period": 2,
+              "code": "M",
+              "jam": 12,
+              "id": "3d1a5d96-709b-4abf-aaf1-097974ff690e"
+            }
+          ],
+          "name": "Slamrock Shake",
+          "flags": "",
+          "id": "ecb9c255-dfae-41fe-a954-37ebcc5a009e"
+        },
+        {
+          "number": "373",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "X",
+              "jam": 20,
+              "id": "bb3c0a39-667b-4161-8ee8-1f513460cbde"
+            },
+            {
+              "period": 2,
+              "code": "P",
+              "jam": 6,
+              "id": "402cbe1b-a4a1-47e0-9b5a-628105f199b6"
+            }
+          ],
+          "name": "Ninja Pony",
+          "flags": "",
+          "id": "90db21d0-4adc-4ebc-9099-301788dbee13"
+        },
+        {
+          "number": "68",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "L",
+              "jam": 19,
+              "id": "9e4ee0cb-06ac-482b-ab03-99da1b1a2532"
+            },
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 9,
+              "id": "bacafc16-4a9a-4173-ae11-c2e9cd4de192"
+            },
+            {
+              "period": 2,
+              "code": "B",
+              "jam": 9,
+              "id": "9c51ef7a-ee6b-4542-8bf6-864e7cf03632"
+            },
+            {
+              "period": 2,
+              "code": "L",
+              "jam": 12,
+              "id": "aa40ba74-dbb9-4878-b022-061f97de192e"
+            }
+          ],
+          "name": "Dr. Boom",
+          "flags": "",
+          "id": "83700659-a5f5-4c14-8352-1d05956b8b3f"
+        },
+        {
+          "number": "86",
+          "penalties": [
+            {
+              "period": 1,
+              "code": "P",
+              "jam": 3,
+              "id": "7f69dae5-880e-4d63-b4ca-3e3f988f2823"
+            },
+            {
+              "period": 1,
+              "code": "F",
+              "jam": 12,
+              "id": "b06a7715-0ba2-49b3-b691-13f2b876ca17"
+            },
+            {
+              "period": 2,
+              "code": "M",
+              "jam": 16,
+              "id": "c5c6694d-560e-430a-8e21-1c3ca66fb61c"
+            }
+          ],
+          "name": "CyanideSlam",
+          "flags": "",
+          "id": "6d2b684c-5c1e-4279-9d1b-f2aaa8d4eb81"
+        },
+        {
+          "number": "9",
+          "penalties": [
+            {
+              "period": 2,
+              "code": "X",
+              "jam": 7,
+              "id": "010bafef-ed3c-42c8-b107-6581fcc971f3"
+            },
+            {
+              "period": 2,
+              "code": "C",
+              "jam": 9,
+              "id": "06c6b80c-26c7-4576-8838-fed5d11432d6"
+            },
+            {
+              "period": 2,
+              "code": "C",
+              "jam": 15,
+              "id": "727ce398-f7f6-431f-b2ae-13f8b9ea5e7b"
+            }
+          ],
+          "name": "Skater X",
+          "flags": "",
+          "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1"
+        }
+      ],
+      "colors": {}
+    }
+  ],
+  "periods": [
+    {
+      "period": 1,
+      "jams": [
+        {
+          "periodClockStart": "29:59.600",
+          "jamClock": "1:34.200",
+          "teams": [
+            {
+              "jamScore": 2,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 2,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 0,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 1,
+          "periodClockEnd": "29:34.200",
+          "periodWallClockEnd": "Sat Aug 26 20:39:19 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:38:54 CDT 2017",
+          "jamLength": "0:25.800"
+        },
+        {
+          "periodClockStart": "29:03.800",
+          "jamClock": "1:31",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd",
+                "position": "Jammer"
+              }],
+              "totalScore": 6,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 0,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 2,
+          "periodClockEnd": "28:35",
+          "periodWallClockEnd": "Sat Aug 26 20:40:18 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:39:50 CDT 2017",
+          "jamLength": "0:29"
+        },
+        {
+          "periodClockStart": "28:04.800",
+          "jamClock": "0:17.400",
+          "teams": [
+            {
+              "jamScore": 24,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 30,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "62f4c43b-cdd2-450c-9ae5-74e489b95bff",
+                "position": "Jammer"
+              }],
+              "totalScore": 0,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 3,
+          "periodClockEnd": "26:22.600",
+          "periodWallClockEnd": "Sat Aug 26 20:42:31 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:40:49 CDT 2017",
+          "jamLength": "1:42.600"
+        },
+        {
+          "periodClockStart": "25:51.800",
+          "jamClock": "1:39.400",
+          "teams": [
+            {
+              "jamScore": 1,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 31,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1",
+                "position": "Jammer"
+              }],
+              "totalScore": 0,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 4,
+          "periodClockEnd": "25:31.600",
+          "periodWallClockEnd": "Sat Aug 26 20:43:22 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:43:02 CDT 2017",
+          "jamLength": "0:20.600"
+        },
+        {
+          "periodClockStart": "25:00.800",
+          "jamClock": "1:28.200",
+          "teams": [
+            {
+              "jamScore": 1,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd",
+                "position": "Jammer"
+              }],
+              "totalScore": 32,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 1,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 1,
+              "leadJammer": "Lead",
+              "starPass": false
+            }
+          ],
+          "jam": 5,
+          "periodClockEnd": "24:29.200",
+          "periodWallClockEnd": "Sat Aug 26 20:44:24 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:43:53 CDT 2017",
+          "jamLength": "0:31.800"
+        },
+        {
+          "periodClockStart": "23:58.600",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 9,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d8980763-30dd-4581-a914-f3b1ed1b8a44",
+                "position": "Jammer"
+              }],
+              "totalScore": 41,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cf863c04-17a9-4775-b0b4-929a716bbd5f",
+                "position": "Jammer"
+              }],
+              "totalScore": 1,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 6,
+          "periodClockEnd": "21:59",
+          "periodWallClockEnd": "Sat Aug 26 20:46:54 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:44:55 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "21:28",
+          "jamClock": "1:32",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 45,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 1,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 7,
+          "periodClockEnd": "21:00",
+          "periodWallClockEnd": "Sat Aug 26 20:47:53 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:47:25 CDT 2017",
+          "jamLength": "0:28"
+        },
+        {
+          "periodClockStart": "20:29.600",
+          "jamClock": "1:35.600",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd",
+                "position": "Jammer"
+              }],
+              "totalScore": 49,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ab55ddc7-b6cf-423d-b656-760b4958a699",
+                "position": "Jammer"
+              }],
+              "totalScore": 1,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 8,
+          "periodClockEnd": "20:05.800",
+          "periodWallClockEnd": "Sat Aug 26 20:48:48 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:48:24 CDT 2017",
+          "jamLength": "0:24.400"
+        },
+        {
+          "periodClockStart": "19:35.200",
+          "jamClock": "1:18.200",
+          "teams": [
+            {
+              "jamScore": 2,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa",
+                "position": "Jammer"
+              }],
+              "totalScore": 51,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 2,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1",
+                "position": "Jammer"
+              }],
+              "totalScore": 3,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 9,
+          "periodClockEnd": "18:53.400",
+          "periodWallClockEnd": "Sat Aug 26 20:50:00 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:49:18 CDT 2017",
+          "jamLength": "0:41.800"
+        },
+        {
+          "periodClockStart": "18:22.600",
+          "jamClock": "1:19.400",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 55,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ab55ddc7-b6cf-423d-b656-760b4958a699",
+                "position": "Jammer"
+              }],
+              "totalScore": 3,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 10,
+          "periodClockEnd": "17:42.600",
+          "periodWallClockEnd": "Sat Aug 26 20:51:11 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:50:31 CDT 2017",
+          "jamLength": "0:40.600"
+        },
+        {
+          "periodClockStart": "17:11.600",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 15,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 70,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ecb9c255-dfae-41fe-a954-37ebcc5a009e",
+                "position": "Jammer"
+              }],
+              "totalScore": 3,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 11,
+          "periodClockEnd": "15:12",
+          "periodWallClockEnd": "Sat Aug 26 20:53:41 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:51:42 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "14:41.800",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 14,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd",
+                "position": "Jammer"
+              }],
+              "totalScore": 84,
+              "leadJammer": "LostLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 3,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cf863c04-17a9-4775-b0b4-929a716bbd5f",
+                "position": "Jammer"
+              }],
+              "totalScore": 6,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 12,
+          "periodClockEnd": "12:42",
+          "periodWallClockEnd": "Sat Aug 26 20:57:39 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:55:39 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "12:10.400",
+          "jamClock": "1:11.800",
+          "teams": [
+            {
+              "jamScore": 14,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e4640d63-0dff-4578-8434-5ec562d8c87d",
+                "position": "Jammer"
+              }],
+              "totalScore": 98,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1",
+                "position": "Jammer"
+              }],
+              "totalScore": 7,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 13,
+          "periodClockEnd": "11:21.800",
+          "periodWallClockEnd": "Sat Aug 26 20:58:59 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:58:10 CDT 2017",
+          "jamLength": "0:48.200"
+        },
+        {
+          "periodClockStart": "10:51.400",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 19,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 117,
+              "leadJammer": "LostLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 4,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cf863c04-17a9-4775-b0b4-929a716bbd5f",
+                "position": "Jammer"
+              }],
+              "totalScore": 11,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 14,
+          "periodClockEnd": "8:51",
+          "periodWallClockEnd": "Sat Aug 26 21:01:30 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 20:59:29 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "8:19.400",
+          "jamClock": "0:35.600",
+          "teams": [
+            {
+              "jamScore": 8,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "3ee0628b-1167-42b8-be73-742261c2da94",
+                "position": "Jammer"
+              }],
+              "totalScore": 125,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "62f4c43b-cdd2-450c-9ae5-74e489b95bff",
+                "position": "Jammer"
+              }],
+              "totalScore": 11,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 15,
+          "periodClockEnd": "6:54.800",
+          "periodWallClockEnd": "Sat Aug 26 21:03:26 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:02:01 CDT 2017",
+          "jamLength": "1:24.400"
+        },
+        {
+          "periodClockStart": "6:23.200",
+          "jamClock": "0:07.800",
+          "teams": [
+            {
+              "jamScore": 15,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 140,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "62f4c43b-cdd2-450c-9ae5-74e489b95bff",
+                "position": "Jammer"
+              }],
+              "totalScore": 11,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 16,
+          "periodClockEnd": "4:30.800",
+          "periodWallClockEnd": "Sat Aug 26 21:05:50 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:03:57 CDT 2017",
+          "jamLength": "1:52.200"
+        },
+        {
+          "periodClockStart": "3:59.600",
+          "jamClock": "1:18",
+          "teams": [
+            {
+              "jamScore": 9,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e4640d63-0dff-4578-8434-5ec562d8c87d",
+                "position": "Jammer"
+              }],
+              "totalScore": 149,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ab55ddc7-b6cf-423d-b656-760b4958a699",
+                "position": "Jammer"
+              }],
+              "totalScore": 11,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 17,
+          "periodClockEnd": "3:18.200",
+          "periodWallClockEnd": "Sat Aug 26 21:07:03 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:06:21 CDT 2017",
+          "jamLength": "0:42"
+        },
+        {
+          "periodClockStart": "2:49.800",
+          "jamClock": "1:19.800",
+          "teams": [
+            {
+              "jamScore": 3,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa",
+                "position": "Jammer"
+              }],
+              "totalScore": 152,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 0,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 11,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 18,
+          "periodClockEnd": "2:07.800",
+          "periodWallClockEnd": "Sat Aug 26 21:09:37 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:07:31 CDT 2017",
+          "jamLength": "0:40.200"
+        },
+        {
+          "periodClockStart": "1:37.400",
+          "jamClock": "1:30",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 156,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 3,
+              "timeouts": 2,
+              "officialReviews": 0,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 14,
+              "leadJammer": "Lead",
+              "starPass": false
+            }
+          ],
+          "jam": 19,
+          "periodClockEnd": "1:07.200",
+          "periodWallClockEnd": "Sat Aug 26 21:10:38 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:10:08 CDT 2017",
+          "jamLength": "0:30"
+        },
+        {
+          "periodClockStart": "0:36",
+          "jamClock": "1:05",
+          "teams": [
+            {
+              "jamScore": 9,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d8980763-30dd-4581-a914-f3b1ed1b8a44",
+                "position": "Jammer"
+              }],
+              "totalScore": 165,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 0,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 14,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 20,
+          "periodClockEnd": "0:00",
+          "periodWallClockEnd": "Sat Aug 26 21:12:04 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:11:09 CDT 2017",
+          "jamLength": "0:55"
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "jams": [
+        {
+          "periodClockStart": "30:00",
+          "jamClock": "1:03.400",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 169,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 14,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 1,
+          "periodClockEnd": "29:03.400",
+          "periodWallClockEnd": "Sat Aug 26 21:28:45 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:27:49 CDT 2017",
+          "jamLength": "0:56.600"
+        },
+        {
+          "periodClockStart": "28:32.600",
+          "jamClock": "1:36",
+          "teams": [
+            {
+              "jamScore": 0,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ef3d1f05-95c2-4b83-b5c4-ad2a79473cbd",
+                "position": "Jammer"
+              }],
+              "totalScore": 169,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 14,
+              "leadJammer": "Lead",
+              "starPass": false
+            }
+          ],
+          "jam": 2,
+          "periodClockEnd": "28:09.200",
+          "periodWallClockEnd": "Sat Aug 26 21:29:40 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:29:16 CDT 2017",
+          "jamLength": "0:24"
+        },
+        {
+          "periodClockStart": "27:38.800",
+          "jamClock": "1:25.800",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "a024dbd4-ebb7-4cc9-ad3f-6ad5124d0787",
+                "position": "Jammer"
+              }],
+              "totalScore": 173,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 4,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 3,
+          "periodClockEnd": "27:05",
+          "periodWallClockEnd": "Sat Aug 26 21:30:44 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:30:10 CDT 2017",
+          "jamLength": "0:34.200"
+        },
+        {
+          "periodClockStart": "26:49.400",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 15,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d8980763-30dd-4581-a914-f3b1ed1b8a44",
+                "position": "Jammer"
+              }],
+              "totalScore": 188,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cb0cd3dd-56f3-4392-a86f-0ccb9e669215",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 4,
+          "periodClockEnd": "24:49",
+          "periodWallClockEnd": "Sat Aug 26 21:36:45 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:34:44 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "24:18.400",
+          "jamClock": "1:15.800",
+          "teams": [
+            {
+              "jamScore": 15,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "b12a0e7d-7123-473d-8235-a01729f4608a",
+                "position": "Jammer"
+              }],
+              "totalScore": 203,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 5,
+          "periodClockEnd": "23:34",
+          "periodWallClockEnd": "Sat Aug 26 21:38:00 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:37:15 CDT 2017",
+          "jamLength": "0:44.200"
+        },
+        {
+          "periodClockStart": "23:03.600",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 2,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa",
+                "position": "Jammer"
+              }],
+              "totalScore": 205,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cf863c04-17a9-4775-b0b4-929a716bbd5f",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 6,
+          "periodClockEnd": "21:04",
+          "periodWallClockEnd": "Sat Aug 26 21:40:30 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:38:30 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "20:33.200",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 17,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e4640d63-0dff-4578-8434-5ec562d8c87d",
+                "position": "Jammer"
+              }],
+              "totalScore": 222,
+              "leadJammer": "LostLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d386bf24-4f77-49e8-8346-2cb3b19720f1",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 7,
+          "periodClockEnd": "18:33",
+          "periodWallClockEnd": "Sat Aug 26 21:43:01 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:41:01 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "18:13",
+          "jamClock": "1:33.400",
+          "teams": [
+            {
+              "jamScore": 4,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "daa25cab-7253-4d21-b434-990b44dd6d46",
+                "position": "Jammer"
+              }],
+              "totalScore": 226,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "cb0cd3dd-56f3-4392-a86f-0ccb9e669215",
+                "position": "Jammer"
+              }],
+              "totalScore": 18,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 8,
+          "periodClockEnd": "17:46.600",
+          "periodWallClockEnd": "Sat Aug 26 21:45:17 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:44:51 CDT 2017",
+          "jamLength": "0:26.600"
+        },
+        {
+          "periodClockStart": "17:15.600",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 28,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa",
+                "position": "Jammer"
+              }],
+              "totalScore": 254,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 4,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 22,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 9,
+          "periodClockEnd": "15:16",
+          "periodWallClockEnd": "Sat Aug 26 21:47:48 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:45:48 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "14:44.400",
+          "jamClock": "1:21.600",
+          "teams": [
+            {
+              "jamScore": 3,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d8980763-30dd-4581-a914-f3b1ed1b8a44",
+                "position": "Jammer"
+              }],
+              "totalScore": 257,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 22,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 10,
+          "periodClockEnd": "14:05.800",
+          "periodWallClockEnd": "Sat Aug 26 21:48:58 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:48:20 CDT 2017",
+          "jamLength": "0:38.400"
+        },
+        {
+          "periodClockStart": "13:34.400",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 10,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "3ee0628b-1167-42b8-be73-742261c2da94",
+                "position": "Jammer"
+              }],
+              "totalScore": 267,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 2,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ab55ddc7-b6cf-423d-b656-760b4958a699",
+                "position": "Jammer"
+              }],
+              "totalScore": 22,
+              "leadJammer": "Lead",
+              "starPass": false
+            }
+          ],
+          "jam": 11,
+          "periodClockEnd": "11:34",
+          "periodWallClockEnd": "Sat Aug 26 21:51:30 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:49:30 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "11:02.600",
+          "jamClock": "0:07.200",
+          "teams": [
+            {
+              "jamScore": 23,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "e265c2ef-b30c-4c29-b10b-eafadc277b26",
+                "position": "Jammer"
+              }],
+              "totalScore": 294,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 1,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 22,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 12,
+          "periodClockEnd": "9:10.400",
+          "periodWallClockEnd": "Sat Aug 26 21:53:54 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:52:02 CDT 2017",
+          "jamLength": "1:52.800"
+        },
+        {
+          "periodClockStart": "8:41.400",
+          "jamClock": "1:40.200",
+          "teams": [
+            {
+              "jamScore": 2,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "be5fcf85-8af4-4c5a-8043-b6d2437f0aaa",
+                "position": "Jammer"
+              }],
+              "totalScore": 296,
+              "leadJammer": "NoLead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 1,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "62f4c43b-cdd2-450c-9ae5-74e489b95bff",
+                "position": "Jammer"
+              }],
+              "totalScore": 22,
+              "leadJammer": "Lead",
+              "starPass": false
+            }
+          ],
+          "jam": 13,
+          "periodClockEnd": "8:21.400",
+          "periodWallClockEnd": "Sat Aug 26 21:56:06 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:55:46 CDT 2017",
+          "jamLength": "0:19.800"
+        },
+        {
+          "periodClockStart": "7:50.400",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 24,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "daa25cab-7253-4d21-b434-990b44dd6d46",
+                "position": "Jammer"
+              }],
+              "totalScore": 320,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 3,
+              "timeouts": 1,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "90db21d0-4adc-4ebc-9099-301788dbee13",
+                "position": "Jammer"
+              }],
+              "totalScore": 25,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 14,
+          "periodClockEnd": "5:50",
+          "periodWallClockEnd": "Sat Aug 26 21:58:37 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:56:37 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "5:18.400",
+          "jamClock": "0:00",
+          "teams": [
+            {
+              "jamScore": 23,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "b12a0e7d-7123-473d-8235-a01729f4608a",
+                "position": "Jammer"
+              }],
+              "totalScore": 343,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 0,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 25,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 15,
+          "periodClockEnd": "3:18",
+          "periodWallClockEnd": "Sat Aug 26 22:01:09 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 21:59:09 CDT 2017",
+          "jamLength": "2:00"
+        },
+        {
+          "periodClockStart": "2:49.200",
+          "jamClock": "0:13.400",
+          "teams": [
+            {
+              "jamScore": 19,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "b10c3ae7-cf97-4f1a-8855-f7fe0e06dfe0",
+                "position": "Jammer"
+              }],
+              "totalScore": 362,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 0,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "ed026344-c091-4ca5-b3bc-d31bb99286c1",
+                "position": "Jammer"
+              }],
+              "totalScore": 25,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 16,
+          "periodClockEnd": "1:02.800",
+          "periodWallClockEnd": "Sat Aug 26 22:04:48 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 22:03:01 CDT 2017",
+          "jamLength": "1:46.600"
+        },
+        {
+          "periodClockStart": "0:31.400",
+          "jamClock": "1:26.600",
+          "teams": [
+            {
+              "jamScore": 5,
+              "timeouts": 3,
+              "officialReviews": 1,
+              "team": "1",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "daa25cab-7253-4d21-b434-990b44dd6d46",
+                "position": "Jammer"
+              }],
+              "totalScore": 367,
+              "leadJammer": "Lead",
+              "starPass": false
+            },
+            {
+              "jamScore": 0,
+              "timeouts": 0,
+              "officialReviews": 1,
+              "team": "2",
+              "skaters": [{
+                "penaltyBox": false,
+                "id": "d5747928-3ed8-46e6-926b-cbe581a20937",
+                "position": "Jammer"
+              }],
+              "totalScore": 25,
+              "leadJammer": "NoLead",
+              "starPass": false
+            }
+          ],
+          "jam": 17,
+          "periodClockEnd": "0:00",
+          "periodWallClockEnd": "Sat Aug 26 22:05:53 CDT 2017",
+          "periodWallClockStart": "Sat Aug 26 22:05:19 CDT 2017",
+          "jamLength": "0:33.400"
+        }
+      ]
+    }
+  ]
+}
