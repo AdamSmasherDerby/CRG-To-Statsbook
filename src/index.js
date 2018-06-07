@@ -21,7 +21,10 @@ let crgFilename = '',
     statsbookFileName = 'assets/wftda-statsbook-base-us-letter.xlsx',
     sbTemplate = require('../assets/2018statsbook.json'),
     skaters = {},
-    newSB = true
+    newSB = true,
+    skatersNotOnIGRF = [],
+    skatersOnIGRF = {}
+
 
 const teamNames = ['home','away']
 
@@ -111,6 +114,8 @@ let saveToExisting = (outFileName) => {
 
     newSB = false
     skaters = {}
+
+    //editSkatersWindow(crgData,skatersOnIGRF)
 
     // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
 
@@ -284,7 +289,7 @@ let updateGameData = (workbook) => {
     return workbook
 }
 
-let editSkatersWindow = (crgData, skatersOnIGRF) => new Promise((resolve) => {
+let editSkatersWindow = (crgData, skatersOnIGRF) => {
     const modalPath = path.join('file://', __dirname, 'editskaters.html')
     let win = new BrowserWindow({ 
         parent: remote.getCurrentWindow(),
@@ -310,15 +315,30 @@ let editSkatersWindow = (crgData, skatersOnIGRF) => new Promise((resolve) => {
 
     ipc.on('skater-window-closed', () => {
         console.log('Skater window closed')
-        resolve()
+        return 'hello'
     })
-})
+}
 
+let getIGRFSkaters = (workbook) => {
 
-let updateSkaters = async (workbook) => {
+    for(let t in teamNames) {
+        skatersOnIGRF[teamNames[t]] = []
+        let teamName = teamNames[t]
+        let teamSheet = sbTemplate.teams[teamName].sheetName
+        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
+        //let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+        for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+            let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
+            if (number != undefined){skatersOnIGRF[teamNames[t]].push(number.toString())}
+        }
+    }
+
+    return(skatersOnIGRF)
+
+}
+
+let updateSkaters = (workbook) => {
     // Update the skater information.
-    let skatersNotOnIGRF = []
-    let skatersOnIGRF = {}
 
     // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
@@ -342,10 +362,11 @@ let updateSkaters = async (workbook) => {
 
         if (!newSB){
             // If we're writing to an existing statsbook, record the list of skaters present on the IGRF:
-            for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+            /*for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
                 let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
                 if (number != undefined){skatersOnIGRF[teamNames[t]].push(number.toString())}
-            }
+            }*/
+            skatersOnIGRF = getIGRFSkaters(workbook)
         }
 
         for(let s in crgData.teams[t].skaters){
@@ -383,10 +404,6 @@ let updateSkaters = async (workbook) => {
 
         // Add each team to the "skaters" object
         skaters[teamNames[t]] = team
-    }
-
-    if (!newSB){
-        await editSkatersWindow(crgData,skatersOnIGRF)  // Eventually move somewhere else
     }
 
     if (skatersNotOnIGRF.length > 0) {
