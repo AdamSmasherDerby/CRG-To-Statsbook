@@ -99,6 +99,7 @@ app.on('activate',() => {
 })
 
 let openAbout = () => {
+// opening function for "About This Software" window
     aboutWin = new BrowserWindow({
         parent: win,
         title: 'CRG Data Tool',
@@ -136,9 +137,11 @@ ipc.on('table-generated', () => {
     win.webContents.send('table-generated')
 })
 
-ipc.on('skater-window-closed', () => {
-    win.webContents.send('skater-window-closed')
+ipc.on('skater-window-closed', (event, outFileName) => {
+    win.webContents.send('skater-window-closed',outFileName)
 })
+
+// Error handlers
 
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
     dialog.showMessageBox(win, {

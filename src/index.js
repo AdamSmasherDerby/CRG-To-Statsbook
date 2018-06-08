@@ -30,7 +30,7 @@ const teamNames = ['home','away']
 
 
 fileSelect.onchange = (e) => {
-    // When a CRG file is selected by clicking.
+// When a CRG file is selected by clicking.
     
     $('*:focus').blur()
 
@@ -53,22 +53,8 @@ fileSelect.onchange = (e) => {
     return false
 }
 
-holder.ondragover = () => {
-    holder.classList.add('box__ondragover')
-    return false
-}
-
-holder.ondragleave = () => {
-    holder.classList.remove('box__ondragover')
-    return false
-}
-
-holder.ondragend = () => {
-    return false
-}
-
 holder.ondrop = (e) => {
-    // When a CRG File is dropped into the drop zone.
+// When a CRG File is dropped into the drop zone.
 
     holder.classList.remove('box__ondragover')
     e.preventDefault()
@@ -87,7 +73,7 @@ holder.ondrop = (e) => {
 }
 
 let makeReader = (crgFile) => {
-    // Create reader object
+// Create reader object
     let reader = new FileReader()
     crgFilename = crgFile.name
 
@@ -101,7 +87,7 @@ let makeReader = (crgFile) => {
 }
 
 let readCRGData = (e) => {
-    // Read in the statsbook data for an event e
+// Read in the statsbook data for an event e
     crgData = JSON.parse(e.target.result)
 
     // Update the "File Information" box
@@ -109,88 +95,8 @@ let readCRGData = (e) => {
     createSaveArea()
 }
 
-let saveToExisting = (outFileName) => {
-    // Given an existing StatsBook file, populate with the CRG Data
-
-    newSB = false
-    skaters = {}
-
-    //editSkatersWindow(crgData,skatersOnIGRF)
-
-    // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
-
-    let workbook = XLP.fromFileAsync(outFileName)
-        .then(
-            workbook => {
-                // Do not update general game data in this case,
-                // as the manually entered data will almost certainly be
-                // more accurate.
-                workbook = updateSkaters(workbook)
-                return workbook
-            })
-        .catch(e => {
-            // This is where you break out if user doesn't want to integrate missing skaters
-            //console.log(e)
-            throw e
-        })
-        .then(
-            workbook => {
-                workbook = updatePenalties(workbook)
-                workbook = updateScores(workbook)
-                workbook = updateGameClock(workbook)
-                workbook.toFileAsync(outFileName)
-                writeCompleteDialog(outFileName)
-                return workbook
-            })
-        .catch(e => {
-            console.log(e)
-        })
-    return workbook
-}
-
-let writeToNewSb = (outFileName) => {
-    // Given an oututput file name, write the game data to a fresh statsbook file.
-
-    newSB = true
-    skaters = {}
- 
-    let workbook = XLP.fromFileAsync(statsbookFileName)
-        .then(
-            workbook => {
-                workbook = updateGameData(workbook)
-                return workbook
-            })
-        .catch(e => {
-            // Throw errors in the first write. (e.g., file already open.)
-            throw e
-        })
-        .then(
-            workbook => {
-                workbook = updateSkaters(workbook)
-                workbook = updatePenalties(workbook)
-                workbook = updateScores(workbook)
-                workbook = updateGameClock(workbook)
-                workbook.toFileAsync(outFileName)
-                writeCompleteDialog(outFileName)
-                return workbook
-            })
-        .catch(e => {
-            console.log(e)
-        })
-    return workbook
-}
-
-let writeCompleteDialog = (outFileName) => {
-    dialog.showMessageBox({
-        type: 'info',
-        buttons: ['OK'],
-        title: 'CRG to Statsbook',
-        message: `Scoreboard data successfully written to ${outFileName}`
-    })
-}
-
 let updateFileInfoBox = () => {
-    // Update File Info Box
+// Update File Info Box
 
     bottomBox.innerHTML = `<strong>Filename:</strong> ${crgFilename}<br>`
     bottomBox.innerHTML += `<strong>Game Date:</strong> ${crgData.identifier.substr(0,10)}<br>`
@@ -200,6 +106,7 @@ let updateFileInfoBox = () => {
 }
 
 let createSaveArea = () => {
+// Create Drop Zone and Save to New Button for saving to existing StatsBooks
 
     rightBox.innerHTML = '<div class="col-12 text-center"><strong>Save To:</strong>&nbsp;<button id="save-blank" type="button" class="btn btn-sm">New StatsBook</button></div>'
     rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
@@ -243,7 +150,7 @@ let createSaveArea = () => {
 
         let sbFile = e.target.files[0]
 
-        saveToExisting(sbFile.path)
+        prepareForExisting(sbFile.path)
 
         return false
     }
@@ -257,7 +164,7 @@ let createSaveArea = () => {
 
         let sbFile = e.dataTransfer.files[0]
 
-        saveToExisting(sbFile.path)
+        prepareForExisting(sbFile.path)
         return false
     }
 
@@ -276,8 +183,138 @@ let createSaveArea = () => {
     }
 }
 
+let writeToNewSb = (outFileName) => {
+// Given an oututput file name, write the game data to a fresh statsbook file.
+
+    newSB = true
+    skaters = {}
+    
+    let workbook = XLP.fromFileAsync(statsbookFileName)
+        .then(
+            workbook => {
+                workbook = updateGameData(workbook)
+                return workbook
+            })
+        .catch(e => {
+            // Throw errors in the first write. (e.g., file already open.)
+            throw e
+        })
+        .then(
+            workbook => {
+                workbook = updateSkaters(workbook)
+                workbook = updatePenalties(workbook)
+                workbook = updateScores(workbook)
+                workbook = updateGameClock(workbook)
+                workbook.toFileAsync(outFileName)
+                writeCompleteDialog(outFileName)
+                return workbook
+            })
+        .catch(e => {
+            console.log(e)
+        })
+    return workbook
+}
+
+let prepareForExisting = (outFileName) => {
+// Check the state of the existing statsbook file in preparation for saving to it.
+
+    newSB = false
+    XLP.fromFileAsync(outFileName)
+        .then(
+            workbook => {
+                skatersOnIGRF = getIGRFSkaters(workbook)
+                // Todo - only raise this window if needed
+                editSkatersWindow(crgData,skatersOnIGRF,outFileName)
+            }
+        )
+
+}
+
+let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
+// Raise a dialog for handling discrepancies between CRG and IGRF rosters
+    const modalPath = path.join('file://', __dirname, 'editskaters.html')
+
+    let win = new BrowserWindow({ 
+        parent: remote.getCurrentWindow(),
+        modal: true,
+        icon: __dirname + '/build/flamingo-white.png'
+    })
+
+    win.setMenu(null)
+    win.on('close', function () { 
+        win = null
+        ipc.send('skater-window-closed', outFileName)
+    })
+    win.loadURL(modalPath)
+    win.webContents.openDevTools()
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF))
+    })
+
+    ipc.on('table-generated', () => {
+        console.log('Table Generated!')
+    })
+
+    win.show()
+}
+
+ipc.on('skater-window-closed', (event, outFileName) => {
+// When the Edit Skaters dialog is closed, save to the statsbook.
+    console.log('Skater window closed')
+    saveToExisting(outFileName)
+})
+
+let saveToExisting = (outFileName) => {
+// Given an existing StatsBook file, populate with the CRG Data
+    skaters = {}
+
+    // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
+
+    let workbook = XLP.fromFileAsync(outFileName)
+        .then(
+            workbook => {
+                // Do not update general game data in the existing statsbook case
+                workbook = updateSkaters(workbook)
+                return workbook
+            })
+        .catch(e => {
+            throw e
+        })
+        .then(
+            workbook => {
+                workbook = updatePenalties(workbook)
+                workbook = updateScores(workbook)
+                workbook = updateGameClock(workbook)
+                workbook.toFileAsync(outFileName)
+                    .then(
+                        () => {
+                            writeCompleteDialog(outFileName)
+                            return workbook
+                        })
+                    .catch(e => {
+                        // Throw error here if statsbook file is already open
+                        console.log(e)
+                    })
+                return workbook
+            })
+        .catch(e => {
+            console.log(e)
+        })
+    return workbook
+}
+
+let writeCompleteDialog = (outFileName) => {
+// Display dialog indicating write complete
+    dialog.showMessageBox({
+        type: 'info',
+        buttons: ['OK'],
+        title: 'CRG to Statsbook',
+        message: `Scoreboard data successfully written to ${outFileName}`
+    })
+}
+
 let updateGameData = (workbook) => {
-    // Update the general game data - Time, Date, and Team Names
+// Update the general game data - Time, Date, and Team Names
     let sheet = sbTemplate.mainSheet
     workbook.sheet(sheet).cell(sbTemplate.date).value(crgData.identifier.substr(0,10))
     workbook.sheet(sheet).cell(sbTemplate.time).value(crgData.identifier.slice(11,16))
@@ -289,47 +326,24 @@ let updateGameData = (workbook) => {
     return workbook
 }
 
-let editSkatersWindow = (crgData, skatersOnIGRF) => {
-    const modalPath = path.join('file://', __dirname, 'editskaters.html')
-    let win = new BrowserWindow({ 
-        parent: remote.getCurrentWindow(),
-        modal: true,
-        icon: __dirname + '/build/flamingo-white.png'
-    })
-    win.setMenu(null)
-    win.on('close', function () { 
-        win = null
-        ipc.send('skater-window-closed')
-    })
-    win.loadURL(modalPath)
-    win.webContents.openDevTools()
-    win.show()
-
-    win.webContents.on('did-finish-load', () => {
-        win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF))
-    })
-
-    ipc.on('table-generated', () => {
-        console.log('Table Generated!')
-    })
-
-    ipc.on('skater-window-closed', () => {
-        console.log('Skater window closed')
-        return 'hello'
-    })
-}
-
 let getIGRFSkaters = (workbook) => {
+// Given a workbook, get the list of skaters on the IGRF
 
     for(let t in teamNames) {
         skatersOnIGRF[teamNames[t]] = []
         let teamName = teamNames[t]
         let teamSheet = sbTemplate.teams[teamName].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-        //let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
             let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
-            if (number != undefined){skatersOnIGRF[teamNames[t]].push(number.toString())}
+            let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value()
+            name = (name == undefined ? '' : name)
+            if (number != undefined){skatersOnIGRF[teamNames[t]].push({
+                number: number.toString(),
+                name: name,
+                row: s
+            })}
         }
     }
 
@@ -338,7 +352,7 @@ let getIGRFSkaters = (workbook) => {
 }
 
 let updateSkaters = (workbook) => {
-    // Update the skater information.
+// Update the skater information.
 
     // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
@@ -348,7 +362,6 @@ let updateSkaters = (workbook) => {
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let row = 0
         let maxNum = sbTemplate.teams[teamNames[t]].maxNum
-        skatersOnIGRF[teamNames[t]] = []
 
         if (crgData.teams[t].skaters.length > maxNum){
             dialog.showMessageBox({
@@ -360,15 +373,6 @@ let updateSkaters = (workbook) => {
             throw 'Too Many Skaters'
         }
 
-        if (!newSB){
-            // If we're writing to an existing statsbook, record the list of skaters present on the IGRF:
-            /*for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
-                let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
-                if (number != undefined){skatersOnIGRF[teamNames[t]].push(number.toString())}
-            }*/
-            skatersOnIGRF = getIGRFSkaters(workbook)
-        }
-
         for(let s in crgData.teams[t].skaters){
             // Read the skater information from the scoreoard file
             let number = crgData.teams[t].skaters[s].number
@@ -378,13 +382,14 @@ let updateSkaters = (workbook) => {
             if(!newSB){
                 // If we are updating an existing statsbook,
                 // Record the row number on the IGRF for each skater. (zero indexed)
-                row = skatersOnIGRF[teamNames[t]].indexOf(number)
+                let igrfEntry = skatersOnIGRF[teamNames[t]].find(x => x.number == number)
 
-                if (row == -1){
+                if (!igrfEntry){
                     skatersNotOnIGRF.push({team: t, number: number, name:name, id: id})
+                } else {
+                    row = igrfEntry.row
                 }
 
-                //TODO - throw warning for skater on IGRF not in CRG?
             } else {
                 // If we're making a new statsbook, just assign the row numbers in order
                 // and write the skaters to the IGRF
@@ -420,7 +425,7 @@ let updateSkaters = (workbook) => {
 
         for (let t in teamNames){
             // Determine if there is room to add the missing skaters
-            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - skatersOnIGRF[teamNames[t]].length
+            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - Object.keys(skatersOnIGRF[teamNames[t]]).length
             neededRosterSpots[t] = skatersNotOnIGRF.filter(x => x.team == t).length
             enoughSpots[t] = (emptyRosterSpots[t] >= neededRosterSpots[t] ? true : false)
         }
@@ -477,7 +482,7 @@ let updateSkaters = (workbook) => {
     if (!newSB) {
         // If this is an existing statsbook rewrite all the names and numbers
         // *even if there were no errors*.  I have no idea why this is necessary,
-        // but it breaks conditional formatting if you dont' do it.
+        // but it breaks conditional formatting if you don't do it.
         for (let t in teamNames){
             let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
             let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
@@ -515,7 +520,7 @@ let addSkatersDialog = (errorMsg) => {
 }
 
 let updatePenalties = (workbook) => {
-    // Update the penalty data in the statsbook from the CRG data
+// Update the penalty data in the statsbook from the CRG data
     let sheet = sbTemplate.penalties.sheetName
 
     for(let t in crgData.teams){
@@ -586,7 +591,7 @@ let updatePenalties = (workbook) => {
 }
 
 let updateScores = (workbook) => {
-    // Process scores.
+// Process scores.
     // For the time being, that just means jammers and jam numbers.
     let scoreSheet = sbTemplate.score.sheetName
     let lineupSheet = sbTemplate.lineups.sheetName
@@ -691,7 +696,7 @@ let updateScores = (workbook) => {
 }
 
 let updateGameClock = (workbook) => {
-    // Update Game Clock sheet
+// Update Game Clock sheet
     let clockSheet = sbTemplate.clock.sheetName
     let timeRe = /(\d):(\d\d)(\.\d+)*/
 
@@ -713,8 +718,10 @@ let updateGameClock = (workbook) => {
     return workbook
 }
 
+// Helper functions
+
 let rowcol = (rcstring) => {
-    // Return row and col as 1 indexed numbers
+// Return row and col as 1 indexed numbers
     let [, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
     let row = parseInt(rowstr)
     let col = colstr.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)
@@ -724,6 +731,22 @@ let rowcol = (rcstring) => {
 
 window.onerror = (msg, url, lineNo, columnNo) => {
     ipc.send('error-thrown', msg, url, lineNo, columnNo)
+    return false
+}
+
+// Cosmetic Functions for Drop Zone
+
+holder.ondragover = () => {
+    holder.classList.add('box__ondragover')
+    return false
+}
+
+holder.ondragleave = () => {
+    holder.classList.remove('box__ondragover')
+    return false
+}
+
+holder.ondragend = () => {
     return false
 }
 

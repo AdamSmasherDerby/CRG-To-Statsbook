@@ -15,6 +15,8 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     for (let t in crgData.teams){
         // For each team
 
+        let IGRFSkaterNumbers = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number))
+
         // Create Header
         let tableHeader = document.createElement('tr')
 
@@ -57,7 +59,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
             tableCell = document.createElement('td')
             check = document.createElement('i')
             check.setAttribute('class','fa fa-check')
-            if(skatersOnIGRF[teamNames[t]].includes(number)){
+            if(IGRFSkaterNumbers.includes(number)){
                 tableCell.appendChild(check)
             }
             tableRow.appendChild(tableCell)
