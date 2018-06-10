@@ -25,7 +25,7 @@ let createWindow = () => {
 
     if (isDev){
         win.webContents.openDevTools()
-        require('devtron').install()
+        //require('devtron').install()
     }
 
     win.on('closed', ()=> {

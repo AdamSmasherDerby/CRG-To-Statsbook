@@ -137,7 +137,7 @@ let createSaveArea = () => {
     }
 
     sbFileSelect.onchange = (e) => {
-        // When 'Select Existing Statsbook File' is clicked
+    // When 'Select Existing Statsbook File' is clicked
 
         $('*:focus').blur()
 
@@ -156,7 +156,7 @@ let createSaveArea = () => {
     }
 
     sbHolder.ondrop = (e) => {
-        // When a statsbook file is dropped into the drop zone
+    // When a statsbook file is dropped into the drop zone
 
         holder.classList.remove('box__ondragover')
         e.preventDefault()
@@ -239,6 +239,7 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
         modal: true,
         icon: __dirname + '/build/flamingo-white.png'
     })
+    win.webContents.openDevTools()
 
     win.setMenu(null)
     win.on('close', function () { 
@@ -246,7 +247,8 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
         ipc.send('skater-window-closed', outFileName)
     })
     win.loadURL(modalPath)
-    win.webContents.openDevTools()
+    win.show()
+
     win.webContents.on('did-finish-load', () => {
         win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF))
     })
@@ -255,7 +257,6 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
         console.log('Table Generated!')
     })
 
-    win.show()
 }
 
 ipc.on('skater-window-closed', (event, outFileName) => {
