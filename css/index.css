@@ -73,3 +73,18 @@ body {
     -webkit-user-select:none; 
     user-select:none;
 }
+
+.btn-primary {
+	background-color:#555;
+    border-color:#555;
+    color:white;
+    font-weight: 700;
+    transition: 0s;
+}
+
+.btn-primary:hover {
+    background-color: pink;
+    color: #555;
+    border-color: #555;
+    transition: 0s;
+}

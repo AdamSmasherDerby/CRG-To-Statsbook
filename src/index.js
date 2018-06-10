@@ -108,7 +108,7 @@ let updateFileInfoBox = () => {
 let createSaveArea = () => {
 // Create Drop Zone and Save to New Button for saving to existing StatsBooks
 
-    rightBox.innerHTML = '<div class="col-12 text-center"><strong>Save To:</strong>&nbsp;<button id="save-blank" type="button" class="btn btn-sm">New StatsBook</button></div>'
+    rightBox.innerHTML = '<div class="col-12 text-center">Save To:&nbsp;<button id="save-blank" type="button" class="btn btn-primary btn-sm">New StatsBook</button></div>'
     rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
     let sbBox = document.createElement('div')
     $(sbBox).attr({'class':'col-md-10','id':'drag-sb-file'})
@@ -244,24 +244,19 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
     win.setMenu(null)
     win.on('close', function () { 
         win = null
-        ipc.send('skater-window-closed', outFileName)
     })
     win.loadURL(modalPath)
     win.show()
 
     win.webContents.on('did-finish-load', () => {
-        win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF))
-    })
-
-    ipc.on('table-generated', () => {
-        console.log('Table Generated!')
+        win.webContents.send('send-skater-list', JSON.stringify(crgData), JSON.stringify(skatersOnIGRF), outFileName)
     })
 
 }
 
-ipc.on('skater-window-closed', (event, outFileName) => {
+ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
 // When the Edit Skaters dialog is closed, save to the statsbook.
-    console.log('Skater window closed')
+    if(skaterList == undefined){return}
     saveToExisting(outFileName)
 })
 

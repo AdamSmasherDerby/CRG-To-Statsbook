@@ -3,9 +3,12 @@ const remote = electron.remote
 const ipc = require('electron').ipcRenderer
 
 const cancelBtn = document.getElementById('cancelBtn')
+const confirmBtn = document.getElementById('confirmBtn')
 const skaterTableDiv = document.getElementById('skaterTableDiv')
 
 const teamNames = ['home','away']
+
+let outFileName = ''
 
 let makeSkaterTable = (crgData, skatersOnIGRF) => {
     // Create Table
@@ -37,6 +40,10 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
 
         tableHeaderCell = document.createElement('th')
         tableHeaderCell.appendChild(document.createTextNode('IGRF'))
+        tableHeader.appendChild(tableHeaderCell)
+
+        tableHeaderCell = document.createElement('th')
+        tableHeaderCell.appendChild(document.createTextNode('Keep'))
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeader.setAttribute('class','thead-dark') 
@@ -90,6 +97,20 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
                 tableCell.appendChild(check)
             }
             tableRow.appendChild(tableCell)
+
+            tableCell = document.createElement('td')
+            let checkDiv = document.createElement('div')
+            checkDiv.setAttribute('class','form-check')
+            let checkBox = document.createElement('input')
+            Object.assign(checkBox, {
+                class: 'form-check-input',
+                type: 'checkBox',
+                name: `checklist${t}`,
+                value: number
+            })
+            checkDiv.appendChild(checkBox)
+            tableCell.appendChild(checkDiv)
+            tableRow.appendChild(tableCell)
             
             table.appendChild(tableRow)
         }
@@ -97,15 +118,23 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     return table
 }
 
-cancelBtn.addEventListener('click', ()=> {
+cancelBtn.addEventListener('click', () => {
     let window = remote.getCurrentWindow()
+    ipc.send('skater-window-closed', outFileName, undefined)
     window.close()
 })
 
-ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON) => {
+confirmBtn.addEventListener('click', () => {
+    let window = remote.getCurrentWindow()
+    let skaterList = undefined  //TODO - make this be not blank
+    ipc.send('skater-window-closed', outFileName, skaterList)
+    window.close()
+})
+
+ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
+    outFileName = outFile
     let crgData = JSON.parse(crgJSON)
     let skatersOnIGRF = JSON.parse(skatersOnIGRFJSON)
     skaterTableDiv.appendChild(makeSkaterTable(crgData, skatersOnIGRF))
-    ipc.send('table-generated')
 })
-
+//Array.from(document.getElementsByName('checklist0')).map((v) => v.value)

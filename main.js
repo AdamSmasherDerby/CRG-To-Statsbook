@@ -133,12 +133,8 @@ let openAbout = () => {
     
 }
 
-ipc.on('table-generated', () => {
-    win.webContents.send('table-generated')
-})
-
-ipc.on('skater-window-closed', (event, outFileName) => {
-    win.webContents.send('skater-window-closed',outFileName)
+ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
+    win.webContents.send('skater-window-closed',outFileName, skaterList)
 })
 
 // Error handlers
