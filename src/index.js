@@ -87,7 +87,7 @@ let makeReader = (crgFile) => {
 }
 
 let readCRGData = (e) => {
-// Read in the statsbook data for an event e
+// Read in the CRG data for an event e
     crgData = JSON.parse(e.target.result)
 
     // Update the "File Information" box
@@ -130,7 +130,7 @@ let createSaveArea = () => {
             if (fileName === undefined){
                 return
             }
-            writeToNewSb(fileName)        
+            prepareForNewSb(fileName)        
             $('*:focus').blur()
 
         })
@@ -183,36 +183,28 @@ let createSaveArea = () => {
     }
 }
 
-let writeToNewSb = (outFileName) => {
+let prepareForNewSb = (outFileName) => {
 // Given an oututput file name, write the game data to a fresh statsbook file.
 
     newSB = true
     skaters = {}
+    let crgSkaters = getCRGSkaters(),
+        tooManySkaters = false
+
+    for (let t in teamNames){
+    // Determine if there are too many skaters in CRG for the size of the IGRF
+        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+        if (Object.values(crgSkaters[teamNames[t]]).length > maxNum){
+            tooManySkaters = true
+        }
+    }
     
-    let workbook = XLP.fromFileAsync(statsbookFileName)
-        .then(
-            workbook => {
-                workbook = updateGameData(workbook)
-                return workbook
-            })
-        .catch(e => {
-            // Throw errors in the first write. (e.g., file already open.)
-            throw e
-        })
-        .then(
-            workbook => {
-                workbook = updateSkaters(workbook)
-                workbook = updatePenalties(workbook)
-                workbook = updateScores(workbook)
-                workbook = updateGameClock(workbook)
-                workbook.toFileAsync(outFileName)
-                writeCompleteDialog(outFileName)
-                return workbook
-            })
-        .catch(e => {
-            console.log(e)
-        })
-    return workbook
+    if (tooManySkaters){
+        editSkatersWindow(crgData, {}, outFileName)
+    } else {
+        skaters = crgSkaters
+        saveStatsbook(outFileName)
+    }
 }
 
 let prepareForExisting = (outFileName) => {
@@ -223,7 +215,10 @@ let prepareForExisting = (outFileName) => {
         .then(
             workbook => {
                 skatersOnIGRF = getIGRFSkaters(workbook)
-                // Todo - only raise this window if needed
+                // Load CRG skaters, raise window to test for discrepancies
+                // only raise window if:
+                // Too many skaters in CRG
+                // Skater lists in IGRF and CRG do not match 1:1
                 editSkatersWindow(crgData,skatersOnIGRF,outFileName)
             }
         )
@@ -254,22 +249,29 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
 
 }
 
-ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
+ipc.on('skater-window-closed', (event, outFileName, skaters) => {
 // When the Edit Skaters dialog is closed, save to the statsbook.
-    if(skaterList == undefined){return}
-    saveToExisting(outFileName)
+    if(skaters == undefined){return}
+    saveStatsbook(outFileName)
 })
 
-let saveToExisting = (outFileName) => {
-// Given an existing StatsBook file, populate with the CRG Data
-    skaters = {}
+let saveStatsbook = (outFileName) => {
+// Write the statsbook data, either to a new copy of the statsbook or to the specified file.
+    let inFileName = ''
 
-    // TODO - THROW A WARNING THAT YOU'RE DOING THIS!
+    if(newSB){
+        inFileName = statsbookFileName
+    } else {
+        inFileName = outFileName
+    }
 
-    let workbook = XLP.fromFileAsync(outFileName)
+    let workbook = XLP.fromFileAsync(inFileName)
         .then(
             workbook => {
-                // Do not update general game data in the existing statsbook case
+                if (newSB){
+                // Only update game data for new statsbooks.
+                    workbook = updateGameData(workbook)
+                }
                 workbook = updateSkaters(workbook)
                 return workbook
             })
@@ -347,6 +349,39 @@ let getIGRFSkaters = (workbook) => {
 
 }
 
+let getCRGSkaters = () => {
+// Assuming a global crgData object, retrieve skaters from it
+    let crgSkaters = {}
+
+    // read the list of skaters from the crgData file and sb file if present
+    for(let t in crgData.teams){
+        let team = {}
+        let row = 0
+
+        for(let s in crgData.teams[t].skaters){
+            // Read the skater information from the scoreoard file
+            let number = crgData.teams[t].skaters[s].number
+            let name = crgData.teams[t].skaters[s].name
+            let id = crgData.teams[t].skaters[s].id
+            row = parseInt(s)            
+
+            // Add skater information to the team
+            team[id] = {
+                name: name,
+                number: number,
+                row: row
+            }
+
+        }
+
+        // Add each team to the "crgSkaters" object
+        crgSkaters[teamNames[t]] = team
+    }
+
+    return crgSkaters
+
+}
+
 let updateSkaters = (workbook) => {
 // Update the skater information.
 
@@ -357,9 +392,10 @@ let updateSkaters = (workbook) => {
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let row = 0
-        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+        //let maxNum = sbTemplate.teams[teamNames[t]].maxNum
 
-        if (crgData.teams[t].skaters.length > maxNum){
+        // TODO put this warning elsewhere
+        /*if (crgData.teams[t].skaters.length > maxNum){
             dialog.showMessageBox({
                 type: 'error',
                 buttons: ['Cancel'],
@@ -367,7 +403,7 @@ let updateSkaters = (workbook) => {
                 message: `There are more than ${maxNum} skaters present in the scoreboard data, the maximum allowable on the IGRF`
             })
             throw 'Too Many Skaters'
-        }
+        }*/
 
         for(let s in crgData.teams[t].skaters){
             // Read the skater information from the scoreoard file
