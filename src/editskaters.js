@@ -160,7 +160,7 @@ confirmBtn.addEventListener('click', () => {
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
         let IGRFSkaterNumbers = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number))
         let team = {}
-        let checkedNumbers = Array.from(document.getElementsByName('checklist0')).map((v) => v.value)
+        let checkedNumbers = Array.from(document.getElementsByName(`checklist${t}`)).map((v) => v.value)
         checkedNumbers.sort()
 
         for (let n in checkedNumbers){
