@@ -6,3 +6,6 @@ button {
     -webkit-app-region: no-drag;
 }
 
+#error-message {
+    color: rgb(255, 98, 125);
+}

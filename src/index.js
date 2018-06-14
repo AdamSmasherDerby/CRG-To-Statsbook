@@ -249,9 +249,10 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
 
 }
 
-ipc.on('skater-window-closed', (event, outFileName, skaters) => {
+ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
 // When the Edit Skaters dialog is closed, save to the statsbook.
-    if(skaters == undefined){return}
+    if(skaterList == undefined){return}
+    skaters = JSON.parse(skaterList)
     saveStatsbook(outFileName)
 })
 

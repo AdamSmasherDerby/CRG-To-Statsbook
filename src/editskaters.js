@@ -1,12 +1,17 @@
 const electron = require('electron')
 const remote = electron.remote
 const ipc = require('electron').ipcRenderer
+const uuid = require('uuid/v4')
 
 const cancelBtn = document.getElementById('cancelBtn')
 const confirmBtn = document.getElementById('confirmBtn')
 const skaterTableDiv = document.getElementById('skaterTableDiv')
+const errorMessage = document.getElementById('error-message')
 
 const teamNames = ['home','away']
+const maxNum = 20 // Make this dynamic at some point
+let crgData = {},
+    skatersOnIGRF = {}
 
 let outFileName = ''
 
@@ -103,11 +108,13 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
             checkDiv.setAttribute('class','form-check')
             let checkBox = document.createElement('input')
             Object.assign(checkBox, {
-                class: 'form-check-input',
                 type: 'checkBox',
                 name: `checklist${t}`,
                 value: number
             })
+            checkBox.setAttribute('class','form-check-input')
+            checkBox.addEventListener('click', () => {countChecks()})
+            if(inIGRF){checkBox.setAttribute('checked','true')}
             checkDiv.appendChild(checkBox)
             tableCell.appendChild(checkDiv)
             tableRow.appendChild(tableCell)
@@ -118,6 +125,27 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     return table
 }
 
+let countChecks = () => {
+// Count the number of checked boxes, and do something if there's more than maxNum on a team.
+    let tooMany = false
+    let errorText = ''
+
+    for (let t in teamNames){
+        let checklist = `checklist${t}`
+        let nChecks = Array.from(document.getElementsByName(checklist)).filter((v) => v.checked == true).length
+        if (nChecks > maxNum){
+            errorText += `Too many skaters checked on ${crgData.teams[t].name}. `
+            tooMany = true
+        }
+    }
+    if (tooMany){
+        confirmBtn.disabled = true
+    } else {
+        confirmBtn.disabled = false
+    }
+    errorMessage.innerHTML = (errorText != '' ? 'Warning: ' + errorText : '')
+}
+
 cancelBtn.addEventListener('click', () => {
     let window = remote.getCurrentWindow()
     ipc.send('skater-window-closed', outFileName, undefined)
@@ -126,15 +154,61 @@ cancelBtn.addEventListener('click', () => {
 
 confirmBtn.addEventListener('click', () => {
     let window = remote.getCurrentWindow()
-    let skaterList = undefined  //TODO - make this be not blank
-    ipc.send('skater-window-closed', outFileName, skaterList)
+    let skaterList = {}  
+
+    for (let t in teamNames){
+        let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
+        let IGRFSkaterNumbers = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number))
+        let team = {}
+        let checkedNumbers = Array.from(document.getElementsByName('checklist0')).map((v) => v.value)
+        checkedNumbers.sort()
+
+        for (let n in checkedNumbers){
+            let number = checkedNumbers[n],
+                IGRFskater = {},
+                CRGskater = {},
+                name = '',
+                id = ''
+
+            if(CRGSkaterNumbers.includes(number)){
+                CRGskater = crgData.teams[t].skaters.find(x => x.number == number)
+            }
+
+            if(IGRFSkaterNumbers.includes(number)){
+                IGRFskater = skatersOnIGRF[teamNames[t]].find(x => x.number == number)
+            }
+
+            // Get the skater name - priority to the name on the IGRF
+            name = (IGRFSkaterNumbers.includes(number) ? IGRFskater.name : CRGskater.name)
+            
+            // Take the unique ID from the CRG data if present, assign one otherwise
+            id = (CRGSkaterNumbers.includes(number) ? CRGskater.id : uuid())
+
+            team[id] = {
+                name: name,
+                number: number,
+                row: parseInt(n)
+            }
+
+        }
+
+        skaterList[teamNames[t]] = team
+    }
+
+    ipc.send('skater-window-closed', outFileName, JSON.stringify(skaterList))
     window.close()
 })
 
 ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
     outFileName = outFile
-    let crgData = JSON.parse(crgJSON)
-    let skatersOnIGRF = JSON.parse(skatersOnIGRFJSON)
+    crgData = JSON.parse(crgJSON)
+    skatersOnIGRF = JSON.parse(skatersOnIGRFJSON)
     skaterTableDiv.appendChild(makeSkaterTable(crgData, skatersOnIGRF))
 })
+
 //Array.from(document.getElementsByName('checklist0')).map((v) => v.value)
+
+// TODO:
+// Add a "deselect all" button (Eventually add a "select all" option)
+// When "confirm" button is cheked, combine the two lists, add ids skaters that don't have them, and return the skater list.
+// Warn if *names* don't match betwen IGRF and CRG

@@ -82,9 +82,16 @@ body {
     transition: 0s;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not([disabled]) {
     background-color: pink;
     color: #555;
     border-color: #555;
+    transition: 0s;
+}
+
+.btn-primary:disabled {
+    background-color: #999;
+    color: white;
+    border-color: #999;
     transition: 0s;
 }
