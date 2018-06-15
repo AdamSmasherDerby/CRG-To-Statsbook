@@ -25,7 +25,8 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
 
         // Get the list of all numbers in both locations.
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
-        let IGRFSkaterNumbers = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number))
+        let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
+            : Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)))
         let concatNumbers = CRGSkaterNumbers.concat(IGRFSkaterNumbers)
         let numberSet = new Set(concatNumbers)
         let allNumbers = [...numberSet]
@@ -48,7 +49,22 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeaderCell = document.createElement('th')
-        tableHeaderCell.appendChild(document.createTextNode('Keep'))
+        let allCheckDiv = document.createElement('div')
+        allCheckDiv.setAttribute('class','form-check')
+        let allCheckBox = document.createElement('input')
+        allCheckBox.setAttribute('class','form-check-input')
+        Object.assign(allCheckBox, {
+            type: 'checkBox',
+            id: `checkAll${t}`,
+            value: false
+        })
+        let allCheckLabel = document.createElement('label')
+        allCheckLabel.setAttribute('class','form-check-label')
+        allCheckLabel.setAttribute('for',`checkAll${t}`)
+        allCheckLabel.innerHTML = 'All'
+        allCheckDiv.appendChild(allCheckBox)
+        allCheckDiv.appendChild(allCheckLabel)
+        tableHeaderCell.appendChild(allCheckDiv)
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeader.setAttribute('class','thead-dark') 
@@ -138,27 +154,26 @@ let countChecks = () => {
             tooMany = true
         }
     }
-    if (tooMany){
-        confirmBtn.disabled = true
-    } else {
-        confirmBtn.disabled = false
-    }
+    confirmBtn.disabled = (tooMany ? true : false)
     errorMessage.innerHTML = (errorText != '' ? 'Warning: ' + errorText : '')
 }
 
 cancelBtn.addEventListener('click', () => {
+// Close the window when "Cancel" button is pressed.
     let window = remote.getCurrentWindow()
     ipc.send('skater-window-closed', outFileName, undefined)
     window.close()
 })
 
 confirmBtn.addEventListener('click', () => {
+// When the "Confirm" button is pressed, build and return the skater list
     let window = remote.getCurrentWindow()
     let skaterList = {}  
 
     for (let t in teamNames){
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
-        let IGRFSkaterNumbers = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number))
+        let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
+            : Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)))
         let team = {}
         let checkedNumbers = Array.from(document.getElementsByName(`checklist${t}`)).map((v) => v.value)
         checkedNumbers.sort()
@@ -206,9 +221,7 @@ ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
     skaterTableDiv.appendChild(makeSkaterTable(crgData, skatersOnIGRF))
 })
 
-//Array.from(document.getElementsByName('checklist0')).map((v) => v.value)
 
 // TODO:
 // Add a "deselect all" button (Eventually add a "select all" option)
-// When "confirm" button is cheked, combine the two lists, add ids skaters that don't have them, and return the skater list.
 // Warn if *names* don't match betwen IGRF and CRG

@@ -22,9 +22,7 @@ let crgFilename = '',
     sbTemplate = require('../assets/2018statsbook.json'),
     skaters = {},
     newSB = true,
-    skatersNotOnIGRF = [],
     skatersOnIGRF = {}
-
 
 const teamNames = ['home','away']
 
@@ -185,24 +183,13 @@ let createSaveArea = () => {
 
 let prepareForNewSb = (outFileName) => {
 // Given an oututput file name, write the game data to a fresh statsbook file.
-
     newSB = true
-    skaters = {}
-    let crgSkaters = getCRGSkaters(),
-        tooManySkaters = false
-
-    for (let t in teamNames){
-    // Determine if there are too many skaters in CRG for the size of the IGRF
-        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
-        if (Object.values(crgSkaters[teamNames[t]]).length > maxNum){
-            tooManySkaters = true
-        }
-    }
     
-    if (tooManySkaters){
+    if (tooManyCRGSkaters()){
+        // With a new Statsbook, only call the edit skaters window if there are too many skaters in CRG
         editSkatersWindow(crgData, {}, outFileName)
     } else {
-        skaters = crgSkaters
+        skaters = getCRGSkaters()
         saveStatsbook(outFileName)
     }
 }
@@ -215,11 +202,21 @@ let prepareForExisting = (outFileName) => {
         .then(
             workbook => {
                 skatersOnIGRF = getIGRFSkaters(workbook)
-                // Load CRG skaters, raise window to test for discrepancies
-                // only raise window if:
-                // Too many skaters in CRG
-                // Skater lists in IGRF and CRG do not match 1:1
-                editSkatersWindow(crgData,skatersOnIGRF,outFileName)
+
+                // Test for identical skater number lists between the IGRF and CRG
+                let CRGIGRFMatch = true
+                for (let t in teamNames){
+                    let CRGSkaterNumberString = Object.values(crgData.teams[t].skaters.map((v) => v.number)).sort().join(',')
+                    let IGRFSkaterNumberString = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)).sort().join(',')
+                    if (CRGSkaterNumberString != IGRFSkaterNumberString) {CRGIGRFMatch = false}
+                }
+                if (!CRGIGRFMatch || tooManyCRGSkaters){
+                    editSkatersWindow(crgData, skatersOnIGRF, outFileName)
+                } else {
+                    skaters = skatersOnIGRF
+                    saveStatsbook(outFileName)
+                }
+
             }
         )
 
@@ -258,13 +255,7 @@ ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
 
 let saveStatsbook = (outFileName) => {
 // Write the statsbook data, either to a new copy of the statsbook or to the specified file.
-    let inFileName = ''
-
-    if(newSB){
-        inFileName = statsbookFileName
-    } else {
-        inFileName = outFileName
-    }
+    let inFileName = (newSB ? statsbookFileName : outFileName )
 
     let workbook = XLP.fromFileAsync(inFileName)
         .then(
@@ -325,68 +316,10 @@ let updateGameData = (workbook) => {
     return workbook
 }
 
-let getIGRFSkaters = (workbook) => {
-// Given a workbook, get the list of skaters on the IGRF
-
-    for(let t in teamNames) {
-        skatersOnIGRF[teamNames[t]] = []
-        let teamName = teamNames[t]
-        let teamSheet = sbTemplate.teams[teamName].sheetName
-        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
-        for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
-            let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
-            let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value()
-            name = (name == undefined ? '' : name)
-            if (number != undefined){skatersOnIGRF[teamNames[t]].push({
-                number: number.toString(),
-                name: name,
-                row: s
-            })}
-        }
-    }
-
-    return(skatersOnIGRF)
-
-}
-
-let getCRGSkaters = () => {
-// Assuming a global crgData object, retrieve skaters from it
-    let crgSkaters = {}
-
-    // read the list of skaters from the crgData file and sb file if present
-    for(let t in crgData.teams){
-        let team = {}
-        let row = 0
-
-        for(let s in crgData.teams[t].skaters){
-            // Read the skater information from the scoreoard file
-            let number = crgData.teams[t].skaters[s].number
-            let name = crgData.teams[t].skaters[s].name
-            let id = crgData.teams[t].skaters[s].id
-            row = parseInt(s)            
-
-            // Add skater information to the team
-            team[id] = {
-                name: name,
-                number: number,
-                row: row
-            }
-
-        }
-
-        // Add each team to the "crgSkaters" object
-        crgSkaters[teamNames[t]] = team
-    }
-
-    return crgSkaters
-
-}
-
 let updateSkaters = (workbook) => {
 // Update the skater information.
 
-    // read the list of skaters from the crgData file and sb file if present
+/*     // read the list of skaters from the crgData file and sb file if present
     for(let t in crgData.teams){
         let team = {}
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
@@ -394,17 +327,6 @@ let updateSkaters = (workbook) => {
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let row = 0
         //let maxNum = sbTemplate.teams[teamNames[t]].maxNum
-
-        // TODO put this warning elsewhere
-        /*if (crgData.teams[t].skaters.length > maxNum){
-            dialog.showMessageBox({
-                type: 'error',
-                buttons: ['Cancel'],
-                title: 'CRG to Statsbook',
-                message: `There are more than ${maxNum} skaters present in the scoreboard data, the maximum allowable on the IGRF`
-            })
-            throw 'Too Many Skaters'
-        }*/
 
         for(let s in crgData.teams[t].skaters){
             // Read the skater information from the scoreoard file
@@ -510,46 +432,31 @@ let updateSkaters = (workbook) => {
             })
             throw 'Missing Skaters without room to add'
         }
-    }
+    } */
 
-    if (!newSB) {
-        // If this is an existing statsbook rewrite all the names and numbers
-        // *even if there were no errors*.  I have no idea why this is necessary,
-        // but it breaks conditional formatting if you don't do it.
-        for (let t in teamNames){
-            let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
-            let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-            let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
 
-            // Go through list of skaters on this team.
-            for (let s in Object.keys(skaters[teamNames[t]])){
-                let id = Object.keys(skaters[teamNames[t]])[s]
-                let name = skaters[teamNames[t]][id].name
-                let number = skaters[teamNames[t]][id].number
-                let row = skaters[teamNames[t]][id].row
-                
-                // Repopulate the IGRF
-                workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
-                workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
-            }
+    // If this is an existing statsbook rewrite all the names and numbers
+    // *even if there were no errors*.  I have no idea why this is necessary,
+    // but it breaks conditional formatting if you don't do it.
+    for (let t in teamNames){
+        let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
+        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
+        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+
+        // Go through list of skaters on this team.
+        for (let s in Object.keys(skaters[teamNames[t]])){
+            let id = Object.keys(skaters[teamNames[t]])[s]
+            let name = skaters[teamNames[t]][id].name
+            let number = skaters[teamNames[t]][id].number
+            let row = skaters[teamNames[t]][id].row
+            
+            // Repopulate the IGRF
+            workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
+            workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
         }
     }
 
     return workbook
-}
-
-let addSkatersDialog = (errorMsg) => {
-
-    let addSkaters = dialog.showMessageBox({
-        type: 'question',
-        buttons: ['Add','Cancel'],
-        title: 'CRG to Statsbook',
-        message: 'The following skaters are in the scoreboard data, ' + 
-        'but not present on the IGRF.  Would you like to add them to the IGRF or Cancel?',
-        detail: errorMsg
-    })
-
-    return (addSkaters == 0 ? true : false)
 }
 
 let updatePenalties = (workbook) => {
@@ -753,6 +660,80 @@ let updateGameClock = (workbook) => {
 
 // Helper functions
 
+let getIGRFSkaters = (workbook) => {
+// Given a workbook, get the list of skaters on the IGRF
+
+    for(let t in teamNames) {
+        skatersOnIGRF[teamNames[t]] = []
+        let teamName = teamNames[t]
+        let teamSheet = sbTemplate.teams[teamName].sheetName
+        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
+        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+        for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+            let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
+            let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value()
+            name = (name == undefined ? '' : name)
+            if (number != undefined){skatersOnIGRF[teamNames[t]].push({
+                number: number.toString(),
+                name: name,
+                row: s
+            })}
+        }
+    }
+
+    return(skatersOnIGRF)
+
+}
+
+let getCRGSkaters = () => {
+// Assuming a global crgData object, retrieve skaters from it
+    let crgSkaters = {}
+
+    // read the list of skaters from the crgData file and sb file if present
+    for(let t in crgData.teams){
+        let team = {}
+        let row = 0
+
+        for(let s in crgData.teams[t].skaters){
+            // Read the skater information from the scoreoard file
+            let number = crgData.teams[t].skaters[s].number
+            let name = crgData.teams[t].skaters[s].name
+            let id = crgData.teams[t].skaters[s].id
+            row = parseInt(s)            
+
+            // Add skater information to the team
+            team[id] = {
+                name: name,
+                number: number,
+                row: row
+            }
+
+        }
+
+        // Add each team to the "crgSkaters" object
+        crgSkaters[teamNames[t]] = team
+    }
+
+    return crgSkaters
+
+}
+
+let tooManyCRGSkaters = () => {
+// Return true if there are more skaters in CRG on either team than the limit
+
+    let crgSkaters = getCRGSkaters(),
+        tooManySkaters = false
+
+    for (let t in teamNames){
+    // Determine if there are too many skaters in CRG for the size of the IGRF
+        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+        if (Object.values(crgSkaters[teamNames[t]]).length > maxNum){
+            tooManySkaters = true
+        }
+    }
+    return tooManySkaters
+}
+
 let rowcol = (rcstring) => {
 // Return row and col as 1 indexed numbers
     let [, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
@@ -763,6 +744,7 @@ let rowcol = (rcstring) => {
 }
 
 window.onerror = (msg, url, lineNo, columnNo) => {
+// Catch unhandled errors and send them back to main.js
     ipc.send('error-thrown', msg, url, lineNo, columnNo)
     return false
 }
