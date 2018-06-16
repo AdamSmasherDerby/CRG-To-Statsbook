@@ -21,7 +21,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     table.setAttribute('class','table')
 
     for (let t in crgData.teams){
-        // For each team
+    // For each team
 
         // Get the list of all numbers in both locations.
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
@@ -56,8 +56,10 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         Object.assign(allCheckBox, {
             type: 'checkBox',
             id: `checkAll${t}`,
-            value: false
+            checked: false,
+            value: t
         })
+        allCheckBox.addEventListener('click', (event) => {toggleAll(event)})
         let allCheckLabel = document.createElement('label')
         allCheckLabel.setAttribute('class','form-check-label')
         allCheckLabel.setAttribute('for',`checkAll${t}`)
@@ -158,6 +160,16 @@ let countChecks = () => {
     errorMessage.innerHTML = (errorText != '' ? 'Warning: ' + errorText : '')
 }
 
+let toggleAll = (event) => {
+// Toggle all the checkboxes for this team
+
+    let checklist = `checklist${event.currentTarget.value}`
+    let checkArray = document.getElementsByName(checklist)
+    checkArray.forEach(x => x.checked = event.currentTarget.checked)
+
+    countChecks()
+}
+
 cancelBtn.addEventListener('click', () => {
 // Close the window when "Cancel" button is pressed.
     let window = remote.getCurrentWindow()
@@ -175,7 +187,10 @@ confirmBtn.addEventListener('click', () => {
         let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
             : Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)))
         let team = {}
-        let checkedNumbers = Array.from(document.getElementsByName(`checklist${t}`)).map((v) => v.value)
+        let checkedNumbers = Array
+            .from(document.getElementsByName(`checklist${t}`))
+            .filter(x => x.checked)
+            .map((v) => v.value)
         checkedNumbers.sort()
 
         for (let n in checkedNumbers){

@@ -463,33 +463,35 @@ let updatePenalties = (workbook) => {
 // Update the penalty data in the statsbook from the CRG data
     let sheet = sbTemplate.penalties.sheetName
 
-    for(let t in crgData.teams){
+    for(let t in teamNames){
     // For each team
+        let teamName = teamNames[t]
+        let team = skaters[teamName]
 
         for (let p=1; p<3; p++){
         // For each period
-            let firstPenaltyCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstPenalty)            
+            let firstPenaltyCell = rowcol(sbTemplate.penalties[p][teamName].firstPenalty)            
             let pFirstCol = firstPenaltyCell.c
             
-            let firstJamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstJam)
+            let firstJamCell = rowcol(sbTemplate.penalties[p][teamName].firstJam)
             let jFirstCol = firstJamCell.c
 
-            let firstFOCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstFO)
-            let firstFOJamCell = rowcol(sbTemplate.penalties[p][teamNames[t]].firstFOJam)
+            let firstFOCell = rowcol(sbTemplate.penalties[p][teamName].firstFO)
+            let firstFOJamCell = rowcol(sbTemplate.penalties[p][teamName].firstFOJam)
 
-            for (let s in crgData.teams[t].skaters){
+            for (let skaterID in team){
             // For each skater on the team
 
-                let skaterID = crgData.teams[t].skaters[s].id
-                let skaterData = skaters[teamNames[t]][skaterID]
-                let penaltyRow = firstPenaltyCell.r + (skaterData.row * 2)
-                let jamRow = firstJamCell.r + (skaterData.row * 2)
+                let skater = team[skaterID]
+                let skaterData = crgData.teams[t].skaters.find(x => x.id == skaterID)
+                let penaltyRow = firstPenaltyCell.r + (skater.row * 2)
+                let jamRow = firstJamCell.r + (skater.row * 2)
                 let lastPenaltyCode = 'EXP'
 
-                if(crgData.teams[t].skaters[s].penalties.length > 0){
+                if(skaterData.penalties.length > 0){
                     // If they have any penalties, add them
 
-                    let plist = crgData.teams[t].skaters[s].penalties
+                    let plist = skaterData.penalties
                     lastPenaltyCode = plist[plist.length-1].code
 
                     let priorPenalties = plist.filter(x => x.period < p).length
@@ -510,16 +512,16 @@ let updatePenalties = (workbook) => {
 
                 }
 
-                if(crgData.teams[t].skaters[s].hasOwnProperty('fo_exp')){
+                if(skaterData.hasOwnProperty('fo_exp')){
                     let code = ''
-                    if (crgData.teams[t].skaters[s].fo_exp.code == 'FO'){
+                    if (skaterData.fo_exp.code == 'FO'){
                         code = 'FO'
-                    } else if (crgData.teams[t].skaters[s].fo_exp.code == 'EXP'){
+                    } else if (skaterData.fo_exp.code == 'EXP'){
                         code = lastPenaltyCode
                     } else {
                         code = '??'
                     }
-                    let jam = crgData.teams[t].skaters[s].fo_exp.jam
+                    let jam = skaterData.fo_exp.jam
                     workbook.sheet(sheet).row(penaltyRow).cell(firstFOCell.c).value(code)
                     workbook.sheet(sheet).row(jamRow).cell(firstFOJamCell.c).value(jam)
                 }
