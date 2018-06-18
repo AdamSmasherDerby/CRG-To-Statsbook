@@ -488,7 +488,7 @@ let updatePenalties = (workbook) => {
                 let jamRow = firstJamCell.r + (skater.row * 2)
                 let lastPenaltyCode = 'EXP'
 
-                if(skaterData.penalties.length > 0){
+                if(skaterData != undefined && skaterData.penalties.length > 0){
                     // If they have any penalties, add them
 
                     let plist = skaterData.penalties
@@ -512,7 +512,7 @@ let updatePenalties = (workbook) => {
 
                 }
 
-                if(skaterData.hasOwnProperty('fo_exp')){
+                if(skaterData != undefined && skaterData.hasOwnProperty('fo_exp')){
                     let code = ''
                     if (skaterData.fo_exp.code == 'FO'){
                         code = 'FO'
