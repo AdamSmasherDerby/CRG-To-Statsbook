@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CRG Data Tool</title>
+        <link rel="stylesheet" href="../node_modules/typeface-raleway/index.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../css/index.css">
+        <link rel="stylesheet" href="../css/editskaters.css">
+    </head>
+    <body>
+        <div class="container my-ui-text">
+            <div class="row my-3">
+                <H3>Confirm Skaters</H3><br>
+            </div>
+            <P>
+            Different skaters are present on the IGRF and in the scoreboard data, or there are too many skaters present.
+            Please select which skaters you wish to keep on the IGRF.
+            </P>
+            <P id="error-message"></P>
+            <form>
+                <div class="row my-3">
+                    <button id="cancelBtn" type="button" class="btn btn-primary btn-sm mr-2">Cancel</button>
+                    <button id="confirmBtn" type="button" class="btn btn-primary btn-sm">Confirm</button>
+                </div>
+            </form>
+            <div id="skaterTableDiv" class="row my-3">
+            </div>
+
+        </div>
+
+        <script>
+            window.jQuery = window.$ = require('jquery');
+        </script>
+        <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    </body>
+    <script src="editskaters.js"></script>
+</html>

@@ -12,6 +12,7 @@
     "dist": "electron-builder"
   },
   "devDependencies": {
+    "devtron": "^1.4.0",
     "electron": "2.0.0",
     "electron-builder": "20.8.1",
     "eslint": "^4.19.1"
@@ -20,10 +21,12 @@
     "bootstrap": "^4.1.0",
     "electron-debug": "^2.0.0",
     "electron-is-dev": "^0.3.0",
+    "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "moment": "^2.22.1",
     "popper.js": "1.14.0",
     "typeface-raleway": "^0.0.54",
+    "uuid": "^3.2.1",
     "xlsx": "^0.12.10",
     "xlsx-populate": "^1.14.0",
     "xlsx-style": "^0.8.13"

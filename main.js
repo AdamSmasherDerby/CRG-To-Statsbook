@@ -25,6 +25,7 @@ let createWindow = () => {
 
     if (isDev){
         win.webContents.openDevTools()
+        //require('devtron').install()
     }
 
     win.on('closed', ()=> {
@@ -46,6 +47,14 @@ let createWindow = () => {
             message: 'CRG Data Tool has become unresponsive.  Perhaps you should give it some personal space.'
         })
     })
+
+    win.webContents.on('new-window', 
+        (event, url, frameName, disposition, options) => {
+            Object.assign(options, {
+                parent: win,
+                modal: true
+            })
+        })
 
     menu = Menu.buildFromTemplate([
         {
@@ -90,6 +99,7 @@ app.on('activate',() => {
 })
 
 let openAbout = () => {
+// opening function for "About This Software" window
     aboutWin = new BrowserWindow({
         parent: win,
         title: 'CRG Data Tool',
@@ -122,6 +132,12 @@ let openAbout = () => {
     })
     
 }
+
+ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
+    win.webContents.send('skater-window-closed',outFileName, skaterList)
+})
+
+// Error handlers
 
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
     dialog.showMessageBox(win, {
