@@ -572,8 +572,15 @@ let updateScores = (workbook) => {
                 let jammerList = crgData.periods[p].jams[j].teams[t].skaters.filter(
                     x => x.position == 'Jammer'
                 )
+                // The jammer ID is undefined if no jammer was entered in this jam
                 let jammerID = (jammerList.length > 0 ? jammerList[0].id : undefined)
-                let jammerNumber = (jammerID ? skaters[teamNames[t]][jammerID].number : '')
+
+                // Should return '' for jammer number if the jammer was not entered
+                // OR if the jammer was not selected from the edit skaters window
+                let jammerNumber = 
+                    jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
+                        skaters[teamNames[t]][jammerID].number : ''
+                
 
                 // Add the jam number and jammer number to scores
                 workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
@@ -583,8 +590,11 @@ let updateScores = (workbook) => {
                 let pivotList = crgData.periods[p].jams[j].teams[t].skaters.filter(
                     x => x.position =='Pivot'
                 )
+
                 let pivotID = (pivotList.length > 0 ? pivotList[0].id : undefined)
-                let pivotNumber = (pivotID ? skaters[teamNames[t]][pivotID].number : '')
+                let pivotNumber = 
+                    pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID) ?
+                        skaters[teamNames[t]][pivotID].number : ''
 
                 // Add the pivot number to lineups
                 workbook.sheet(lineupSheet).row(lineupPivotCells[team].r).cell(lineupPivotCells[team].c).value(pivotNumber)
