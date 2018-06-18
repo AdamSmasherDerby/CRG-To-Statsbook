@@ -108,17 +108,19 @@ let createSaveArea = () => {
 
     rightBox.innerHTML = '<div class="col-12 text-center">Save To:&nbsp;<button id="save-blank" type="button" class="btn btn-primary btn-sm">New StatsBook</button></div>'
     rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
+
     let sbBox = document.createElement('div')
     $(sbBox).attr({'class':'col-md-10','id':'drag-sb-file'})
     let inputArea = document.createElement('input')
     $(inputArea).attr({'type':'file','name':'sbfile', 'id': 'sbfile-select','class':'inputfile','accept':'.xlsx'})
     let sbInputLabel = document.createElement('label')
     sbInputLabel.setAttribute('for','sbfile-select')
+    sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
+
     sbBox.appendChild(inputArea)
     sbBox.appendChild(sbInputLabel)
     rightBox.appendChild(sbBox)
-    sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
-
+    
     saveNewButton = document.getElementById('save-blank')
     sbHolder = document.getElementById('drag-sb-file')
     sbFileSelect = document.getElementById('sbfile-select')
@@ -132,6 +134,11 @@ let createSaveArea = () => {
             $('*:focus').blur()
 
         })
+    }
+
+    sbFileSelect.onclick = () => {
+    // Allows the same file to be selected more than once
+        sbFileSelect.value = ''
     }
 
     sbFileSelect.onchange = (e) => {
@@ -167,6 +174,7 @@ let createSaveArea = () => {
     }
 
     sbHolder.ondragover = () => {
+        sbFileSelect.value = ''
         holder.classList.add('box__ondragover')
         return false
     }
@@ -182,7 +190,7 @@ let createSaveArea = () => {
 }
 
 let prepareForNewSb = (outFileName) => {
-// Given an oututput file name, write the game data to a fresh statsbook file.
+// Given an oututput file name, prepare to write the game data to a fresh statsbook file.
     newSB = true
     
     if (tooManyCRGSkaters()){
@@ -210,7 +218,7 @@ let prepareForExisting = (outFileName) => {
                     let IGRFSkaterNumberString = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)).sort().join(',')
                     if (CRGSkaterNumberString != IGRFSkaterNumberString) {CRGIGRFMatch = false}
                 }
-                if (!CRGIGRFMatch || tooManyCRGSkaters){
+                if (!CRGIGRFMatch || tooManyCRGSkaters()){
                     editSkatersWindow(crgData, skatersOnIGRF, outFileName)
                 } else {
                     skaters = skatersOnIGRF
@@ -317,128 +325,10 @@ let updateGameData = (workbook) => {
 }
 
 let updateSkaters = (workbook) => {
-// Update the skater information.
+// Update the skater information on the IGRF.  Necessary even for existing statsbooks, not sure why.
 
-/*     // read the list of skaters from the crgData file and sb file if present
-    for(let t in crgData.teams){
-        let team = {}
-        let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
-        let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-        let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
-        let row = 0
-        //let maxNum = sbTemplate.teams[teamNames[t]].maxNum
-
-        for(let s in crgData.teams[t].skaters){
-            // Read the skater information from the scoreoard file
-            let number = crgData.teams[t].skaters[s].number
-            let name = crgData.teams[t].skaters[s].name
-            let id = crgData.teams[t].skaters[s].id
-
-            if(!newSB){
-                // If we are updating an existing statsbook,
-                // Record the row number on the IGRF for each skater. (zero indexed)
-                let igrfEntry = skatersOnIGRF[teamNames[t]].find(x => x.number == number)
-
-                if (!igrfEntry){
-                    skatersNotOnIGRF.push({team: t, number: number, name:name, id: id})
-                } else {
-                    row = igrfEntry.row
-                }
-
-            } else {
-                // If we're making a new statsbook, just assign the row numbers in order
-                // and write the skaters to the IGRF
-                row = parseInt(s)
-                workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
-                workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
-            }
-
-            // Add skater information to the internal table
-            team[id] = {
-                name: name,
-                number: number,
-                row: row
-            }
-
-        }
-
-        // Add each team to the "skaters" object
-        skaters[teamNames[t]] = team
-    }
-
-    if (skatersNotOnIGRF.length > 0) {
-        // Throw an error if there are skaters in the scoreboard not on the IGRF
-        let errorMsg = ''        
-        let emptyRosterSpots = []
-        let neededRosterSpots = []
-        let enoughSpots = []
-
-        for (let s in skatersNotOnIGRF){
-            // Create the error messgae listing the missing skaters
-            errorMsg += `Team: ${parseInt(skatersNotOnIGRF[s].team)+1} Number: ${skatersNotOnIGRF[s].number}\n`
-        }
-
-        for (let t in teamNames){
-            // Determine if there is room to add the missing skaters
-            emptyRosterSpots[t] = sbTemplate.teams[teamNames[t]].maxNum - Object.keys(skatersOnIGRF[teamNames[t]]).length
-            neededRosterSpots[t] = skatersNotOnIGRF.filter(x => x.team == t).length
-            enoughSpots[t] = (emptyRosterSpots[t] >= neededRosterSpots[t] ? true : false)
-        }
-
-        if(enoughSpots.every(x => x == true)){
-            // If there is enough room, ask the user if they wish to do so.
-            let addSkaters = addSkatersDialog(errorMsg)
-            if (addSkaters){
-                // If the user choses to add the skaters, do so
-                for (let t in teamNames){
-                    let row = Object.keys(skaters[teamNames[t]]).length
-                    let newSkaters = skatersNotOnIGRF.filter(x => x.team == t)
-
-                    for (let s in newSkaters){
-                        // Add each new skater to the internal table and assign them the next available row number
-                        skaters[teamNames[t]][newSkaters[s].id] = {
-                            name: newSkaters[s].name,
-                            number: newSkaters[s].number,
-                            row: row
-                        }
-                        row++
-                    }
-
-                    // Get array of skater numbers on this team
-                    let allNumbers = Object.values(skaters[teamNames[t]]).map((v) => (v.number))
-                    
-                    // Put the list in roster order
-                    allNumbers.sort()
-
-                    // Go through list of skaters on this team.
-                    for (let s in Object.keys(skaters[teamNames[t]])){
-                        let id = Object.keys(skaters[teamNames[t]])[s]
-                        
-                        // Reassign row number to be index of skater number in sorted list
-                        let row = allNumbers.indexOf(skaters[teamNames[t]][id].number)
-                        skaters[teamNames[t]][id].row = row
-                    }
-
-                }
-            }
-        } else {
-            dialog.showMessageBox({
-                type: 'error',
-                buttons: ['Cancel'],
-                title: 'CRG to Statsbook',
-                message: 'The following skaters are in the scoreboard data,' + 
-                'but not present on the IGRF. There is not enough room on the IGRF to add them.',
-                detail: errorMsg
-            })
-            throw 'Missing Skaters without room to add'
-        }
-    } */
-
-
-    // If this is an existing statsbook rewrite all the names and numbers
-    // *even if there were no errors*.  I have no idea why this is necessary,
-    // but it breaks conditional formatting if you don't do it.
     for (let t in teamNames){
+
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
@@ -533,8 +423,7 @@ let updatePenalties = (workbook) => {
 }
 
 let updateScores = (workbook) => {
-// Process scores.
-    // For the time being, that just means jammers and jam numbers.
+// Process scores - for the time being, that just means jammers and jam numbers.
     let scoreSheet = sbTemplate.score.sheetName
     let lineupSheet = sbTemplate.lineups.sheetName
     let jamCells = {home: {}, away: {}}
@@ -776,5 +665,3 @@ holder.ondragleave = () => {
 holder.ondragend = () => {
     return false
 }
-
-// TODO - Figure out why the second run doesn't work
