@@ -5,6 +5,7 @@ const ipc = require('electron').ipcRenderer
 const remote = require('electron').remote
 const path = require('path')
 const BrowserWindow = remote.BrowserWindow
+const uuid = require('uuid/v4')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -215,7 +216,7 @@ let prepareForExisting = (outFileName) => {
                 let CRGIGRFMatch = true
                 for (let t in teamNames){
                     let CRGSkaterNumberString = Object.values(crgData.teams[t].skaters.map((v) => v.number)).sort().join(',')
-                    let IGRFSkaterNumberString = Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)).sort().join(',')
+                    let IGRFSkaterNumberString = Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number).sort().join(',')
                     if (CRGSkaterNumberString != IGRFSkaterNumberString) {CRGIGRFMatch = false}
                 }
                 if (!CRGIGRFMatch || tooManyCRGSkaters()){
@@ -281,7 +282,7 @@ let saveStatsbook = (outFileName) => {
         .then(
             workbook => {
                 workbook = updatePenalties(workbook)
-                workbook = updateScores(workbook)
+                workbook = updateLineups(workbook)
                 workbook = updateGameClock(workbook)
                 workbook.toFileAsync(outFileName)
                     .then(
@@ -425,19 +426,20 @@ let updatePenalties = (workbook) => {
     return workbook
 }
 
-let updateScores = (workbook) => {
-// Process scores - for the time being, that just means jammers and jam numbers.
-    let scoreSheet = sbTemplate.score.sheetName
-    let lineupSheet = sbTemplate.lineups.sheetName
-    let jamCells = {home: {}, away: {}}
-    let jammerCells = {home: {}, away: {}}
-    let lineupJammerCells = {home: {}, away: {}}
-    let lineupNoPivotCells = {home: {}, away: {}}
-    let lineupPivotCells = {home: {}, away: {}}
-    let boxCodes = sbTemplate.lineups.boxCodes
+let updateLineups = (workbook) => {
+// Process lineups - add jammers to the score sheet and everyone else to the lineup tab
+    let scoreSheet = sbTemplate.score.sheetName,
+        lineupSheet = sbTemplate.lineups.sheetName,
+        jamCells = {home: {}, away: {}},
+        jammerCells = {home: {}, away: {}},
+        lineupJammerCells = {home: {}, away: {}},
+        lineupNoPivotCells = {home: {}, away: {}},
+        lineupPivotCells = {home: {}, away: {}},
+        boxCodes = sbTemplate.lineups.boxCodes,
+        blockerRe = /Blocker(\d)/
 
     for (let p in crgData.periods){
-        // For each period
+    // For each period
         let period = crgData.periods[p].period
 
         // Get the starting cells for jam number and jammer         
@@ -450,7 +452,7 @@ let updateScores = (workbook) => {
         })
 
         for (let j in crgData.periods[p].jams){
-            // For each jam
+        // For each jam
 
             // Retrieve the common jam number.
             let jamNumber = crgData.periods[p].jams[j].jam
@@ -468,7 +470,7 @@ let updateScores = (workbook) => {
                 let jammerID = (jammerList.length > 0 ? jammerList[0].id : undefined)
 
                 // Should return '' for jammer number if the jammer was not entered
-                // OR if the jammer was not selected from the edit skaters window
+                // OR if the selected jammer is not present in the skater list.
                 let jammerNumber = 
                     jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
                         skaters[teamNames[t]][jammerID].number : ''
@@ -484,12 +486,41 @@ let updateScores = (workbook) => {
                 )
 
                 let pivotID = (pivotList.length > 0 ? pivotList[0].id : undefined)
-                let pivotNumber = 
-                    pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID) ?
-                        skaters[teamNames[t]][pivotID].number : ''
+                let pivotNumber = pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID)
+                    ? skaters[teamNames[t]][pivotID].number 
+                    : ''
 
                 // Add the pivot number to lineups
-                workbook.sheet(lineupSheet).row(lineupPivotCells[team].r).cell(lineupPivotCells[team].c).value(pivotNumber)
+                workbook.sheet(lineupSheet)
+                    .row(lineupPivotCells[team].r)
+                    .cell(lineupPivotCells[team].c)
+                    .value(pivotNumber)
+
+                // Retrieve the blocker numbers
+                let blockerList = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                    x => blockerRe.test(x.position)
+                )
+
+                let firstBlockerOffset = 1
+                if (blockerList.length > 3 && pivotID == undefined){
+                // If there are more than three blockers and the pivot is undefined, start entering blockers in the pivot box
+                    workbook.sheet(lineupSheet).row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X') 
+                    firstBlockerOffset = 0
+                    // TODO test this branch
+                }
+
+                for (let b = 0; (b < 4 && b < blockerList.length); b++){
+                // Add blockers to statsbook
+                    let blockerID = blockerList[b].id
+                    let blockerNumber = skaters[teamNames[t]].hasOwnProperty(blockerID) 
+                        ? skaters[teamNames[t]][blockerID].number 
+                        : ''
+                    workbook.sheet(lineupSheet)
+                        .row(lineupPivotCells[team].r)
+                        .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1))
+                        .value(blockerNumber)
+                }
+
 
                 // check for star pass
                 starPass[t] = crgData.periods[p].jams[j].teams[t].starPass
@@ -505,6 +536,18 @@ let updateScores = (workbook) => {
                     workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(pivotNumber)
                     workbook.sheet(lineupSheet).row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X')
                     workbook.sheet(lineupSheet).row(lineupPivotCells[team].r).cell(lineupPivotCells[team].c).value(jammerNumber)
+
+                    for (let b = 0; (b < 3 && b < blockerList.length); b++){
+                    // Add blockers to star pass line
+                        let blockerID = blockerList[b].id
+                        let blockerNumber = skaters[teamNames[t]].hasOwnProperty(blockerID) 
+                            ? skaters[teamNames[t]][blockerID].number 
+                            : ''
+                        workbook.sheet(lineupSheet)
+                            .row(lineupPivotCells[team].r)
+                            .cell(lineupPivotCells[team].c + (b + 1) * (boxCodes + 1))
+                            .value(blockerNumber)
+                    }
                 }
             }
 
@@ -577,11 +620,16 @@ let getIGRFSkaters = (workbook) => {
             let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
             let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value()
             name = (name == undefined ? '' : name)
-            if (number != undefined){skatersOnIGRF[teamNames[t]].push({
-                number: number.toString(),
-                name: name,
-                row: s
-            })}
+            let scoreboardMatch = crgData.teams[t].skaters.find(x => x.number == number)
+            let id = scoreboardMatch != undefined ? scoreboardMatch.id : uuid()
+            if (number != undefined){
+                skatersOnIGRF[teamNames[t]][id]={
+                    number: number.toString(),
+                    name: name,
+                    row: s,
+                    id: id
+                }
+            }
         }
     }
 

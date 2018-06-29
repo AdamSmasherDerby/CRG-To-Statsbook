@@ -1,6 +1,6 @@
 CRG Data Tool is a utility for converting output Game Data files from CRG Scoreboard and to WFTDA StatsBooks.  It can either generate a new statsbook based on a template or repopulate an existing statsbook file.  If there is a conflict between your scoreboard data and an existing statsbook file, it will attempt to help you resolve the conflict.
 
-This software is still in alpha stage. As such, be sure to back up any StatsBook files *before* feeding them to this program, unless you want to risk retyping stuff.
+This software is still in beta stage. As such, be sure to back up any StatsBook files *before* feeding them to this program, unless you want to risk retyping stuff.
 
 Although the software uses data from both CRG Scoreboard and WFTDA, it is not provided, endorsed, produced, or supported by the WFTDA. 
 
@@ -10,16 +10,17 @@ At present, CRG Scoreboard does not record enough data for a full statsbook, and
 
 ## Current Abilities
 
-At present, this tool can populate the following information from the game data file:
+At present, this tool can populate the following information from the game data file.  Information which is not entered in CRG is skipped.
 
 * Game Time and Date
 * Team Names
 * Team Rosters with name and number
-* Jam Numbers, including star passes if entered
-* Jammer numbers, if entered
-* Pivot numbers, if entered
-* Penalty codes, if entered
-* Foul Outs, if entered
+* Jam Numbers, including star passes
+* Jammer numbers
+* Pivot numbers
+* Blocker numbers
+* Penalty codes
+* Foul Outs
 * Expulsions
     * If the user is running a dev version of CRG that records expulsion codes, the program will use that, otherwise it will assume that the last penalty entered is the penalty for which the skater was expelled.
 * Jam times on the Game Clock sheet.  Because why not?
