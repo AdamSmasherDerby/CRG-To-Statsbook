@@ -20,8 +20,8 @@ At present, this tool can populate the following information from the game data 
 * Pivot numbers, if entered
 * Penalty codes, if entered
 * Foul Outs, if entered
-* Expulsions, sort of.
-    * Note that CRG does not currently record the penalty code for expulsions.  The tool will assume that the last penalty recorded for an expelled skater is the one for which they were expelled.  The user should manually verify that this (and frankly, every other darn thing this program does) is correct.
+* Expulsions
+    * If the user is running a dev version of CRG that records expulsion codes, the program will use that, otherwise it will assume that the last penalty entered is the penalty for which the skater was expelled.
 * Jam times on the Game Clock sheet.  Because why not?
 
 Flamingo icon from http://www.iconsmind.com
@@ -40,3 +40,4 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 ### Release Notes
 
 * 0.0.1 - Alpha release for testing at BrewHaHa
+* 0.3.0 - Initial Public Beta

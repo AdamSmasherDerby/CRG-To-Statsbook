@@ -351,7 +351,8 @@ let updateSkaters = (workbook) => {
 
 let updatePenalties = (workbook) => {
 // Update the penalty data in the statsbook from the CRG data
-    let sheet = sbTemplate.penalties.sheetName
+    let sheet = sbTemplate.penalties.sheetName,
+        expRe = /EXP-(\w)/
 
     for(let t in teamNames){
     // For each team
@@ -406,6 +407,8 @@ let updatePenalties = (workbook) => {
                     let code = ''
                     if (skaterData.fo_exp.code == 'FO'){
                         code = 'FO'
+                    } else if (expRe.exec(skaterData.fo_exp.code) != null) {
+                        code = expRe.exec(skaterData.fo_exp.code)[1]
                     } else if (skaterData.fo_exp.code == 'EXP'){
                         code = lastPenaltyCode
                     } else {
