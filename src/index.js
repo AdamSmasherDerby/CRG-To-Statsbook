@@ -614,7 +614,7 @@ let getIGRFSkaters = (workbook) => {
 // Given a workbook, get the list of skaters on the IGRF
 
     for(let t in teamNames) {
-        skatersOnIGRF[teamNames[t]] = []
+        skatersOnIGRF[teamNames[t]] = {}
         let teamName = teamNames[t]
         let teamSheet = sbTemplate.teams[teamName].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)

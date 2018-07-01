@@ -41,4 +41,7 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 ### Release Notes
 
 * 0.0.1 - Alpha release for testing at BrewHaHa
-* 0.3.0 - Initial Public Beta
+* 0.3.0 - July 1, 2018
+    * Initial Public Beta
+* 0.3.1 - Also July 1, 2018
+    * Immediate Bug Fix. (Nice going, Smasher.)

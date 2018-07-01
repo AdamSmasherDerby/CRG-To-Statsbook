@@ -26,7 +26,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         // Get the list of all numbers in both locations.
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
         let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
-            : Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)))
+            : Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number))
         let concatNumbers = CRGSkaterNumbers.concat(IGRFSkaterNumbers)
         let numberSet = new Set(concatNumbers)
         let allNumbers = [...numberSet]
@@ -82,7 +82,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
 
             if(IGRFSkaterNumbers.includes(number)){
             // If the skater is on the IGRF, use the name from there
-                skater = skatersOnIGRF[teamNames[t]].find(x => x.number == number)
+                skater = Object.values(skatersOnIGRF[teamNames[t]]).find(x => x.number == number)
                 name = skater.name
                 inIGRF = true
             }
@@ -185,7 +185,7 @@ confirmBtn.addEventListener('click', () => {
     for (let t in teamNames){
         let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
         let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
-            : Object.values(skatersOnIGRF[teamNames[t]].map((v) => v.number)))
+            : Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number))
         let team = {}
         let checkedNumbers = Array
             .from(document.getElementsByName(`checklist${t}`))
@@ -205,7 +205,7 @@ confirmBtn.addEventListener('click', () => {
             }
 
             if(IGRFSkaterNumbers.includes(number)){
-                IGRFskater = skatersOnIGRF[teamNames[t]].find(x => x.number == number)
+                IGRFskater = Object.values(skatersOnIGRF[teamNames[t]]).find(x => x.number == number)
             }
 
             // Get the skater name - priority to the name on the IGRF
