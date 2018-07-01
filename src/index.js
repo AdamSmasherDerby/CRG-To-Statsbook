@@ -404,7 +404,10 @@ let updatePenalties = (workbook) => {
 
                 }
 
-                if(skaterData != undefined && skaterData.hasOwnProperty('fo_exp')){
+                if(skaterData != undefined 
+                    && skaterData.hasOwnProperty('fo_exp')
+                    && skaterData.fo_exp.period == p
+                ){
                     let code = ''
                     if (skaterData.fo_exp.code == 'FO'){
                         code = 'FO'
