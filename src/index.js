@@ -6,6 +6,7 @@ const remote = require('electron').remote
 const path = require('path')
 const BrowserWindow = remote.BrowserWindow
 const uuid = require('uuid/v4')
+const isDev = require('electron-is-dev')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -240,7 +241,10 @@ let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
         modal: true,
         icon: __dirname + '/build/flamingo-white.png'
     })
-    win.webContents.openDevTools()
+
+    if (isDev){
+        win.webContents.openDevTools()
+    }
 
     win.setMenu(null)
     win.on('close', function () { 

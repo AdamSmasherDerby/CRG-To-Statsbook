@@ -45,3 +45,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Initial Public Beta
 * 0.3.1 - Also July 1, 2018
     * Immediate Bug Fix. (Nice going, Smasher.)
+* 0.3.2 - July 2, 2018
+    * No longer opens dev tools for "edit skaters" window in production version.
