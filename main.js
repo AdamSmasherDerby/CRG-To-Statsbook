@@ -28,6 +28,8 @@ let createWindow = () => {
         //require('devtron').install()
     }
 
+    win.webContents.on('will-navigate', (event) => event.preventDefault())
+
     win.on('closed', ()=> {
         win=null
     })
