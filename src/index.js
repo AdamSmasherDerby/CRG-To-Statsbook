@@ -28,6 +28,10 @@ let crgFilename = '',
 
 const teamNames = ['home','away']
 
+fileSelect.onclick = () => {
+// Allows the same file to be selected more than once
+    fileSelect.value = ''
+}
 
 fileSelect.onchange = (e) => {
 // When a CRG file is selected by clicking.
@@ -176,7 +180,6 @@ let createSaveArea = () => {
     }
 
     sbHolder.ondragover = () => {
-        sbFileSelect.value = ''
         holder.classList.add('box__ondragover')
         return false
     }
