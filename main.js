@@ -14,7 +14,7 @@ let createWindow = () => {
         title: 'CRG Data Tool',
         icon: __dirname + '/build/flamingo-white.png',
         width: 800, 
-        height: 600
+        height: 650
     })
 
     win.loadURL(url.format({

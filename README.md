@@ -47,3 +47,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Immediate Bug Fix. (Nice going, Smasher.)
 * 0.3.2 - July 2, 2018
     * No longer opens dev tools for "edit skaters" window in production version.
+* 0.3.3 - 
+    * Added ability to swap team order

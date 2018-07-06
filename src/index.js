@@ -12,7 +12,7 @@ const isDev = require('electron-is-dev')
 let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
 let rightBox = document.getElementById('right-box')
-let bottomBox = document.getElementById('bottom-box')
+let fileInfoBox = document.getElementById('fileInfoBox')
 let saveNewButton = {}
 let sbHolder = {}
 let sbFileSelect = {}
@@ -25,7 +25,6 @@ let crgFilename = '',
     skaters = {},
     newSB = true,
     skatersOnIGRF = {}
-
 const teamNames = ['home','away']
 
 fileSelect.onclick = () => {
@@ -46,7 +45,7 @@ fileSelect.onchange = (e) => {
     e.stopPropagation
 
     if (e.target.files.length > 1){
-        bottomBox.innerHTML = 'Error: Multiple Files Selected.'
+        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -65,7 +64,7 @@ holder.ondrop = (e) => {
     e.stopPropagation
 
     if (e.dataTransfer.files.length > 1){
-        bottomBox.innerHTML = 'Error: Multiple Files Selected.'
+        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     } 
     
@@ -100,13 +99,41 @@ let readCRGData = (e) => {
 }
 
 let updateFileInfoBox = () => {
-// Update File Info Box
+// Update File Info Box - I should really learn React one of these days.
 
-    bottomBox.innerHTML = `<strong>Filename:</strong> ${crgFilename}<br>`
-    bottomBox.innerHTML += `<strong>Game Date:</strong> ${crgData.identifier.substr(0,10)}<br>`
-    bottomBox.innerHTML += `<strong>Team 1:</strong> ${crgData.teams[0].name}<br>`
-    bottomBox.innerHTML += `<strong>Team 2:</strong> ${crgData.teams[1].name}<br>`
-    bottomBox.innerHTML += `<strong>File Loaded:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
+    fileInfoBox.innerHTML = `<strong>Filename:</strong> ${crgFilename}<br>`
+        +  `<strong>Game Date:</strong> ${crgData.identifier.substr(0,10)}<br>`
+        + `<strong>File Loaded:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
+
+    let teamOneBox = document.getElementById('teamOneBox')
+    teamOneBox.innerHTML = `<strong>Team 1:</strong> ${crgData.teams[0].name}<br>`
+
+    let teamTwoBox = document.getElementById('teamTwoBox')
+    teamTwoBox.innerHTML = `<strong>Team 2:</strong> ${crgData.teams[1].name}<br>`
+
+    // Setup ability to swap teams 
+    let teamSwapBox = document.getElementById('teamSwapBox')
+    while (teamSwapBox.firstChild){
+        teamSwapBox.removeChild(teamSwapBox.firstChild)
+    }
+    let teamSwapButton = document.createElement('button')
+    teamSwapButton.setAttribute('class', 'btn btn-primary btn-sm')
+    Object.assign(teamSwapButton, {
+        id: 'team-swap',
+        innerHTML: 'Swap Teams'
+    })
+    teamSwapBox.appendChild(teamSwapButton)
+
+    teamSwapButton.onclick = () => {
+        [crgData.teams[0], crgData.teams[1]] = [crgData.teams[1], crgData.teams[0]]
+        for (let p in crgData.periods){
+            for (let j in crgData.periods[p].jams){
+                [crgData.periods[p].jams[j].teams[0], crgData.periods[p].jams[j].teams[1]] =
+                    [crgData.periods[p].jams[j].teams[1], crgData.periods[p].jams[j].teams[0]]
+            }
+        }
+        updateFileInfoBox()
+    }
 }
 
 let createSaveArea = () => {
