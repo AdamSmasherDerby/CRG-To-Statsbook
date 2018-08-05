@@ -127,7 +127,12 @@ let createSaveArea = () => {
     sbFileSelect = document.getElementById('sbfile-select')
 
     saveNewButton.onclick = () => {
-        dialog.showSaveDialog({defaultPath: 'statsbook.xlsx'}, (fileName) => {
+        let defaultFileName = 'statsbook.xlsx'
+        if (crgFilename.slice(-4)=='json'){
+            defaultFileName = crgFilename.slice(0,-4) + 'xlsx'
+        }
+
+        dialog.showSaveDialog({defaultPath: defaultFileName}, (fileName) => {
             if (fileName === undefined){
                 return
             }
