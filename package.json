@@ -1,6 +1,6 @@
 {
   "name": "crgdatatool",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A tool for working with Games Data files from CRG",
   "main": "main.js",
   "author": "Adam Smasher <dan@fnerk.com>",
