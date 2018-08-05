@@ -49,3 +49,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * No longer opens dev tools for "edit skaters" window in production version.
 * 0.3.3 - 
     * Added ability to swap team order
+    * Changed default output file name to match gamedata file name
+    * Allow the same CRG data file to be uploaded twice in a row
+    * Prevent files dropped outside of the drop zone from doing stuff.
