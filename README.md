@@ -40,15 +40,19 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 
 ### Release Notes
 
-* 0.0.1 - Alpha release for testing at BrewHaHa
+* 0.0.1 - Alpha release for testing at BrewHaHa.
 * 0.3.0 - July 1, 2018
-    * Initial Public Beta
+    * Initial Public Beta.
 * 0.3.1 - Also July 1, 2018
     * Immediate Bug Fix. (Nice going, Smasher.)
 * 0.3.2 - July 2, 2018
     * No longer opens dev tools for "edit skaters" window in production version.
-* 0.3.3 - 
+* 0.3.3 - August 5, 2018
     * Added ability to swap team order
-    * Changed default output file name to match gamedata file name
-    * Allow the same CRG data file to be uploaded twice in a row
+    * Changed default output file name to match gamedata file name.
+    * Allow the same CRG data file to be uploaded twice in a row.
     * Prevent files dropped outside of the drop zone from doing stuff.
+* 0.3.4 - August 24, 2018
+    * Skaters deselected in the edit screen are now removed from prexisting IGRF.
+    * Fixed wrong input area turning pink on dragover.
+    * Added error popup if attempt is made to save to a file open in Excel.

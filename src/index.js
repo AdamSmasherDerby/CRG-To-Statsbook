@@ -201,7 +201,7 @@ let createSaveArea = () => {
     sbHolder.ondrop = (e) => {
     // When a statsbook file is dropped into the drop zone
 
-        holder.classList.remove('box__ondragover')
+        sbHolder.classList.remove('box__ondragover')
         e.preventDefault()
         e.stopPropagation
 
@@ -212,12 +212,12 @@ let createSaveArea = () => {
     }
 
     sbHolder.ondragover = () => {
-        holder.classList.add('box__ondragover')
+        sbHolder.classList.add('box__ondragover')
         return false
     }
 
     sbHolder.ondragleave = () => {
-        holder.classList.remove('box__ondragover')
+        sbHolder.classList.remove('box__ondragover')
         return false
     }
 
@@ -329,9 +329,16 @@ let saveStatsbook = (outFileName) => {
                             writeCompleteDialog(outFileName)
                             return workbook
                         })
-                    .catch(e => {
-                        // Throw error here if statsbook file is already open
-                        console.log(e)
+                    .catch(() => {
+                        // Throw error here if statsbook file is already open - TODO Raise message
+                        dialog.showMessageBox({
+                            type: 'error',
+                            buttons: ['OK'],
+                            title: 'CRG to Statsbook',
+                            message: `Unable to write to ${outFileName}, probably because it is already open. ` +
+                                'Close the file in Excel and then retry.'
+                        })
+
                     })
                 return workbook
             })
@@ -372,9 +379,11 @@ let updateSkaters = (workbook) => {
         let teamSheet = sbTemplate.teams[teamNames[t]].sheetName
         let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
+        let maxNum = sbTemplate.teams[teamNames[t]].maxNum
+        let numSkaters = Object.keys(skaters[teamNames[t]]).length
 
         // Go through list of skaters on this team.
-        for (let s in Object.keys(skaters[teamNames[t]])){
+        for (let s in numSkaters){
             let id = Object.keys(skaters[teamNames[t]])[s]
             let name = skaters[teamNames[t]][id].name
             let number = skaters[teamNames[t]][id].number
@@ -383,6 +392,12 @@ let updateSkaters = (workbook) => {
             // Repopulate the IGRF
             workbook.sheet(teamSheet).row(numberCell.r + row).cell(numberCell.c).value(number)
             workbook.sheet(teamSheet).row(nameCell.r + row).cell(nameCell.c).value(name)
+        }
+
+        for (let s = numSkaters; s < maxNum; s++){
+            let row = numberCell.r
+            workbook.sheet(teamSheet).row(row + s).cell(numberCell.c).value('')
+            workbook.sheet(teamSheet).row(row + s).cell(nameCell.c).value('')
         }
     }
 

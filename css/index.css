@@ -38,6 +38,10 @@ body {
     vertical-align: baseline
 }
 
+.box__ondragover {
+    background-color: pink
+}
+
 .inputfile {
     width: 0.1px;
     height: 0.1px;
@@ -63,10 +67,6 @@ body {
 
 .inputfile:focus + label {
     outline: 1px dotted #000;
-}
-
-.box__ondragover {
-    background-color: pink
 }
 
 .my-ui-text { 
