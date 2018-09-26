@@ -383,7 +383,7 @@ let updateSkaters = (workbook) => {
         let numSkaters = Object.keys(skaters[teamNames[t]]).length
 
         // Go through list of skaters on this team.
-        for (let s in numSkaters){
+        for (let s = 0; s < numSkaters; s++){
             let id = Object.keys(skaters[teamNames[t]])[s]
             let name = skaters[teamNames[t]][id].name
             let number = skaters[teamNames[t]][id].number

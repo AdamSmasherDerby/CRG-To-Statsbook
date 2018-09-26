@@ -56,3 +56,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Skaters deselected in the edit screen are now removed from prexisting IGRF.
     * Fixed wrong input area turning pink on dragover.
     * Added error popup if attempt is made to save to a file open in Excel.
+* 0.3.5 - September 21, 2018
+    * Fixed error introduced in last version with updating IGRF
