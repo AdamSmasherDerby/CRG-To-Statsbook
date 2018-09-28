@@ -578,6 +578,7 @@ let updateLineups = (workbook) => {
                         .value(blockerNumber)
                 }
 
+                rewriteLineupRow(team)
 
                 // check for star pass
                 starPass[t] = crgData.periods[p].jams[j].teams[t].starPass
@@ -605,6 +606,8 @@ let updateLineups = (workbook) => {
                             .cell(lineupPivotCells[team].c + (b + 1) * (boxCodes + 1))
                             .value(blockerNumber)
                     }
+
+                    rewriteLineupRow(team)
                 }
             }
 
@@ -637,7 +640,27 @@ let updateLineups = (workbook) => {
     }    
 
     return workbook
+
+    function rewriteLineupRow  (team) {
+        for (let b = 0; b < 4; b++) {
+            // Rewrite the line whether or not values were entered.
+            // This is to account for an Excel bug that breaks conditional formatting.
+            let blockerNumber = workbook.sheet(lineupSheet)
+                .row(lineupPivotCells[team].r)
+                .cell(lineupPivotCells[team].c + b * (boxCodes + 1))
+                .value()
+            blockerNumber = (blockerNumber == undefined ? '' : blockerNumber.toString())
+            workbook.sheet(lineupSheet)
+                .row(lineupPivotCells[team].r)
+                .cell(lineupPivotCells[team].c + b * (boxCodes +1))
+                .value(blockerNumber)
+        }
+    }
+
 }
+
+
+
 
 let updateGameClock = (workbook) => {
 // Update Game Clock sheet

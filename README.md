@@ -56,5 +56,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Skaters deselected in the edit screen are now removed from prexisting IGRF.
     * Fixed wrong input area turning pink on dragover.
     * Added error popup if attempt is made to save to a file open in Excel.
-* 0.3.5 - September 21, 2018
+* 0.3.5 - September 28, 2018
     * Fixed error introduced in last version with updating IGRF
+    * Fixed situation where filling in blockers at halftime would break conditional formatting after a second export at the end of the game.  This was due to an Excel issue where cell formats aren't updated properly. Thanks, Microsoft!
