@@ -23,6 +23,7 @@
     "electron-is-dev": "^0.3.0",
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
+    "lodash": "^4.17.11",
     "moment": "^2.22.1",
     "popper.js": "1.14.0",
     "typeface-raleway": "^0.0.54",

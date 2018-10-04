@@ -7,6 +7,7 @@ const path = require('path')
 const BrowserWindow = remote.BrowserWindow
 const uuid = require('uuid/v4')
 const isDev = require('electron-is-dev')
+const formatcrgdata = require('./formatcrgdata.js')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -91,7 +92,8 @@ let makeReader = (crgFile) => {
 
 let readCRGData = (e) => {
 // Read in the CRG data for an event e
-    crgData = JSON.parse(e.target.result)
+    let fileData = JSON.parse(e.target.result)
+    crgData = formatcrgdata.makecrgdata(fileData, crgFilename)
 
     // Update the "File Information" box
     updateFileInfoBox()
