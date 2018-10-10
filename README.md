@@ -59,3 +59,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 * 0.3.5 - September 28, 2018
     * Fixed error introduced in last version with updating IGRF
     * Fixed situation where filling in blockers at halftime would break conditional formatting after a second export at the end of the game.  This was due to an Excel issue where cell formats aren't updated properly. Thanks, Microsoft!
+* 1.0.0 - October 10, 2018
+    * Will read CRG 3.9.5 and later data files as well as earlier
+    * Also probably time to declare a non-beta release.

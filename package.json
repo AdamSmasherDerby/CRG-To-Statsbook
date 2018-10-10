@@ -1,6 +1,6 @@
 {
   "name": "crgdatatool",
-  "version": "0.3.5",
+  "version": "1.0.0",
   "description": "A tool for working with Games Data files from CRG",
   "main": "main.js",
   "author": "Adam Smasher <dan@fnerk.com>",
@@ -24,7 +24,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.11",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "popper.js": "1.14.0",
     "typeface-raleway": "^0.0.54",
     "uuid": "^3.2.1",
