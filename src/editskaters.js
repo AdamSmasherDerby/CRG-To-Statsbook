@@ -4,7 +4,9 @@ const ipc = require('electron').ipcRenderer
 const uuid = require('uuid/v4')
 
 const cancelBtn = document.getElementById('cancelBtn')
+const cancelBtn2 = document.getElementById('cancelBtn2')
 const confirmBtn = document.getElementById('confirmBtn')
+const confirmBtn2 = document.getElementById('confirmBtn2')
 const skaterTableDiv = document.getElementById('skaterTableDiv')
 const errorMessage = document.getElementById('error-message')
 
@@ -170,15 +172,21 @@ let toggleAll = (event) => {
     countChecks()
 }
 
-cancelBtn.addEventListener('click', () => {
-// Close the window when "Cancel" button is pressed.
+cancelBtn.addEventListener('click', closeWindow)
+cancelBtn2.addEventListener('click', closeWindow)
+
+function closeWindow () {
+// Close the window 
     let window = remote.getCurrentWindow()
     ipc.send('skater-window-closed', outFileName, undefined)
     window.close()
-})
+}
 
-confirmBtn.addEventListener('click', () => {
-// When the "Confirm" button is pressed, build and return the skater list
+confirmBtn.addEventListener('click', returnSkaterList)
+confirmBtn2.addEventListener('click', returnSkaterList)
+
+function returnSkaterList () {
+// Build and return skater list
     let window = remote.getCurrentWindow()
     let skaterList = {}  
 
@@ -227,7 +235,7 @@ confirmBtn.addEventListener('click', () => {
 
     ipc.send('skater-window-closed', outFileName, JSON.stringify(skaterList))
     window.close()
-})
+}
 
 ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
     outFileName = outFile
@@ -238,5 +246,4 @@ ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
 
 
 // TODO:
-// Add a "deselect all" button (Eventually add a "select all" option)
 // Warn if *names* don't match betwen IGRF and CRG
