@@ -14,11 +14,15 @@ const teamNames = ['home','away']
 const maxNum = 20 // Make this dynamic at some point
 let crgData = {},
     skatersOnIGRF = {}
-
 let outFileName = ''
 
+cancelBtn.addEventListener('click', closeWindow)
+cancelBtn2.addEventListener('click', closeWindow)
+confirmBtn.addEventListener('click', returnSkaterList)
+confirmBtn2.addEventListener('click', returnSkaterList)
+
 let makeSkaterTable = (crgData, skatersOnIGRF) => {
-    // Create Table
+// Create Table
     let table = document.createElement('table')
     table.setAttribute('class','table')
 
@@ -43,11 +47,45 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeaderCell = document.createElement('th')
-        tableHeaderCell.appendChild(document.createTextNode('CRG'))
+        let crgDiv = document.createElement('div')
+        crgDiv.setAttribute('class','form-check')
+        let crgCheckBox = document.createElement('input')
+        crgCheckBox.setAttribute('class','form-check-input')
+        Object.assign(crgCheckBox, {
+            type: 'checkBox',
+            id: `checkCRG${t}`,
+            checked: false,
+            value: t
+        })
+        crgCheckBox.addEventListener('click', (event) => {toggleCRG(event)})
+        let crgCheckLabel = document.createElement('label')
+        crgCheckLabel.setAttribute('class','form-check-label')
+        crgCheckLabel.setAttribute('for',`checkCRG${t}`)
+        crgCheckLabel.innerHTML = 'CRG'
+        crgDiv.appendChild(crgCheckBox)
+        crgDiv.appendChild(crgCheckLabel)
+        tableHeaderCell.appendChild(crgDiv)
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeaderCell = document.createElement('th')
-        tableHeaderCell.appendChild(document.createTextNode('IGRF'))
+        let igrfDiv = document.createElement('div')
+        igrfDiv.setAttribute('class','form-check')
+        let igrfCheckBox = document.createElement('input')
+        igrfCheckBox.setAttribute('class','form-check-input')
+        Object.assign(igrfCheckBox, {
+            type: 'checkBox',
+            id: `checkIGRF${t}`,
+            checked: false,
+            value: t
+        })
+        igrfCheckBox.addEventListener('click', (event) => {toggleIGRF(event)})
+        let igrfCheckLabel = document.createElement('label')
+        igrfCheckLabel.setAttribute('class','form-check-label')
+        igrfCheckLabel.setAttribute('for',`checkIGRF${t}`)
+        igrfCheckLabel.innerHTML = 'IGRF'
+        igrfDiv.appendChild(igrfCheckBox)
+        igrfDiv.appendChild(igrfCheckLabel)
+        tableHeaderCell.appendChild(igrfDiv)
         tableHeader.appendChild(tableHeaderCell)
 
         tableHeaderCell = document.createElement('th')
@@ -159,6 +197,7 @@ let countChecks = () => {
         }
     }
     confirmBtn.disabled = (tooMany ? true : false)
+    confirmBtn2.disabled = (tooMany ? true : false)
     errorMessage.innerHTML = (errorText != '' ? 'Warning: ' + errorText : '')
 }
 
@@ -172,8 +211,17 @@ let toggleAll = (event) => {
     countChecks()
 }
 
-cancelBtn.addEventListener('click', closeWindow)
-cancelBtn2.addEventListener('click', closeWindow)
+let toggleCRG = (event) => {
+// Toggle all the checkboxes for this team for skaters in CRG
+
+    countChecks()
+}
+
+let toggleIGRF = (event) => {
+// Toggle all the checkboxes for this team for skaters in the IGRF
+
+    countChecks()
+}
 
 function closeWindow () {
 // Close the window 
@@ -181,9 +229,6 @@ function closeWindow () {
     ipc.send('skater-window-closed', outFileName, undefined)
     window.close()
 }
-
-confirmBtn.addEventListener('click', returnSkaterList)
-confirmBtn2.addEventListener('click', returnSkaterList)
 
 function returnSkaterList () {
 // Build and return skater list
