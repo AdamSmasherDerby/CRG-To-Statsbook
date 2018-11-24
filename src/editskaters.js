@@ -13,7 +13,9 @@ const errorMessage = document.getElementById('error-message')
 const teamNames = ['home','away']
 const maxNum = 20 // Make this dynamic at some point
 let crgData = {},
-    skatersOnIGRF = {}
+    skatersOnIGRF = {},
+    CRGSkaterNumbers = [],
+    IGRFSkaterNumbers = []
 let outFileName = ''
 
 cancelBtn.addEventListener('click', closeWindow)
@@ -30,10 +32,10 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     // For each team
 
         // Get the list of all numbers in both locations.
-        let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
-        let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
+        CRGSkaterNumbers[t] = Object.values(crgData.teams[t].skaters.map((v) => v.number))
+        IGRFSkaterNumbers[t] = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
             : Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number))
-        let concatNumbers = CRGSkaterNumbers.concat(IGRFSkaterNumbers)
+        let concatNumbers = CRGSkaterNumbers[t].concat(IGRFSkaterNumbers[t])
         let numberSet = new Set(concatNumbers)
         let allNumbers = [...numberSet]
         allNumbers.sort()
@@ -75,9 +77,9 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         Object.assign(igrfCheckBox, {
             type: 'checkBox',
             id: `checkIGRF${t}`,
-            checked: false,
             value: t
         })
+        igrfCheckBox.checked = (IGRFSkaterNumbers[t].length > 0 ? true : false)
         igrfCheckBox.addEventListener('click', (event) => {toggleIGRF(event)})
         let igrfCheckLabel = document.createElement('label')
         igrfCheckLabel.setAttribute('class','form-check-label')
@@ -120,13 +122,13 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
                 skater = {},
                 number = allNumbers[n]
 
-            if(IGRFSkaterNumbers.includes(number)){
+            if(IGRFSkaterNumbers[t].includes(number)){
             // If the skater is on the IGRF, use the name from there
                 skater = Object.values(skatersOnIGRF[teamNames[t]]).find(x => x.number == number)
                 name = skater.name
                 inIGRF = true
             }
-            if(CRGSkaterNumbers.includes(number)){
+            if(CRGSkaterNumbers[t].includes(number)){
                 inCRG = true
                 skater = crgData.teams[t].skaters.find(x => x.number == number)
                 if(!inIGRF){
@@ -170,6 +172,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
                 name: `checklist${t}`,
                 value: number
             })
+
             checkBox.setAttribute('class','form-check-input')
             checkBox.addEventListener('click', () => {countChecks()})
             if(inIGRF){checkBox.setAttribute('checked','true')}
@@ -180,6 +183,8 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
             table.appendChild(tableRow)
         }
     }
+
+    countChecks()
     return table
 }
 
@@ -204,9 +209,16 @@ let countChecks = () => {
 let toggleAll = (event) => {
 // Toggle all the checkboxes for this team
 
-    let checklist = `checklist${event.currentTarget.value}`
+    let team = event.currentTarget.value
+    let checklist = `checklist${team}`
     let checkArray = document.getElementsByName(checklist)
     checkArray.forEach(x => x.checked = event.currentTarget.checked)
+
+    //Deactivate the other two boxes
+    let crgBox = document.getElementById(`checkCRG${team}`)
+    let igrfBox = document.getElementById(`checkIGRF${team}`)
+    crgBox.checked = false
+    igrfBox.checked = false
 
     countChecks()
 }
@@ -214,11 +226,41 @@ let toggleAll = (event) => {
 let toggleCRG = (event) => {
 // Toggle all the checkboxes for this team for skaters in CRG
 
+    let team = event.currentTarget.value
+    let checklist = `checklist${team}`
+    let checkArray = document.getElementsByName(checklist)
+    checkArray.forEach(x => {
+        if (CRGSkaterNumbers[team].includes(x.value)){
+            x.checked = event.currentTarget.checked
+        }
+    })
+
+    //Deactivate the other two boxes
+    let allBox = document.getElementById(`checkAll${team}`)
+    let igrfBox = document.getElementById(`checkIGRF${team}`)
+    allBox.checked = false
+    igrfBox.checked = false
+
     countChecks()
 }
 
 let toggleIGRF = (event) => {
 // Toggle all the checkboxes for this team for skaters in the IGRF
+
+    let team = event.currentTarget.value
+    let checklist = `checklist${team}`
+    let checkArray = document.getElementsByName(checklist)
+    checkArray.forEach(x => {
+        if (IGRFSkaterNumbers[team].includes(x.value)){
+            x.checked = event.currentTarget.checked
+        }
+    })
+
+    //Deactivate the other two boxes
+    let allBox = document.getElementById(`checkAll${team}`)
+    let crgBox = document.getElementById(`checkCRG${team}`)
+    allBox.checked = false
+    crgBox.checked = false
 
     countChecks()
 }

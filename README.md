@@ -62,3 +62,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 * 1.0.0 - October 10, 2018
     * Will read CRG 3.9.5 and later data files as well as earlier
     * Also probably time to declare a non-beta release.
+* 1.0.1 - 
+    * Cancel / Confirm buttons added at the bottom of the edit skaters dialog
+    * Select CRG / Select IGRF checkboxes added to edit skaters dialog
