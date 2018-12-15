@@ -21,7 +21,7 @@ let sbFileSelect = {}
 // Setup Globals
 let crgFilename = '',
     crgData = {},
-    statsbookFileName = 'assets/wftda-statsbook-base-us-letter.xlsx',
+    statsbookFileName = 'assets/wftda-statsbook-full-us-letter.xlsx',
     sbTemplate = require('../assets/2018statsbook.json'),
     skaters = {},
     newSB = true,
