@@ -62,6 +62,28 @@ let createWindow = () => {
         {
             label: 'Options',
             submenu: [
+                {   label: 'Paper Size',
+                    submenu: [                
+                        {
+                            label: 'US Letter',
+                            type: 'radio',
+                            checked: true,
+                            click() {
+                                setPaperSize('Letter')
+                            }
+                        },
+                        {
+                            label: 'A4',
+                            type: 'radio',
+                            click(){
+                                setPaperSize('A4')
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'separator'
+                },
                 {
                     label:'Exit',
                     click(){
@@ -99,6 +121,11 @@ app.on('activate',() => {
         createWindow()
     }
 })
+
+let setPaperSize = (size) => {
+// Dispatches event to change paper size
+    win.webContents.send('set-paper-size',size)
+}
 
 let openAbout = () => {
 // opening function for "About This Software" window

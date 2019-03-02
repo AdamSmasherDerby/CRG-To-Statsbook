@@ -1,6 +1,6 @@
 {
   "name": "crgdatatool",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A tool for working with Games Data files from CRG",
   "main": "main.js",
   "author": "Adam Smasher <dan@fnerk.com>",
@@ -68,7 +68,9 @@
       "createDesktopShortcut": false
     },
     "extraFiles": [
-      "assets/wftda-statsbook-base-us-letter.xlsx"
+      "assets/wftda-statsbook-base-us-letter.xlsx",
+      "assets/wftda-statsbook-full-A4.xlsx",
+      "assets/wftda-statsbook-full-us-letter.xlsx"
     ]
   }
 }

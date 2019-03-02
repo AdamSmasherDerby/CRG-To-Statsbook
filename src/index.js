@@ -28,6 +28,19 @@ let crgFilename = '',
     skatersOnIGRF = {}
 const teamNames = ['home','away']
 
+ipc.on('set-paper-size', (event, size) => {
+    switch (size) {
+        case 'letter':
+            statsbookFileName = 'assets/wftda-statsbook-full-us-letter.xlsx'
+            break
+        case 'A4':
+            statsbookFileName = 'assets/wftda-statsbook-full-A4.xlsx'
+            break
+        default:
+            statsbookFileName = 'asseets/wftda-statsbook-full-us-letter.xlsx'
+    }
+})
+
 fileSelect.onclick = () => {
 // Allows the same file to be selected more than once
     fileSelect.value = ''
