@@ -66,3 +66,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Cancel / Confirm buttons added at the bottom of the edit skaters dialog
     * Select CRG / Select IGRF checkboxes added to edit skaters dialog
     * Updated to output 2019 statsbook.
+* 2.0.1 - March 3, 2019
+    * Added support for A4 paper
