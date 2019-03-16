@@ -14,6 +14,7 @@ let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
 let rightBox = document.getElementById('right-box')
 let fileInfoBox = document.getElementById('fileInfoBox')
+let newVersionWarningBox = document.getElementById('newVersionWarning')
 let saveNewButton = {}
 let sbHolder = {}
 let sbFileSelect = {}
@@ -28,16 +29,30 @@ let crgFilename = '',
     skatersOnIGRF = {}
 const teamNames = ['home','away']
 
+ipc.on('do-version-check', (event, version) => {
+    let tagURL = 'https://api.github.com/repos/AdamSmasherDerby/CRG-To-Statsbook/tags'
+    $.getJSON(tagURL, {_: new Date().getTime()})
+        .done(function (json) {
+            let latestVersion = json[0].name
+            version = 'v' + version
+            if (latestVersion != version) {
+                newVersionWarningBox.innerHTML = `New version available: ${latestVersion} (Current Version: ${version})</BR>` +
+                    '<A HREF="https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases/" target="_system">Download Here</a>'
+            }
+        })
+        .fail(function () {console.log('Update check not performed: no connection')})
+})
+
 ipc.on('set-paper-size', (event, size) => {
     switch (size) {
-        case 'letter':
-            statsbookFileName = 'assets/wftda-statsbook-full-us-letter.xlsx'
-            break
-        case 'A4':
-            statsbookFileName = 'assets/wftda-statsbook-full-A4.xlsx'
-            break
-        default:
-            statsbookFileName = 'asseets/wftda-statsbook-full-us-letter.xlsx'
+    case 'letter':
+        statsbookFileName = 'assets/wftda-statsbook-full-us-letter.xlsx'
+        break
+    case 'A4':
+        statsbookFileName = 'assets/wftda-statsbook-full-A4.xlsx'
+        break
+    default:
+        statsbookFileName = 'asseets/wftda-statsbook-full-us-letter.xlsx'
     }
 })
 

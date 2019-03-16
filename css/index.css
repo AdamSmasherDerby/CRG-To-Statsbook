@@ -95,3 +95,7 @@ body {
     border-color: #999;
     transition: 0s;
 }
+
+#newVersionWarning {
+    color: red;
+}

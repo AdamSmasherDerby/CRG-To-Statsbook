@@ -68,3 +68,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Updated to output 2019 statsbook.
 * 2.0.1 - March 3, 2019
     * Added support for A4 paper
+* 2.1.0 - March 16, 2019
+    * Added check for latest version
