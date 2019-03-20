@@ -411,6 +411,9 @@ let updateSkaters = (workbook) => {
         let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
         let maxNum = sbTemplate.teams[teamNames[t]].maxNum
         let numSkaters = Object.keys(skaters[teamNames[t]]).length
+        /*let skaterNumbers = Object.values(skaters[teamNames[t]]).map((v) => v.number)
+        let sortedSkaterNumbers = skaterNumbers.slice().sort()
+        let indices = sortedSkaterNumbers.map((v) => skaterNumbers.indexOf(v)) */
 
         // Go through list of skaters on this team.
         for (let s = 0; s < numSkaters; s++){
@@ -755,13 +758,16 @@ let getCRGSkaters = () => {
     for(let t in crgData.teams){
         let team = {}
         let row = 0
+        let skaterNumbers = Object.values(crgData.teams[t].skaters).map((v)=> v.number)
+        let sortedSkaterNumbers = skaterNumbers.slice().sort()
+        let rows = skaterNumbers.map((v) => sortedSkaterNumbers.indexOf(v))
 
         for(let s in crgData.teams[t].skaters){
             // Read the skater information from the scoreoard file
             let number = crgData.teams[t].skaters[s].number
             let name = crgData.teams[t].skaters[s].name
             let id = crgData.teams[t].skaters[s].id
-            row = parseInt(s)            
+            row = parseInt(rows[s])            
 
             // Add skater information to the team
             team[id] = {
