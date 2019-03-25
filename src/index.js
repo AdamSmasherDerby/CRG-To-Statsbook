@@ -301,11 +301,12 @@ let prepareForExisting = (outFileName) => {
 let editSkatersWindow = (crgData, skatersOnIGRF, outFileName) => {
 // Raise a dialog for handling discrepancies between CRG and IGRF rosters
     const modalPath = path.join('file://', __dirname, 'editskaters.html')
+    const iconPath = path.join(__dirname,'../build/flamingo-white.png')
 
     let win = new BrowserWindow({ 
         parent: remote.getCurrentWindow(),
         modal: true,
-        icon: __dirname + '/build/flamingo-white.png'
+        icon: iconPath
     })
 
     if (isDev){
