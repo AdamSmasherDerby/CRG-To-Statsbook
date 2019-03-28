@@ -288,6 +288,15 @@ function returnSkaterList () {
             .map((v) => v.value)
         checkedNumbers.sort()
 
+        if (checkedNumbers.length === 0) {
+            if (confirm(`No skaters selected from ${crgData.teams[t].name}. Continue?`)) {
+                // This does nothing.
+                Function.prototype
+            } else {
+                return
+            }
+        }
+
         for (let n in checkedNumbers){
             let number = checkedNumbers[n],
                 IGRFskater = {},
