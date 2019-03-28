@@ -70,6 +70,7 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Added support for A4 paper
 * 2.1.0 - March 16, 2019
     * Added check for latest version
-* 2.1.1 - March 19, 2019
+* 2.1.1 - March 27, 2019
     * Will now correctly sort skaters from versions 3.9.5 and up by number
     * Adds a nonte to the statsbook colophon indicating which version of this tool was used to generate the statsbook.
+    * Added confirmation dialog when selecting no skaters from the reconciliation screen.
