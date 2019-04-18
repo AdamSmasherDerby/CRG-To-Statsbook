@@ -9,14 +9,18 @@ exports.makecrgdata = (fileData, crgFilename) => {
             team: '2',
             skaters: []
         }],
-        periods: []
+        periods: [],
+        version: ''
     }
 
     if (fileData.hasOwnProperty('identifier')){
         // CRG formats prior to 3.9.5
         crgData = fileData
+        crgData.version = '3.0'
     } else if (fileData.hasOwnProperty('state')){
-        // CRG 3.9.5 and up
+        // Determine version
+        crgData.version = (fileData.state.hasOwnProperty('ScoreBoard.InJam') ? '4.0' : '3.9.5')
+
         let sb = {}
         let keys = Object.keys(fileData.state)
         let values = Object.values(fileData.state)
@@ -24,7 +28,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
         let skaterIndices = {}
         let skaterRE = /Team\((\d)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)\.Number/
         let penaltyRE = /Team\((\d)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)\.Penalty\((\d)\)\.Id/
-        let jamStartRE = /Stats\.Period\((\d)\)\.Jam\((\d+)\)\.PeriodClockWalltimeStart/
+        let jamStartRE = /Period\((\d)\)\.Jam\((\d+)\)\.PeriodClockElapsedStart/
 
         // Make sb array
         for (let k in keys){
@@ -49,6 +53,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
                         id: id
                     }
                 )
+                // Track the position of each skater ID in the crgData list
                 skaterIndices[id] = idIndex - 1
             }
 
@@ -58,22 +63,31 @@ exports.makecrgdata = (fileData, crgFilename) => {
                 team = match[1]
                 id = match[2]
                 penaltyNumber = match[3]
-                crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]].penalties.push(
-                    {
-                        period: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Period,
-                        code: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Code,
-                        jam: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Jam,
-                        id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id
-                    }
-                )
+                if (crgData.version == '3.9.5') {
+                    crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]].penalties.push(
+                        {
+                            period: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Period,
+                            code: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Code,
+                            jam: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Jam,
+                            id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id
+                        }
+                    )
+                } else {
+                    crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]].penalties.push(
+                        {
+                            period: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].PeriodNumber,
+                            code: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Code,
+                            jam: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].JamNumber,
+                            id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id
+                        }
+                    )
+                }
             }
-            
         }
 
         // Load team names, create identifer
         crgData.teams[0].name = sb['Team(1)'].Name
         crgData.teams[1].name = sb['Team(2)'].Name
-
         
         let localStartTime = crgFilename.substr(11,5).replace('_',':')
         let localStartDate = crgFilename.substr(0,10)
@@ -81,7 +95,6 @@ exports.makecrgdata = (fileData, crgFilename) => {
         // let localStart = moment(`${localStartDate} ${localStartTime}`)
         // Time Offset is in ms for future use
         // let timeoffset = (unixStart > localStart ?  localStart - unixStart : unixStart - localStart)
-        
 
         crgData.identifier = `${localStartDate} ${localStartTime} - ${crgData.teams[0].name} vs ${crgData.teams[1].name}`
 
@@ -91,6 +104,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
             if (match != undefined) {
                 let period = parseInt(match[1])
                 let jam = parseInt(match[2])
+                if (period == 0 || jam == 0) { continue }
 
                 if (crgData.periods.length < period) {
                 // if this period doesn't exist, add it
@@ -104,37 +118,63 @@ exports.makecrgdata = (fileData, crgFilename) => {
                 
                 if (crgData.periods[period - 1].jams.findIndex( x => {return x.jam == jam}) == -1) {
                 // if this jam doesn't exist, add it
-
-                    let jamLengthMS = sb.Stats[`Period(${period})`][`Jam(${jam})`].JamClockElapsedEnd
-                    let teamOne = sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)']
-                    let teamTwo = sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)']
-
-
-                    crgData.periods[period - 1].jams.push(
-                        {
-                            jam: jam,
-                            jamLength: msToTimeString(jamLengthMS),
-                            teams: [{
-                                team: '1',
-                                jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].JamScore,
-                                starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].StarPass,
-                                skaters: getJamSkaters(teamOne)
-                            },{
-                                team: '2',
-                                jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].JamScore,
-                                starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].StarPass,
-                                skaters: getJamSkaters(teamTwo)
-                            }]
-                        }
-                    )
+                    if(crgData.version == '3.9.5') {
+                        addJam395(sb, period, jam, crgData)
+                    } else {
+                        addJam40(sb, period, jam, crgData)
+                    }
                 }
 
                 crgData.periods[period - 1].jams = _.orderBy(crgData.periods[period - 1].jams, ['jam'])
             }
         }
         
-    }
+    } 
     return crgData
+}
+
+function addJam395(sb, period, jam, crgData) {
+// Add jam data to crgData for version 3.9.5
+    let jamLengthMS = sb.Stats[`Period(${period})`][`Jam(${jam})`].JamClockElapsedEnd
+    let teamOne = sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)']
+    let teamTwo = sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)']
+    crgData.periods[period - 1].jams.push({
+        jam: jam,
+        jamLength: msToTimeString(jamLengthMS),
+        teams: [{
+            team: '1',
+            jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].JamScore,
+            starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].StarPass,
+            skaters: getJamSkaters395(teamOne)
+        }, {
+            team: '2',
+            jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].JamScore,
+            starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].StarPass,
+            skaters: getJamSkaters395(teamTwo)
+        }]
+    })
+}
+
+function addJam40(sb, period, jam, crgData) {
+// Add jam data to crgData for version 4.0
+    let jamLengthMS = sb[`Period(${period})`][`Jam(${jam})`].Duration
+    let teamOne = sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)']
+    let teamTwo = sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)']
+    crgData.periods[period - 1].jams.push({
+        jam: jam,
+        jamLength: msToTimeString(jamLengthMS),
+        teams: [{
+            team: '1',
+            jamScore: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)'].JamScore,
+            starPass: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)'].StarPass,
+            skaters: getJamSkaters40(teamOne)
+        }, {
+            team: '2',
+            jamScore: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)'].JamScore,
+            starPass: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)'].StarPass,
+            skaters: getJamSkaters40(teamTwo)
+        }]
+    })
 }
 
 let msToTimeString = (totalms) => {
@@ -146,7 +186,7 @@ let msToTimeString = (totalms) => {
     return (`${mins}:${secstring}.${msstring}`)
 }
 
-let getJamSkaters = (jamTeam) => {
+let getJamSkaters395 = (jamTeam) => {
     // Given an object of key/value pairs for a given team in a given jam, return
     // an array of skater objects.
     let teamSkaterRE = /Skater\((\w+-\w+-\w+-\w+-\w+)\)/
@@ -159,6 +199,31 @@ let getJamSkaters = (jamTeam) => {
             id = match[1]
             penaltyBox = jamTeam[`Skater(${id})`].PenaltyBox
             position = jamTeam[`Skater(${id})`].Position
+        
+            skaters.push({
+                id: id,
+                penaltyBox: penaltyBox,
+                position: position
+            })
+        }
+    }
+    return skaters
+}
+
+let getJamSkaters40 = (jamTeam) => {
+    // Given an object of key/value pairs for a given team in a given jam, return
+    // an array of skater objects.
+    //let teamSkaterRE = /Fielding\((\w+)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)/
+    let fieldingRE = /Fielding\((\w+)\)/
+    let keys = Object.keys(jamTeam)
+    let id, penaltyBox, position
+    let skaters = []
+    for (let k in keys) {
+        let match = fieldingRE.exec(keys[k])
+        if (match != undefined){
+            position = match[1]
+            id = jamTeam[`Fielding(${position})`].Skater
+            penaltyBox = jamTeam[`Fielding(${position})`].PenaltyBox
         
             skaters.push({
                 id: id,
