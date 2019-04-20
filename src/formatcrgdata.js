@@ -143,13 +143,13 @@ function addJam395(sb, period, jam, crgData) {
         jamLength: msToTimeString(jamLengthMS),
         teams: [{
             team: '1',
-            jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].JamScore,
-            starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(1)'].StarPass,
+            jamScore: teamOne.JamScore,
+            starPass: teamOne.StarPass,
             skaters: getJamSkaters395(teamOne)
         }, {
             team: '2',
-            jamScore: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].JamScore,
-            starPass: sb.Stats[`Period(${period})`][`Jam(${jam})`]['Team(2)'].StarPass,
+            jamScore: teamTwo.JamScore,
+            starPass: teamTwo.StarPass,
             skaters: getJamSkaters395(teamTwo)
         }]
     })
@@ -158,32 +158,39 @@ function addJam395(sb, period, jam, crgData) {
 function addJam40(sb, period, jam, crgData) {
 // Add jam data to crgData for version 4.0
     let jamLengthMS = sb[`Period(${period})`][`Jam(${jam})`].Duration
-    let teamOne = sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)']
-    let teamTwo = sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)']
+    let teams = []
+
+    for(let i = 1; i <=2; i++){
+        let team = sb[`Period(${period})`][`Jam(${jam})`][`TeamJam(${i})`]
+        let t = 1
+        let tripScores = [[],[]]
+        while(team.hasOwnProperty(`ScoringTrip(${t})`)){
+            if (team[`ScoringTrip(${t})`].AfterSP == false){
+                tripScores[0].push(team[`ScoringTrip(${t})`].Score)
+            } else {
+                tripScores[1].push(team[`ScoringTrip(${t})`].Score)
+            }
+            t++
+        }
+        teams.push({
+            team: i,
+            lead: team.Lead,
+            lost: team.Lost,
+            call: team.Calloff,
+            injury: team.Injury,
+            noInitial: team.NoInitial,
+            jamScore: team.JamScore,
+            starPass: team.StarPass,
+            skaters: getJamSkaters40(team),
+            tripScores: tripScores
+        })
+    }
+
     crgData.periods[period - 1].jams.push({
         jam: jam,
         jamLength: msToTimeString(jamLengthMS),
-        teams: [{
-            team: '1',
-            jamScore: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)'].JamScore,
-            starPass: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(1)'].StarPass,
-            skaters: getJamSkaters40(teamOne)
-        }, {
-            team: '2',
-            jamScore: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)'].JamScore,
-            starPass: sb[`Period(${period})`][`Jam(${jam})`]['TeamJam(2)'].StarPass,
-            skaters: getJamSkaters40(teamTwo)
-        }]
+        teams: teams
     })
-}
-
-let msToTimeString = (totalms) => {
-    let mins = Math.floor(totalms / 60000)
-    let secs = Math.floor((totalms % 60000)/1000)
-    let ms = totalms - mins * 60000 - secs * 1000
-    let secstring = (secs < 10 ? `0${secs}` : `${secs}`)
-    let msstring = (ms < 10 ? `00${ms}` : (ms < 100 ? `0${ms}` : `${ms}`))
-    return (`${mins}:${secstring}.${msstring}`)
 }
 
 let getJamSkaters395 = (jamTeam) => {
@@ -233,4 +240,14 @@ let getJamSkaters40 = (jamTeam) => {
         }
     }
     return skaters
+}
+
+let msToTimeString = (totalms) => {
+// Convert ms as int to mm:ss.sss as string
+    let mins = Math.floor(totalms / 60000)
+    let secs = Math.floor((totalms % 60000)/1000)
+    let ms = totalms - mins * 60000 - secs * 1000
+    let secstring = (secs < 10 ? `0${secs}` : `${secs}`)
+    let msstring = (ms < 10 ? `00${ms}` : (ms < 100 ? `0${ms}` : `${ms}`))
+    return (`${mins}:${secstring}.${msstring}`)
 }

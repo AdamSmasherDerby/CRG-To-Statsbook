@@ -353,7 +353,7 @@ let saveStatsbook = (outFileName) => {
         .then(
             workbook => {
                 workbook = updatePenalties(workbook)
-                workbook = updateLineups(workbook)
+                workbook = updateLineupsAndScore(workbook)
                 workbook = updateGameClock(workbook)
                 workbook = updateColophon(workbook)
                 workbook.toFileAsync(outFileName)
@@ -519,7 +519,7 @@ let updatePenalties = (workbook) => {
     return workbook
 }
 
-let updateLineups = (workbook) => {
+let updateLineupsAndScore = (workbook) => {
 // Process lineups - add jammers to the score sheet and everyone else to the lineup tab
     let scoreSheet = sbTemplate.score.sheetName,
         lineupSheet = sbTemplate.lineups.sheetName,
@@ -528,6 +528,7 @@ let updateLineups = (workbook) => {
         lineupJammerCells = {home: {}, away: {}},
         lineupNoPivotCells = {home: {}, away: {}},
         lineupPivotCells = {home: {}, away: {}},
+        firstTripCells = {home: {}, away: {}},
         boxCodes = sbTemplate.lineups.boxCodes,
         blockerRe = /Blocker(\d)/
 
@@ -542,6 +543,7 @@ let updateLineups = (workbook) => {
             lineupJammerCells[team] = rowcol(sbTemplate.lineups[period][team].firstJammer)
             lineupPivotCells[team] = {r: lineupJammerCells[team].r, c: lineupJammerCells[team].c + boxCodes + 1}
             lineupNoPivotCells[team] = rowcol(sbTemplate.lineups[period][team].firstNoPivot)
+            firstTripCells[team] = rowcol(sbTemplate.score[period][team].firstTrip)
         })
 
         for (let j in crgData.periods[p].jams){
@@ -554,9 +556,10 @@ let updateLineups = (workbook) => {
             for (let t in teamNames){
                 // For each team
                 let team = teamNames[t]
+                let jamTeamData = crgData.periods[p].jams[j].teams[t]
 
                 // Retrieve the jammer number.
-                let jammerList = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                let jammerList = jamTeamData.skaters.filter(
                     x => x.position == 'Jammer'
                 )
                 // The jammer ID is undefined if no jammer was entered in this jam
@@ -573,8 +576,26 @@ let updateLineups = (workbook) => {
                 workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
                 workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(jammerNumber)
 
+                // Add the scoring trip data, if present
+                if (jamTeamData.hasOwnProperty('tripScores')){
+                    for(let t = 1; t < jamTeamData.tripScores[0].length; t++){
+                        // Add trip score to sheet
+                        workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + t - 1).value(jamTeamData.tripScores[0][t])
+                    }
+                    if (jamTeamData.starPass){
+                        for(let t=0; t < jamTeamData.tripScores[1].length; t++){
+                            workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + jamTeamData.tripScores[0].length + t).value(jamTeamData.tripScores[1][t])
+                        }
+                    }
+                    
+                    if (jamTeamData.tripScores[0][0] != 0) {
+                    // Handle overtime.  TODO - Handle Star Pass during overtime
+                        workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c).value(`${jamTeamData.tripScores[0][0]} + ${jamTeamData.tripScores[0][1]}`)
+                    }
+                }
+
                 // Retrieve the pivot number.
-                let pivotList = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                let pivotList = jamTeamData.skaters.filter(
                     x => x.position =='Pivot'
                 )
 
@@ -590,7 +611,7 @@ let updateLineups = (workbook) => {
                     .value(pivotNumber)
 
                 // Retrieve the blocker numbers
-                let blockerList = crgData.periods[p].jams[j].teams[t].skaters.filter(
+                let blockerList = jamTeamData.skaters.filter(
                     x => blockerRe.test(x.position)
                 )
 
@@ -617,14 +638,15 @@ let updateLineups = (workbook) => {
                 rewriteLineupRow(team)
 
                 // check for star pass
-                starPass[t] = crgData.periods[p].jams[j].teams[t].starPass
+                starPass[t] = jamTeamData.starPass
 
                 // If there's a star pass on THIS team, add an SP and the pivot's number to scores and lineups
                 if (starPass[t]){
                     jamCells[team].r += 1
                     jammerCells[team].r += 1
                     lineupPivotCells[team].r += 1
-                    lineupNoPivotCells[team].r += 1  
+                    lineupNoPivotCells[team].r += 1
+                    firstTripCells[team].r += 1  
 
                     workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP')
                     workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(pivotNumber)
@@ -658,6 +680,7 @@ let updateLineups = (workbook) => {
                         jammerCells[team].r += 1
                         lineupPivotCells[team].r += 1
                         lineupNoPivotCells[team].r += 1
+                        firstTripCells[team].r += 1
     
                         workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value('SP*')
                     }
@@ -669,7 +692,8 @@ let updateLineups = (workbook) => {
                 jamCells[team].r += 1
                 jammerCells[team].r += 1
                 lineupPivotCells[team].r += 1
-                lineupNoPivotCells[team].r += 1        
+                lineupNoPivotCells[team].r += 1 
+                firstTripCells[team].r += 1       
             }
 
         }
