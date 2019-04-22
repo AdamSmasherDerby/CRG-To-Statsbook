@@ -612,7 +612,7 @@ let updateLineupsAndScore = (workbook) => {
                     // If there is no star pass, add remaining data to current line
 
                         workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value(jamTeamData.injury ? 'X' : '')
-                        workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value(jamTeamData.noInitial ? 'X' : '')
+                        workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value(jamTeamData.noInitial ? 'X' : undefined)
                     
                         if (overtime) {
                         // Handle overtime for the no star pass case (overwriting first jam with X + X)
@@ -627,14 +627,14 @@ let updateLineupsAndScore = (workbook) => {
 
                         if (!overtime) {
                             // Add second jammer scores for most cases
-                            for (let t = starPassTrip; t < jamTeamData.tripScores[1].length; t++) {
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + t - 1).value(jamTeamData.tripScores[1][t])
+                            for (let t = 0; t < jamTeamData.tripScores[1].length; t++) {
+                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + starPassTrip + t - 2).value(jamTeamData.tripScores[1][t])
                             }
                         } else {
                             // Overtime with a star pass. (Yeesh)
                             // Put in data for scorimg trips 2 - end
                             for (let t = 0; t < jamTeamData.tripScores[1].length; t++){
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + t + starPassTrip - 1).value(jamTeamData.tripScores[1][t + 1])
+                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + t + starPassTrip - 1).value(jamTeamData.tripScores[1][t])
                             } 
 
                             if (starPassTrip == 1 && jamTeamData.tripScores[1].length > 1){
@@ -646,7 +646,7 @@ let updateLineupsAndScore = (workbook) => {
                             }
                         }
 
-                        // Sort checkboxes on score sheet
+                        // Put checkboxes on score sheet
                         if(jamTeamData.noInitial) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r + 1).cell(firstNpCells[team].c).value('X')
