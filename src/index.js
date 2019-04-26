@@ -537,7 +537,9 @@ let updateLineupsAndScore = (workbook) => {
         boxCodes = sbTemplate.lineups.boxCodes,
         blockerRe = /Blocker(\d)/,
         starPassTrip = 1,
-        overtime = false
+        overtime = false,
+        pivotID = undefined,
+        pivotNumber = ''
 
     for (let p in crgData.periods){
     // For each period
@@ -569,6 +571,7 @@ let updateLineupsAndScore = (workbook) => {
                 // For each team
                 let team = teamNames[t]
                 let jamTeamData = crgData.periods[p].jams[j].teams[t]
+                starPass[t] = jamTeamData.starPass
 
                 // Retrieve the jammer number.
                 let jammerList = jamTeamData.skaters.filter(
@@ -591,13 +594,14 @@ let updateLineupsAndScore = (workbook) => {
                 // Add version 4.0 data to the score sheet, if present
                 if (jamTeamData.hasOwnProperty('tripScores')){
 
+                    // Assume non-zero initial trip means overtime. (Will also treat operator error that way, which is probably for the best)
                     if (jamTeamData.tripScores[0][0] > 0 || (jamTeamData.tripScores[0].length == 0 && jamTeamData.tripScores[1][0] > 0)){
                         overtime = true
                     } else {
                         overtime = false
                     }
 
-                    // Checkboxes for all cases
+                    // Score Checkboxes for all cases
                     workbook.sheet(scoreSheet).row(firstLostCells[team].r).cell(firstLostCells[team].c).value(jamTeamData.lost ? 'X' : '')
                     workbook.sheet(scoreSheet).row(firstLeadCells[team].r).cell(firstLeadCells[team].c).value(jamTeamData.lead ? 'X' : '')
                     workbook.sheet(scoreSheet).row(firstCallCells[team].r).cell(firstCallCells[team].c).value(jamTeamData.call ? 'X' : '')
@@ -608,8 +612,8 @@ let updateLineupsAndScore = (workbook) => {
                         workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + t - 1).value(jamTeamData.tripScores[0][t])
                     }
 
-                    if (!jamTeamData.starPass){
-                    // If there is no star pass, add remaining data to current line
+                    if (!starPass[t]){
+                    // No Star Pass Scoring and Lineup Data
 
                         workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value(jamTeamData.injury ? 'X' : '')
                         workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value(jamTeamData.noInitial ? 'X' : undefined)
@@ -620,8 +624,17 @@ let updateLineupsAndScore = (workbook) => {
                             workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c).value(`${jamTeamData.tripScores[0][0]}${tripTwoScore}`)
                         }
 
+                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                            for (let sym in jammerList[0].boxTripSymbols[0]){
+                                workbook.sheet(lineupSheet)
+                                    .row(lineupJammerCells[team].r)
+                                    .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
+                                    .value(jammerList[0].boxTripSymbols[0][sym])
+                            }
+                        }
+
                     } else {
-                    // Handle star pass cases
+                    // Star Pass Scoring Data
 
                         starPassTrip = jamTeamData.tripScores[0].length + 1
 
@@ -646,7 +659,7 @@ let updateLineupsAndScore = (workbook) => {
                             }
                         }
 
-                        // Put checkboxes on score sheet
+                        // Star Pass Score Checkboxes
                         if(jamTeamData.noInitial) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r + 1).cell(firstNpCells[team].c).value('X')
@@ -654,6 +667,16 @@ let updateLineupsAndScore = (workbook) => {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                         }
                         workbook.sheet(scoreSheet).row(firstInjCells[team].r + 1).cell(firstInjCells[team].c).value(jamTeamData.inj ? 'X' : '')
+
+                        // Star pass box trips
+                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                            for (let sym in jammerList[0].boxTripSymbols[1]){
+                                workbook.sheet(lineupSheet)
+                                    .row(lineupPivotCells[team].r)
+                                    .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
+                                    .value(jammerList[0].boxTripSymbols[1][sym])
+                            }
+                        }
 
                     }
 
@@ -663,17 +686,42 @@ let updateLineupsAndScore = (workbook) => {
                 let pivotList = jamTeamData.skaters.filter(
                     x => x.position =='Pivot'
                 )
+                
+                if (pivotList.length > 0) {
+                // If there is a pivot, add them to lineups
+                    pivotID = pivotList[0].id 
+                    pivotNumber = pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID)
+                        ? skaters[teamNames[t]][pivotID].number 
+                        : ''
 
-                let pivotID = (pivotList.length > 0 ? pivotList[0].id : undefined)
-                let pivotNumber = pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID)
-                    ? skaters[teamNames[t]][pivotID].number 
-                    : ''
+                    workbook.sheet(lineupSheet)
+                        .row(lineupPivotCells[team].r)
+                        .cell(lineupPivotCells[team].c)
+                        .value(pivotNumber)
 
-                // Add the pivot number to lineups
-                workbook.sheet(lineupSheet)
-                    .row(lineupPivotCells[team].r)
-                    .cell(lineupPivotCells[team].c)
-                    .value(pivotNumber)
+                    if (pivotList[0].hasOwnProperty('boxTripSymbols')){
+                    // Add pre star pass box trips for the pivot
+                        for (let sym in pivotList[0].boxTripSymbols[0]){
+                            workbook.sheet(lineupSheet)
+                                .row(lineupPivotCells[team].r)
+                                .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
+                                .value(pivotList[0].boxTripSymbols[0][sym])
+                        }
+
+                        // Add post star pass box trips for the pivot
+                        if (starPass[t]) {
+                            for (let sym in pivotList[0].boxTripSymbols[1]){
+                                workbook.sheet(lineupSheet)
+                                    .row(lineupJammerCells[team].r + 1)
+                                    .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
+                                    .value(pivotList[0].boxTripSymbols[1][sym])
+                            }
+                        }
+                    }
+                } else {
+                    pivotID = undefined
+                    pivotNumber = ''
+                }
 
                 // Retrieve the blocker numbers
                 let blockerList = jamTeamData.skaters.filter(
@@ -698,17 +746,36 @@ let updateLineupsAndScore = (workbook) => {
                         .row(lineupPivotCells[team].r)
                         .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1))
                         .value(blockerNumber)
+
+                    // Box trips
+                    if (blockerList[b].hasOwnProperty('boxTripSymbols')){
+                        for (let sym in blockerList[b].boxTripSymbols[0]){
+                            workbook.sheet(lineupSheet)
+                                .row(lineupPivotCells[team].r)
+                                .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1) + 1 + parseInt(sym))
+                                .value(blockerList[b].boxTripSymbols[0][sym])
+                        }
+
+                        if (starPass[t]){
+                            for (let sym in blockerList[b].boxTripSymbols[1]){
+                                workbook.sheet(lineupSheet)
+                                    .row(lineupPivotCells[team].r + 1)
+                                    .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1) + 1 + parseInt(sym))
+                                    .value(blockerList[b].boxTripSymbols[1][sym])
+                            }
+                        }
+                    }
+
+
                 }
 
                 rewriteLineupRow(team)
-
-                // check for star pass
-                starPass[t] = jamTeamData.starPass
 
                 // If there's a star pass on THIS team, add an SP and the pivot's number to scores and lineups
                 if (starPass[t]){
                     jamCells[team].r += 1
                     jammerCells[team].r += 1
+                    lineupJammerCells[team].r += 1
                     lineupPivotCells[team].r += 1
                     lineupNoPivotCells[team].r += 1
                     firstTripCells[team].r += 1
@@ -748,6 +815,7 @@ let updateLineupsAndScore = (workbook) => {
 
                         jamCells[team].r += 1
                         jammerCells[team].r += 1
+                        lineupJammerCells[team].r += 1
                         lineupPivotCells[team].r += 1
                         lineupNoPivotCells[team].r += 1
                         firstTripCells[team].r += 1
@@ -766,6 +834,7 @@ let updateLineupsAndScore = (workbook) => {
                 let team = teamNames[t]
                 jamCells[team].r += 1
                 jammerCells[team].r += 1
+                lineupJammerCells[team].r +=1
                 lineupPivotCells[team].r += 1
                 lineupNoPivotCells[team].r += 1 
                 firstTripCells[team].r += 1

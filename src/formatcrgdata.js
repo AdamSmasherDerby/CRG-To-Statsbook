@@ -225,17 +225,31 @@ let getJamSkaters40 = (jamTeam) => {
     let keys = Object.keys(jamTeam)
     let id, penaltyBox, position
     let skaters = []
+    let boxTripSymbols = []
+    let skaterData = {}
+
     for (let k in keys) {
         let match = fieldingRE.exec(keys[k])
         if (match != undefined){
             position = match[1]
-            id = jamTeam[`Fielding(${position})`].Skater
-            penaltyBox = jamTeam[`Fielding(${position})`].PenaltyBox
+            skaterData = jamTeam[`Fielding(${position})`]
+            if(!skaterData.hasOwnProperty('Skater')) { continue }
+            id = skaterData.Skater
+            penaltyBox = skaterData.PenaltyBox
+            if (jamTeam.StarPass){
+                boxTripSymbols = [
+                    [skaterData.BoxTripSymbolsBeforeSP.trim().split(' ')],
+                    [skaterData.BoxTripSymbolsAfterSP.trim().split(' ')]
+                ]
+            } else {
+                boxTripSymbols = [skaterData.BoxTripSymbols.trim().split(' ')]
+            }
         
             skaters.push({
                 id: id,
                 penaltyBox: penaltyBox,
-                position: position
+                position: position,
+                boxTripSymbols: boxTripSymbols
             })
         }
     }
