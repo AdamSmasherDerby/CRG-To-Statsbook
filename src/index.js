@@ -879,10 +879,11 @@ let updateGameClock = (workbook) => {
         let jamTimeCell = rowcol(sbTemplate.clock[period].firstJamTime)
 
         for (let j in crgData.periods[p].jams){
-        // For each jam
+        // For each jam 
             let rawJamTime = crgData.periods[p].jams[j].jamLength
             let jamTimeReResult = timeRe.exec(rawJamTime)
-            let jamTime = `${jamTimeReResult[1]}:${jamTimeReResult[2]}`
+            let jamTime = `${(parseInt(jamTimeReResult[1]) * 60 + parseInt(jamTimeReResult[2]))}`
+            // For the life of me, I cannot figure out how to get this into m:ss format.
             workbook.sheet(clockSheet).row(jamTimeCell.r).cell(jamTimeCell.c).value(jamTime)
             jamTimeCell.r += 1
         }
