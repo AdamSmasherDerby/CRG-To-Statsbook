@@ -74,3 +74,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Will now correctly sort skaters from versions 3.9.5 and up by number
     * Adds a note to the statsbook colophon indicating which version of this tool was used to generate the statsbook.
     * Added confirmation dialog when selecting no skaters from the reconciliation screen.
+* 2.2.0 - April 28, 2019
+    * Support for future CRG releases
+    * Changed from m:ss format to sss format on game clock page to allow formulas to work correctly.
