@@ -14,7 +14,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
     }
 
     if (fileData.hasOwnProperty('identifier')){
-        // CRG formats prior to 3.9.5
+        // CRG formats prior to 3.9.5.  fileData is simply returned as is.
         crgData = fileData
         crgData.version = '3.0'
     } else if (fileData.hasOwnProperty('state')){
@@ -50,7 +50,8 @@ exports.makecrgdata = (fileData, crgFilename) => {
                         number: sb[`Team(${team})`][`Skater(${id})`].Number,
                         penalties: [],
                         name: sb[`Team(${team})`][`Skater(${id})`].Name,
-                        id: id
+                        id: id,
+                        fo_exp: {}
                     }
                 )
                 // Track the position of each skater ID in the crgData list
@@ -73,14 +74,26 @@ exports.makecrgdata = (fileData, crgFilename) => {
                         }
                     )
                 } else {
-                    crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]].penalties.push(
-                        {
+                    // This branch is for 4.0 and up
+                    if (penaltyNumber == 0){
+                    // Penalty(0) is reserved for foulout and expulsion codes
+                        crgData.teams[parseInt(team) -1].skaters[skaterIndices[id]].fo_exp = {
                             period: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].PeriodNumber,
                             code: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Code,
                             jam: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].JamNumber,
-                            id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id
+                            id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id 
                         }
-                    )
+                    } else {
+                    // Add all other penalties to the list
+                        crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]].penalties.push(
+                            {
+                                period: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].PeriodNumber,
+                                code: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Code,
+                                jam: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].JamNumber,
+                                id: sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`].Id
+                            }
+                        )
+                    }
                 }
             }
         }

@@ -498,16 +498,16 @@ let updatePenalties = (workbook) => {
                     && skaterData.hasOwnProperty('fo_exp')
                     && skaterData.fo_exp.period == p
                 ){
-                    let code = ''
+                    let code = '??'
                     if (skaterData.fo_exp.code == 'FO'){
                         code = 'FO'
                     } else if (expRe.exec(skaterData.fo_exp.code) != null) {
                         code = expRe.exec(skaterData.fo_exp.code)[1]
                     } else if (skaterData.fo_exp.code == 'EXP'){
                         code = lastPenaltyCode
-                    } else {
-                        code = '??'
-                    }
+                    } else if (/^[ABCDEFGHILMNPX]{1}/.test(skaterData.fo_exp.code)) {
+                        code = skaterData.fo_exp.code
+                    } 
                     let jam = skaterData.fo_exp.jam
                     workbook.sheet(sheet).row(penaltyRow).cell(firstFOCell.c).value(code)
                     workbook.sheet(sheet).row(jamRow).cell(firstFOJamCell.c).value(jam)
@@ -640,7 +640,7 @@ let updateLineupsAndScore = (workbook) => {
 
                         if (!overtime) {
                             // Add second jammer scores for most cases
-                            for (let t = 0; t < jamTeamData.tripScores[1].length; t++) {
+                            for (let t = 1; t < jamTeamData.tripScores[1].length; t++) {
                                 workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + starPassTrip + t - 2).value(jamTeamData.tripScores[1][t])
                             }
                         } else {
