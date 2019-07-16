@@ -77,6 +77,7 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 * 2.2.0 - April 28, 2019
     * Support for future CRG releases
     * Changed from m:ss format to sss format on game clock page to allow formulas to work correctly.
-* 2.2.1 - 
+* 2.2.1 - July 15, 2019
     * Fixed bug where star passes would cause a "0" in the "NI" column.
     * Correctly add 4.0 formatted foulouts and expulsions.
+    * Add ? and n/a as possible skater numbers.  Can't add comments to the spreadsheet for now, but if that is supported in the future, this can be easily updated.
