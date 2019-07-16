@@ -585,7 +585,11 @@ let updateLineupsAndScore = (workbook) => {
                 let jammerNumber = 
                     jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
                         skaters[teamNames[t]][jammerID].number : ''
-                
+                // If XLSX-populate ever adds support for comments, change this 
+                // to make a cell comment.
+                if (jammerNumber == '' && jammerList[0].comment != ''){
+                    jammerNumber = jammerList[0].comment
+                }
 
                 // Add the jam number and jammer number to scores
                 workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
@@ -693,7 +697,11 @@ let updateLineupsAndScore = (workbook) => {
                     pivotNumber = pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID)
                         ? skaters[teamNames[t]][pivotID].number 
                         : ''
-
+                    // If XLSX-populate ever adds support for comments, change this 
+                    // to make a cell comment.
+                    if (pivotNumber == '' && pivotList[0].comment != ''){
+                        pivotNumber = pivotList[0].comment
+                    }
                     workbook.sheet(lineupSheet)
                         .row(lineupPivotCells[team].r)
                         .cell(lineupPivotCells[team].c)
@@ -733,7 +741,6 @@ let updateLineupsAndScore = (workbook) => {
                 // If there are more than three blockers and the pivot is undefined, start entering blockers in the pivot box
                     workbook.sheet(lineupSheet).row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X') 
                     firstBlockerOffset = 0
-                    // TODO test this branch
                 }
 
                 for (let b = 0; (b < 4 && b < blockerList.length); b++){
@@ -742,6 +749,11 @@ let updateLineupsAndScore = (workbook) => {
                     let blockerNumber = skaters[teamNames[t]].hasOwnProperty(blockerID) 
                         ? skaters[teamNames[t]][blockerID].number 
                         : ''
+                    // If XLSX-populate ever adds support for comments, change this 
+                    // to make a cell comment.
+                    if (blockerNumber == '' && blockerList[b].comment != ''){
+                        blockerNumber = blockerList[b].comment
+                    }
                     workbook.sheet(lineupSheet)
                         .row(lineupPivotCells[team].r)
                         .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1))

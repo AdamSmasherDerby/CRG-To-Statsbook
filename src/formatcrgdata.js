@@ -240,6 +240,7 @@ let getJamSkaters40 = (jamTeam) => {
     let skaters = []
     let boxTripSymbols = []
     let skaterData = {}
+    let comment = ''
 
     for (let k in keys) {
         let match = fieldingRE.exec(keys[k])
@@ -257,12 +258,15 @@ let getJamSkaters40 = (jamTeam) => {
             } else {
                 boxTripSymbols = [skaterData.BoxTripSymbols.trim().split(' ')]
             }
+            if (skaterData.SkaterNumber == 'n/a') { comment = 'n/a'}
+            if (skaterData.SkaterNumber == '?') { comment = '?'}
         
             skaters.push({
                 id: id,
                 penaltyBox: penaltyBox,
                 position: position,
-                boxTripSymbols: boxTripSymbols
+                boxTripSymbols: boxTripSymbols,
+                comment: comment
             })
         }
     }
