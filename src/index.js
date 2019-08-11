@@ -585,11 +585,8 @@ let updateLineupsAndScore = (workbook) => {
                 let jammerNumber = 
                     jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
                         skaters[teamNames[t]][jammerID].number : ''
-                // If XLSX-populate ever adds support for comments, change this 
-                // to make a cell comment.
-                if (jammerNumber == '' && jammerList[0].comment != ''){
-                    jammerNumber = jammerList[0].comment
-                }
+                // If XLSX-populate ever adds support for comments, add code here to
+                // make a cell comment
 
                 // Add the jam number and jammer number to scores
                 workbook.sheet(scoreSheet).row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
