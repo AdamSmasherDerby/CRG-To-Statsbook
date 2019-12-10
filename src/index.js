@@ -603,9 +603,16 @@ let updateLineupsAndScore = (workbook) => {
                     }
 
                     // Score Checkboxes for all cases
-                    workbook.sheet(scoreSheet).row(firstLostCells[team].r).cell(firstLostCells[team].c).value(jamTeamData.lost ? 'X' : '')
-                    workbook.sheet(scoreSheet).row(firstLeadCells[team].r).cell(firstLeadCells[team].c).value(jamTeamData.lead ? 'X' : '')
-                    workbook.sheet(scoreSheet).row(firstCallCells[team].r).cell(firstCallCells[team].c).value(jamTeamData.call ? 'X' : '')
+                    // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
+                    if (jamTeamData.lost) {
+                        workbook.sheet(scoreSheet).row(firstLostCells[team].r).cell(firstLostCells[team].c).value('X')
+                    }
+                    if (jamTeamData.lead) {
+                        workbook.sheet(scoreSheet).row(firstLeadCells[team].r).cell(firstLeadCells[team].c).value('X')
+                    }
+                    if (jamTeamData.call) {
+                        workbook.sheet(scoreSheet).row(firstCallCells[team].r).cell(firstCallCells[team].c).value('X')
+                    }
 
                     // Scoring Trip Data for all cases
                     for(let t = 1; t < jamTeamData.tripScores[0].length; t++){
@@ -616,9 +623,13 @@ let updateLineupsAndScore = (workbook) => {
                     if (!starPass[t]){
                     // No Star Pass Scoring and Lineup Data
 
-                        workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value(jamTeamData.injury ? 'X' : '')
-                        workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value(jamTeamData.noInitial ? 'X' : undefined)
-                    
+                        if (jamTeamData.injury) {
+                            workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value('X')
+                        }
+                        if (jamTeamData.noInitial) {
+                            workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
+                        }
+
                         if (overtime) {
                         // Handle overtime for the no star pass case (overwriting first jam with X + X)
                             let tripTwoScore = (jamTeamData.tripScores[0][1] ? ` + ${jamTeamData.tripScores[0][1]}` : '')
@@ -861,7 +872,7 @@ let updateLineupsAndScore = (workbook) => {
 
     function rewriteLineupRow  (team) {
         for (let b = 0; b < 4; b++) {
-            // Rewrite the line whether or not values were entered.
+            // Rewrite the blocker numbers whether or not values were entered.
             // This is to account for an Excel bug that breaks conditional formatting.
             let blockerNumber = workbook.sheet(lineupSheet)
                 .row(lineupPivotCells[team].r)

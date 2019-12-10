@@ -83,3 +83,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Add ? and n/a as possible skater numbers.  Can't add comments to the spreadsheet for now, but if that is supported in the future, this can be easily updated.
 * 2.2.2 - August 11,2019
     * Fixed a breaking bug where program would crash if a jammer wasn't entered for a given jam.
+* 2.2.3 - December 9, 2019
+    * Another round of 4.0 related bug fixes
