@@ -192,6 +192,7 @@ function addJam40(sb, period, jam, crgData) {
             call: team.Calloff,
             injury: team.Injury,
             noInitial: team.NoInitial,
+            noPivot: team.NoPivot,
             jamScore: team.JamScore,
             starPass: team.StarPass,
             skaters: getJamSkaters40(team),
@@ -247,6 +248,9 @@ let getJamSkaters40 = (jamTeam) => {
         if (match != undefined){
             position = match[1]
             skaterData = jamTeam[`Fielding(${position})`]
+            if (jamTeam.NoPivot && position == 'Pivot') {
+                position = 'Blocker4'
+            }            
             if(!skaterData.hasOwnProperty('Skater')) { continue }
             id = skaterData.Skater
             penaltyBox = skaterData.PenaltyBox

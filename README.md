@@ -1,16 +1,16 @@
 CRG Data Tool is a utility for converting output Game Data files from CRG Scoreboard and to WFTDA StatsBooks.  It can either generate a new statsbook based on a template or repopulate an existing statsbook file.  If there is a conflict between your scoreboard data and an existing statsbook file, it will attempt to help you resolve the conflict.
 
-This software is still in beta stage. As such, be sure to back up any StatsBook files *before* feeding them to this program, unless you want to risk retyping stuff.
+**Note:** It is important to open the generated spreadsheet in a compatiable spreadsheet program BEFORE either feeding it to the statsbook checker or submitting it to WFTDA.  There are formulas in the spreadsheet that will not execute unless the file is opened.  (For example, there won't be any jam numbers in the lineup tab.)
+
+It is recommended to back up any StatsBook files *before* feeding them to this program, unless you want to risk retyping stuff.
 
 Although the software uses data from both CRG Scoreboard and WFTDA, it is not provided, endorsed, produced, or supported by the WFTDA. 
 
-## Limitations
-
-At present, CRG Scoreboard does not record enough data for a full statsbook, and in particular, does not record points per scoring trip.  As such, it is not possible to use this data file to fully populate the score sheet of the StatsBook at this time.  
-
 ## Current Abilities
 
-At present, this tool can populate the following information from the game data file.  Information which is not entered in CRG is skipped.
+As of CRG 4.0, all data needed for a statsbook other than IGRF information such as officials can now be captured by the scoreboard.  All information which is entered will be transferred to the statsbook.  The "telepathy" add on which will allow information NOT entered to be transferred to the statsbook is currently under development.
+
+If you are still running CRG 3.9.5 or earlier, the following information can be transferred:
 
 * Game Time and Date
 * Team Names
@@ -22,7 +22,6 @@ At present, this tool can populate the following information from the game data 
 * Penalty codes
 * Foul Outs
 * Expulsions
-    * If the user is running a dev version of CRG that records expulsion codes, the program will use that, otherwise it will assume that the last penalty entered is the penalty for which the skater was expelled.
 * Jam times on the Game Clock sheet.  Because why not?
 
 Flamingo icon from http://www.iconsmind.com
@@ -85,3 +84,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Fixed a breaking bug where program would crash if a jammer wasn't entered for a given jam.
 * 2.2.3 - December 9, 2019
     * Another round of 4.0 related bug fixes
+* 2.2.4 - January 20, 2020
+    * Added strongly worded note about always opening output files in Excel before error checking.
+    * Fixed "no pivot" data not appearing in output sheet.
