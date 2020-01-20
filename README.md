@@ -85,3 +85,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Fixed a breaking bug where program would crash if a jammer wasn't entered for a given jam.
 * 2.2.3 - December 9, 2019
     * Another round of 4.0 related bug fixes
+* 2.2.4 - January 20, 2020
+    * Added strongly worded note about always opening output files in Excel before error checking.
+    * Fixed "no pivot" data not appearing in output sheet.
