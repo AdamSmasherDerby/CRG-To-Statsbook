@@ -614,10 +614,27 @@ let updateLineupsAndScore = (workbook) => {
                         workbook.sheet(scoreSheet).row(firstCallCells[team].r).cell(firstCallCells[team].c).value('X')
                     }
 
+                    let scoringTrips = jamTeamData.tripScores[0]
+                    let trip10Points = []
+                    // if length > 10 means more than 11 trips
+                    // important note: this is > instead of >= on purpose
+                    // if there are exactly 10 trips, the formula logic should not trigger
+                    if(scoringTrips.length > 10) {
+                        
+                        trip10Points = scoringTrips.slice(9)
+                        scoringTrips = scoringTrips.slice(0,9)
+                    }
+
                     // Scoring Trip Data for all cases
-                    for(let t = 1; t < jamTeamData.tripScores[0].length; t++){
+                    for(let t = 1; t < scoringTrips.length; t++) {
                         // Add trip scores to sheet for initial jammer
-                        workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + t - 1).value(jamTeamData.tripScores[0][t])
+                        workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + t - 1).value(scoringTrips[t])
+                    }
+
+                    if(trip10Points.length) {
+                        const trip10Cell = workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + 8)
+                        const formula = trip10Points.reduce((agg, value) => `${agg}+${value}`)
+                        trip10Cell.formula(formula)
                     }
 
                     if (!starPass[t]){
@@ -632,8 +649,14 @@ let updateLineupsAndScore = (workbook) => {
 
                         if (overtime) {
                         // Handle overtime for the no star pass case (overwriting first jam with X + X)
-                            let tripTwoScore = (jamTeamData.tripScores[0][1] ? ` + ${jamTeamData.tripScores[0][1]}` : '')
-                            workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c).value(`${jamTeamData.tripScores[0][0]}${tripTwoScore}`)
+                            const cell = workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c)
+                            let value = jamTeamData.tripScores[0][0]
+                            if(jamTeamData.tripScores[0][1]) {
+                                value = `${value}+${jamTeamData.tripScores[0][1]}`
+                            } else {
+                                value = `${value}+0`
+                            }
+                            cell.formula(value)
                         }
 
                         if(jammerList[0].hasOwnProperty('boxTripSymbols')){
@@ -665,7 +688,7 @@ let updateLineupsAndScore = (workbook) => {
                             if (starPassTrip == 1 && jamTeamData.tripScores[1].length > 1){
                             // If the star pass happened on the FIRST scoring trip, AND there was more than
                             // one scoring trip, overwrite the first column
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c).value(
+                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c).formula(
                                     `${jamTeamData.tripScores[1][0]} + ${jamTeamData.tripScores[1][1]}`
                                 )
                             }
