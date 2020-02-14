@@ -1,10 +1,8 @@
 const _ = require('lodash')
-const Reader935 = require('./readers/reader395')
-const Reader400 = require('./readers/reader400')
+const ReaderProvider = require('./readers/readerProvider')
 
 exports.makecrgdata = (fileData, crgFilename) => {
-    const reader395 = new Reader935()
-    const reader400 = new Reader400()
+    const readerProvider = new ReaderProvider()
 
     let crgData = {
         teams: [{
@@ -18,13 +16,16 @@ exports.makecrgdata = (fileData, crgFilename) => {
         version: ''
     }
 
-    if (fileData.hasOwnProperty('identifier')){
+    const version = readerProvider.getVersion(fileData)
+
+    if (version === 'v3.0.0'){
         // CRG formats prior to 3.9.5.  fileData is simply returned as is.
         crgData = fileData
-        crgData.version = '3.0'
-    } else if (fileData.hasOwnProperty('state')){
+        crgData.version = version
+    } else {
         // Determine version
-        crgData.version = (fileData.state.hasOwnProperty('ScoreBoard.InJam') ? '4.0' : '3.9.5')
+        crgData.version = version
+        const reader = readerProvider.getReader(version)
 
         let sb = {}
         let keys = Object.keys(fileData.state)
@@ -72,11 +73,8 @@ exports.makecrgdata = (fileData, crgFilename) => {
 
                 skater = crgData.teams[parseInt(team) - 1].skaters[skaterIndices[id]]
                 penalty = sb[`Team(${team})`][`Skater(${id})`][`Penalty(${penaltyNumber})`]
-                if (crgData.version == '3.9.5') {
-                    reader395.readPenalty(penaltyNumber, penalty, skater)
-                } else {
-                    reader400.readPenalty(penaltyNumber, penalty, skater)
-                }
+
+                reader.readPenalty(penaltyNumber, penalty, skater)
             }
         }
 
@@ -114,14 +112,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
                 let jamList = crgData.periods[period - 1].jams
                 
                 if (!jamList.some(x => x.jam == jam)) {
-                    
-                // if this jam doesn't exist, add it
-                    if(crgData.version == '3.9.5') {
-                        reader395.addJam(jam, rawData, jamList)
-
-                    } else {
-                        reader400.addJam(jam, rawData, jamList)
-                    }
+                    reader.addJam(jam, rawData, jamList)
                 }
 
                 crgData.periods[period - 1].jams = _.orderBy(crgData.periods[period - 1].jams, ['jam'])
