@@ -536,8 +536,8 @@ let updateLineupsAndScore = (workbook) => {
         firstNpCells = {home: {}, away: {}}, 
         boxCodes = sbTemplate.lineups.boxCodes,
         blockerRe = /Blocker(\d)/,
-        starPassTrip = 1,
-        overtime = false,
+        starPassTrip = -1,
+        hasInitialPoints = false,
         pivotID = undefined,
         pivotNumber = ''
 
@@ -572,6 +572,7 @@ let updateLineupsAndScore = (workbook) => {
                 let team = teamNames[t]
                 let jamTeamData = crgData.periods[p].jams[j].teams[t]
                 starPass[t] = jamTeamData.starPass
+                starPassTrip = jamTeamData.starPassTrip
 
                 // Retrieve the jammer number.
                 let jammerList = jamTeamData.skaters.filter(
@@ -584,7 +585,7 @@ let updateLineupsAndScore = (workbook) => {
                 // OR if the selected jammer is not present in the skater list.
                 let jammerNumber = 
                     jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
-                        skaters[teamNames[t]][jammerID].number : ''
+                        skaters[teamNames[t]][jammerID].number : '?'
                 // If XLSX-populate ever adds support for comments, add code here to
                 // make a cell comment
 
@@ -596,7 +597,7 @@ let updateLineupsAndScore = (workbook) => {
                 if (Object.prototype.hasOwnProperty.call(jamTeamData, 'trips')){
                     let scoringTrips = jamTeamData.trips
                     let trip10Points = []
-                    overtime = scoringTrips.length && scoringTrips[0].score > 0
+                    hasInitialPoints = scoringTrips.length && scoringTrips[0].score > 0
 
                     // Score Checkboxes for all cases
                     // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
@@ -631,7 +632,7 @@ let updateLineupsAndScore = (workbook) => {
                         }
 
                         // Add trip scores to sheet for initial jammer
-                        row.cell(firstTripCells[team].c + t - 1).value(scoringTrips[t])
+                        row.cell(firstTripCells[team].c + t - 1).value(scoringTrips[t].score)
                     }
 
                     if(trip10Points.length) {
@@ -644,12 +645,11 @@ let updateLineupsAndScore = (workbook) => {
                         }
 
                         const trip10Cell = row.cell(firstTripCells[team].c + 8)
-                        const formula = trip10Points.reduce((agg, value) => `${agg}+${value.points}`)
+                        const formula = trip10Points.map(t => t.score).join('+')
                         trip10Cell.formula(formula)
                     }
 
-                    if (overtime && scoringTrips.length) {
-                        // Handle overtime for the no star pass case (overwriting first jam with X + X)
+                    if (hasInitialPoints && scoringTrips.length) {
                         let trip = scoringTrips[0]
                         if(trip.tripBy === 'Jammer') {
                             row = workbook.sheet(scoreSheet).row(firstTripCells[team].r)
@@ -657,7 +657,7 @@ let updateLineupsAndScore = (workbook) => {
                             row = workbook.sheet(scoreSheet).row(firstTripCells[team].r+1)
                         }
 
-                        let value = `${scoringTrips[0].points}`
+                        let value = `${scoringTrips[0].score}`
 
                         if(scoringTrips[1]) {
                             value = `${value}+${scoringTrips[1].score}`
@@ -674,13 +674,15 @@ let updateLineupsAndScore = (workbook) => {
                         if (jamTeamData.injury) {
                             workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value('X')
                         }
-                        if (jamTeamData.noInitial) {
+                        
+                        // cannot mark no initial if initial points are present
+                        if (jamTeamData.noInitial && !hasInitialPoints) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                         }
 
                         
 
-                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                        if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
                             for (let sym in jammerList[0].boxTripSymbols[0]){
                                 workbook.sheet(lineupSheet)
                                     .row(lineupJammerCells[team].r)
@@ -700,7 +702,7 @@ let updateLineupsAndScore = (workbook) => {
                         workbook.sheet(scoreSheet).row(firstInjCells[team].r + 1).cell(firstInjCells[team].c).value(jamTeamData.inj ? 'X' : '')
 
                         // Star pass box trips
-                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                        if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
                             for (let sym in jammerList[0].boxTripSymbols[1]){
                                 workbook.sheet(lineupSheet)
                                     .row(lineupPivotCells[team].r)
