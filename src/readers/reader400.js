@@ -24,16 +24,17 @@ exports.default = class Reader400 {
 
         for (let i = 1; i <= 2; i++) {
             const team = rawData[`TeamJam(${i})`]
+            const trips = []
+
             let t = 1
-            const tripScores = [[], []]
-            
             while (Object.prototype.hasOwnProperty.call(team,`ScoringTrip(${t})`)) {
-                if (team[`ScoringTrip(${t})`].AfterSP == false) {
-                    tripScores[0].push(team[`ScoringTrip(${t})`].Score)
-                } else {
-                    tripScores[1].push(team[`ScoringTrip(${t})`].Score)
-                }
-                t++
+                const afterSP =  team[`ScoringTrip(${t})`].AfterSP
+
+                trips.push({
+                    trip: t,
+                    tripBy: afterSP ? 'Pivot': 'Jammer',
+                    score: team[`ScoringTrip(${t})`].Score
+                })
             }
 
             teams.push({
@@ -47,7 +48,7 @@ exports.default = class Reader400 {
                 jamScore: team.JamScore,
                 starPass: team.StarPass,
                 skaters: this.addJamSkaters(team),
-                tripScores: tripScores
+                trips
             })
         }
 
