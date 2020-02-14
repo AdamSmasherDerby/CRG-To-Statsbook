@@ -1,4 +1,4 @@
-exports.default = class Reader395 {
+module.exports = class Reader395 {
     readPenalty(penaltyNumber, penalty, skater) {
         const penaltyData = {
             period: penalty.Period,

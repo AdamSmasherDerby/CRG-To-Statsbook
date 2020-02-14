@@ -1,4 +1,4 @@
-exports.default = class Reader400 {
+module.exports = class Reader400 {
     readPenalty(penaltyNumber, penalty, skater) {
         const penaltyData = {
             period: penalty.PeriodNumber,
@@ -26,15 +26,26 @@ exports.default = class Reader400 {
             const team = rawData[`TeamJam(${i})`]
             const trips = []
 
+            let starPassTrip = -1
+            let trip
             let t = 1
+            let spId = team['StarPassTrip']
+
             while (Object.prototype.hasOwnProperty.call(team,`ScoringTrip(${t})`)) {
-                const afterSP =  team[`ScoringTrip(${t})`].AfterSP
+                trip = team[`ScoringTrip(${t})`]
+                const afterSP =  trip.AfterSP
 
                 trips.push({
                     trip: t,
                     tripBy: afterSP ? 'Pivot': 'Jammer',
-                    score: team[`ScoringTrip(${t})`].Score
+                    score: trip.Score
                 })
+
+                if(spId === trip.Id) {
+                    starPassTrip = t
+                }
+                
+                t++
             }
 
             teams.push({
@@ -48,6 +59,7 @@ exports.default = class Reader400 {
                 jamScore: team.JamScore,
                 starPass: team.StarPass,
                 skaters: this.addJamSkaters(team),
+                starPassTrip,
                 trips
             })
         }
