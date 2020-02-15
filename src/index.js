@@ -536,8 +536,8 @@ let updateLineupsAndScore = (workbook) => {
         firstNpCells = {home: {}, away: {}}, 
         boxCodes = sbTemplate.lineups.boxCodes,
         blockerRe = /Blocker(\d)/,
-        starPassTrip = 1,
-        overtime = false,
+        starPassTrip = -1,
+        hasInitialPoints = false,
         pivotID = undefined,
         pivotNumber = ''
 
@@ -572,6 +572,7 @@ let updateLineupsAndScore = (workbook) => {
                 let team = teamNames[t]
                 let jamTeamData = crgData.periods[p].jams[j].teams[t]
                 starPass[t] = jamTeamData.starPass
+                starPassTrip = jamTeamData.starPassTrip
 
                 // Retrieve the jammer number.
                 let jammerList = jamTeamData.skaters.filter(
@@ -584,7 +585,7 @@ let updateLineupsAndScore = (workbook) => {
                 // OR if the selected jammer is not present in the skater list.
                 let jammerNumber = 
                     jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ? 
-                        skaters[teamNames[t]][jammerID].number : ''
+                        skaters[teamNames[t]][jammerID].number : '?'
                 // If XLSX-populate ever adds support for comments, add code here to
                 // make a cell comment
 
@@ -593,14 +594,10 @@ let updateLineupsAndScore = (workbook) => {
                 workbook.sheet(scoreSheet).row(jammerCells[team].r).cell(jammerCells[team].c).value(jammerNumber)
 
                 // Add version 4.0 data to the score sheet, if present
-                if (jamTeamData.hasOwnProperty('tripScores')){
-
-                    // Assume non-zero initial trip means overtime. (Will also treat operator error that way, which is probably for the best)
-                    if (jamTeamData.tripScores[0][0] > 0 || (jamTeamData.tripScores[0].length == 0 && jamTeamData.tripScores[1][0] > 0)){
-                        overtime = true
-                    } else {
-                        overtime = false
-                    }
+                if (Object.prototype.hasOwnProperty.call(jamTeamData, 'trips')){
+                    let scoringTrips = jamTeamData.trips
+                    let trip10Points = []
+                    hasInitialPoints = scoringTrips.length && scoringTrips[0].score > 0
 
                     // Score Checkboxes for all cases
                     // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
@@ -614,29 +611,78 @@ let updateLineupsAndScore = (workbook) => {
                         workbook.sheet(scoreSheet).row(firstCallCells[team].r).cell(firstCallCells[team].c).value('X')
                     }
 
+                    // if length > 10 means more than 11 trips
+                    // important note: this is > instead of >= on purpose
+                    // if there are exactly 10 trips, the formula logic should not trigger
+                    if(scoringTrips.length > 10) {
+                        trip10Points = scoringTrips.slice(9)
+                        scoringTrips = scoringTrips.slice(0,9)
+                    }
+
+                    let row
                     // Scoring Trip Data for all cases
-                    for(let t = 1; t < jamTeamData.tripScores[0].length; t++){
+                    for(let t = 1; t < scoringTrips.length; t++) {
+                        
+                        let trip = scoringTrips[t]
+
+                        if(trip.tripBy === 'Jammer') {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r)
+                        } else {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r+1)
+                        }
+
                         // Add trip scores to sheet for initial jammer
-                        workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c + t - 1).value(jamTeamData.tripScores[0][t])
+                        row.cell(firstTripCells[team].c + t - 1).value(scoringTrips[t].score)
+                    }
+
+                    if(trip10Points.length) {
+                        // If someone starpasses on trip 11+, this logic doesn't work
+                        // but also, no guidance is given in the manual on this, so it's #magicland anyways
+                        if(trip10Points[0].tripBy === 'Jammer') {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r)
+                        } else {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r+1)
+                        }
+
+                        const trip10Cell = row.cell(firstTripCells[team].c + 8)
+                        const formula = trip10Points.map(t => t.score).join('+')
+                        trip10Cell.formula(formula)
+                    }
+
+                    if (hasInitialPoints && scoringTrips.length) {
+                        let trip = scoringTrips[0]
+                        if(trip.tripBy === 'Jammer') {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r)
+                        } else {
+                            row = workbook.sheet(scoreSheet).row(firstTripCells[team].r+1)
+                        }
+
+                        let value = `${scoringTrips[0].score}`
+
+                        if(scoringTrips[1]) {
+                            value = `${value}+${scoringTrips[1].score}`
+                        } else {
+                            value = `${value}+0`
+                        }
+
+                        row.cell(firstTripCells[team].c).formula(value)
                     }
 
                     if (!starPass[t]){
-                    // No Star Pass Scoring and Lineup Data
+                        // No Star Pass Scoring and Lineup Data
 
                         if (jamTeamData.injury) {
                             workbook.sheet(scoreSheet).row(firstInjCells[team].r).cell(firstInjCells[team].c).value('X')
                         }
-                        if (jamTeamData.noInitial) {
+                        
+                        // cannot mark no initial if initial points are present
+                        if (jamTeamData.noInitial && !hasInitialPoints) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                         }
 
-                        if (overtime) {
-                        // Handle overtime for the no star pass case (overwriting first jam with X + X)
-                            let tripTwoScore = (jamTeamData.tripScores[0][1] ? ` + ${jamTeamData.tripScores[0][1]}` : '')
-                            workbook.sheet(scoreSheet).row(firstTripCells[team].r).cell(firstTripCells[team].c).value(`${jamTeamData.tripScores[0][0]}${tripTwoScore}`)
-                        }
+                        
 
-                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                        if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
                             for (let sym in jammerList[0].boxTripSymbols[0]){
                                 workbook.sheet(lineupSheet)
                                     .row(lineupJammerCells[team].r)
@@ -646,31 +692,6 @@ let updateLineupsAndScore = (workbook) => {
                         }
 
                     } else {
-                    // Star Pass Scoring Data
-
-                        starPassTrip = jamTeamData.tripScores[0].length + 1
-
-                        if (!overtime) {
-                            // Add second jammer scores for most cases
-                            for (let t = 1; t < jamTeamData.tripScores[1].length; t++) {
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + starPassTrip + t - 2).value(jamTeamData.tripScores[1][t])
-                            }
-                        } else {
-                            // Overtime with a star pass. (Yeesh)
-                            // Put in data for scorimg trips 2 - end
-                            for (let t = 0; t < jamTeamData.tripScores[1].length; t++){
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c + t + starPassTrip - 1).value(jamTeamData.tripScores[1][t])
-                            } 
-
-                            if (starPassTrip == 1 && jamTeamData.tripScores[1].length > 1){
-                            // If the star pass happened on the FIRST scoring trip, AND there was more than
-                            // one scoring trip, overwrite the first column
-                                workbook.sheet(scoreSheet).row(firstTripCells[team].r + 1).cell(firstTripCells[team].c).value(
-                                    `${jamTeamData.tripScores[1][0]} + ${jamTeamData.tripScores[1][1]}`
-                                )
-                            }
-                        }
-
                         // Star Pass Score Checkboxes
                         if(jamTeamData.noInitial) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
@@ -681,7 +702,7 @@ let updateLineupsAndScore = (workbook) => {
                         workbook.sheet(scoreSheet).row(firstInjCells[team].r + 1).cell(firstInjCells[team].c).value(jamTeamData.inj ? 'X' : '')
 
                         // Star pass box trips
-                        if(jammerList[0].hasOwnProperty('boxTripSymbols')){
+                        if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
                             for (let sym in jammerList[0].boxTripSymbols[1]){
                                 workbook.sheet(lineupSheet)
                                     .row(lineupPivotCells[team].r)
