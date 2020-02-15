@@ -87,3 +87,6 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 * 2.2.4 - January 20, 2020
     * Added strongly worded note about always opening output files in Excel before error checking.
     * Fixed "no pivot" data not appearing in output sheet.
+* 2.3.0 - February 15, 2020
+    * MAJOR under-the-hood improvements, courtesy of official-sounding
+    * Added a dialog to allow users to immediately open their created Statsbook in their default spreadsheet program.
