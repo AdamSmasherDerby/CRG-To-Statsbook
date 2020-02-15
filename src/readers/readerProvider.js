@@ -22,7 +22,7 @@ module.exports = class ReaderProvider {
 
     getReader(version) {
         if (version === 'unknown' || version === 'v3.0.0') {
-            return null;
+            return null
         } else if (version === 'v3.9.5') {
             return new Reader395()
         } else {

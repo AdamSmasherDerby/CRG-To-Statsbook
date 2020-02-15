@@ -383,12 +383,14 @@ let saveStatsbook = (outFileName) => {
 
 let writeCompleteDialog = (outFileName) => {
 // Display dialog indicating write complete
-    dialog.showMessageBox({
+    ipc.send('write-complete',outFileName)
+
+    /*dialog.showMessageBox({
         type: 'info',
         buttons: ['OK'],
         title: 'CRG to Statsbook',
         message: `Scoreboard data successfully written to ${outFileName}`
-    })
+    })*/
 }
 
 let updateGameData = (workbook) => {

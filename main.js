@@ -7,7 +7,8 @@ require('electron-debug')({enabled: false})
 
 let menu,
     win,
-    aboutWin
+    aboutWin,
+    completeWin
 
 let createWindow = () => {
     win = new BrowserWindow({
@@ -25,7 +26,7 @@ let createWindow = () => {
 
     if (isDev){
         win.webContents.openDevTools()
-        //require('devtron').install()
+        require('devtron').install()
     }
 
     win.webContents.on('will-navigate', (event) => event.preventDefault())
@@ -175,6 +176,43 @@ let openAbout = () => {
 ipc.on('skater-window-closed', (event, outFileName, skaterList) => {
     win.webContents.send('skater-window-closed',outFileName, skaterList)
 })
+
+ipc.on('write-complete', (event, outFileName) => {
+    openComplete(outFileName)
+})
+
+let openComplete = (outFileName) => {
+    completeWin = new BrowserWindow({
+        parent: win,
+        title: 'CRG Data Tool',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 600,
+        height: 300,
+        x: win.getPosition()[0] + 100,
+        y: win.getPosition()[1] + 150
+    })
+
+    completeWin.setMenu(null)
+
+    completeWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'src/complete.html'),
+        protocol: 'file',
+        slashes: true
+    }))
+
+    completeWin.webContents.on('new-window', function(e, url) {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
+
+    completeWin.on('closed', () => {
+        completeWin = null
+    })
+
+    completeWin.webContents.on('did-finish-load', () => {
+        completeWin.webContents.send('set-filename', outFileName)
+    })
+}
 
 // Error handlers
 

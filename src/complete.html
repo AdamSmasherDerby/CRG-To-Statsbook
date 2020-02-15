@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CRG Data Tool</title>
+        <link rel="stylesheet" href="../node_modules/typeface-raleway/index.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../css/index.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row mt-3 ml-3">
+                <div class="col">
+                    <P>Scoreboard data has been successfully written to:</P>
+                    <P><span id="filename"></span><br></P>
+                    <P><b>Reminder:</b> The statsbook data will be incomplete until it is opened in a spreadsheet program.<br></P>
+                    <button class="btn btn-primary btn-sm" id="openButton">Open Output File (Recommended)</button>
+                    <button class="btn btn-primary btn-sm" id="okButton">OK</button><br>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.jQuery = window.$ = require('jquery');
+        </script>
+        <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+    </body>
+    <script src="complete.js"></script>
+</html>
