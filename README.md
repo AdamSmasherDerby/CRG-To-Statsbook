@@ -90,3 +90,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
 * 2.3.0 - February 15, 2020
     * MAJOR under-the-hood improvements, courtesy of official-sounding
     * Added a dialog to allow users to immediately open their created Statsbook in their default spreadsheet program.
+* 2.3.1 - February 21, 2020
+    * Make the exporter tolerant of negative jam durations.

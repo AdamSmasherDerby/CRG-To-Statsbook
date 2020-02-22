@@ -925,9 +925,11 @@ let updateGameClock = (workbook) => {
         // For each jam 
             let rawJamTime = crgData.periods[p].jams[j].jamLength
             let jamTimeReResult = timeRe.exec(rawJamTime)
-            let jamTime = `${(parseInt(jamTimeReResult[1]) * 60 + parseInt(jamTimeReResult[2]))}`
-            // For the life of me, I cannot figure out how to get this into m:ss format.
-            workbook.sheet(clockSheet).row(jamTimeCell.r).cell(jamTimeCell.c).value(jamTime)
+            if (jamTimeReResult != null) {
+                let jamTime = `${(parseInt(jamTimeReResult[1]) * 60 + parseInt(jamTimeReResult[2]))}`
+                // For the life of me, I cannot figure out how to get this into m:ss format.
+                workbook.sheet(clockSheet).row(jamTimeCell.r).cell(jamTimeCell.c).value(jamTime)
+            }
             jamTimeCell.r += 1
         }
     }
