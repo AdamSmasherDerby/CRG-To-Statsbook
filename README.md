@@ -6,6 +6,8 @@ It is recommended to back up any StatsBook files *before* feeding them to this p
 
 Although the software uses data from both CRG Scoreboard and WFTDA, it is not provided, endorsed, produced, or supported by the WFTDA. 
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J11GKIZ)
+
 ## Current Abilities
 
 As of CRG 4.0, all data needed for a statsbook other than IGRF information such as officials can now be captured by the scoreboard.  All information which is entered will be transferred to the statsbook.  The "telepathy" add on which will allow information NOT entered to be transferred to the statsbook is currently under development.
