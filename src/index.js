@@ -670,6 +670,15 @@ let updateLineupsAndScore = (workbook) => {
                         row.cell(firstTripCells[team].c).formula(value)
                     }
 
+                    if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
+                        for (let sym in jammerList[0].boxTripSymbols[0]){
+                            workbook.sheet(lineupSheet)
+                                .row(lineupJammerCells[team].r)
+                                .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
+                                .value(jammerList[0].boxTripSymbols[0][sym])
+                        }
+                    }
+
                     if (!starPass[t]){
                         // No Star Pass Scoring and Lineup Data
 
@@ -681,18 +690,7 @@ let updateLineupsAndScore = (workbook) => {
                         if (jamTeamData.noInitial && !hasInitialPoints) {
                             workbook.sheet(scoreSheet).row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
                         }
-
                         
-
-                        if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
-                            for (let sym in jammerList[0].boxTripSymbols[0]){
-                                workbook.sheet(lineupSheet)
-                                    .row(lineupJammerCells[team].r)
-                                    .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
-                                    .value(jammerList[0].boxTripSymbols[0][sym])
-                            }
-                        }
-
                     } else {
                         // Star Pass Score Checkboxes
                         if(jamTeamData.noInitial) {
@@ -707,7 +705,7 @@ let updateLineupsAndScore = (workbook) => {
                         if(jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')){
                             for (let sym in jammerList[0].boxTripSymbols[1]){
                                 workbook.sheet(lineupSheet)
-                                    .row(lineupPivotCells[team].r)
+                                    .row(lineupPivotCells[team].r + 1)
                                     .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
                                     .value(jammerList[0].boxTripSymbols[1][sym])
                             }
