@@ -94,3 +94,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Added a dialog to allow users to immediately open their created Statsbook in their default spreadsheet program.
 * 2.3.1 - February 21, 2020
     * Make the exporter tolerant of negative jam durations.
+* 2.3.2 - March 11, 2020
+    * Fix bug with box trip symbols in jams with a star pass.
