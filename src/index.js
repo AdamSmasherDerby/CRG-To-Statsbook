@@ -204,12 +204,14 @@ let createSaveArea = () => {
             defaultFileName = crgFilename.slice(0,-4) + 'xlsx'
         }
 
-        dialog.showSaveDialog({defaultPath: defaultFileName}, (fileName) => {
-            if (fileName === undefined){
-                return
-            }
-            prepareForNewSb(fileName)        
-        })
+        dialog.showSaveDialog({defaultPath: defaultFileName})
+            .then((result) => {
+                const fileName = result.filePath
+                if (fileName === undefined){
+                    return
+                }
+                prepareForNewSb(fileName)        
+            })
     }
 
     sbFileSelect.onclick = () => {
@@ -301,7 +303,10 @@ let editSkatersWindow = () => {
     let win = new BrowserWindow({ 
         parent: remote.getCurrentWindow(),
         modal: true,
-        icon: iconPath
+        icon: iconPath,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
 
     if (isDev){
