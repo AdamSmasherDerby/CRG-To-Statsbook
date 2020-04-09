@@ -51,12 +51,11 @@ class XlsxWriter {
             const numberCell = rowcol(sbTemplate.teams[team].firstNumber)
             const nameCell = rowcol(sbTemplate.teams[team].firstName)
             const maxNum = sbTemplate.teams[team].maxNum
-            const teamSkaters = Object.values(skaters[team])
+            const teamSkaters = skaters[team]
 
-            teamSkaters.forEach((skater) => {
+            teamSkaters.forEach((skater, row) => {
                 const name = skater.name
                 const number = skater.number
-                const row = skater.row
 
                 sheet.row(numberCell.r + row).cell(numberCell.c).value(number)
                 sheet.row(nameCell.r + row).cell(nameCell.c).value(name)
@@ -90,12 +89,12 @@ class XlsxWriter {
                 const firstFOCell = rowcol(template.firstFO)
                 const firstFOJamCell = rowcol(template.firstFOJam)
 
-                Object.keys(team).forEach((skaterId) => {
-                    const skater = team[skaterId]
+                team.forEach((skater, row) => {
+                    const skaterId = skater.id
                     const crgSkater = crgTeam.skaters.find(s => s.id === skaterId)
 
-                    const penaltyRow = firstPenaltyCell.r + (skater.row * 2)
-                    const jamRow = firstJamCell.r + (skater.row * 2)
+                    const penaltyRow = firstPenaltyCell.r + (row * 2)
+                    const jamRow = firstJamCell.r + (row * 2)
 
                     let lastPenaltyCode = 'EXP'
 

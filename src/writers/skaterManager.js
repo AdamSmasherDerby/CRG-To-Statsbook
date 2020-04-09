@@ -1,6 +1,7 @@
 const sbTemplate = require('../assets/2018statsbook.json')
 const rowcol = require('../helpers/rowcol')
 const uuid = require('uuid/v4')
+const _ = require('lodash')
 
 const teamNames = ['home', 'away']
 // const periods = [1, 2]
@@ -24,39 +25,42 @@ module.exports = class SkaterManager {
         return tooManySkaters
     }
 
+    compareCrgAndIgrf() {
+
+    }
+
     crgSkaters() {
         const crgSkaters = {}
 
         if (this.crgData.teams) {
             this.crgData.teams.forEach((crgTeam) => {
-                const team = {}
-                const skaterNumbers = Object.values(crgTeam.skaters).map((v) => v.number)
-                const sortedSkaterNumbers = skaterNumbers.slice().sort()
-                const rows = skaterNumbers.map((v) => sortedSkaterNumbers.indexOf(v))
+                const team = []
 
-                crgTeam.skaters.forEach((skater, s) => {
+
+                _.orderBy(crgTeam.skaters, (s) => s.number)
+                .forEach((skater, s) => {
                     const number = skater.number
                     const name = skater.name
                     const id = skater.id
-                    const row = parseInt(rows[s])
 
-                    team[id] = {
+                    team.push({
+                        id,
                         name,
                         number,
-                        row
-                    }
+                        row: s
+                    })
                 })
             })
-
-            return crgSkaters
         }
+
+        return crgSkaters
     }
 
     igrfSkaters(workbook) {
         const skatersOnIGRF = {}
 
         teamNames.forEach((team, t) => {
-            skatersOnIGRF[team] = {}
+            skatersOnIGRF[team] = []
             const teamSheet = sbTemplate.teams[team].sheetName
             const maxNum = sbTemplate.teams[team].maxNum
 
@@ -70,12 +74,12 @@ module.exports = class SkaterManager {
                 let scoreboardMatch = this.crgData.teams[t].skaters.find(x => x.number == number)
                 let id = scoreboardMatch != undefined ? scoreboardMatch.id : uuid()
                 if (number != undefined){
-                    skatersOnIGRF[team][id] = {
+                    skatersOnIGRF[team].push({
                         number: number.toString(),
                         name: name,
                         row: s,
                         id: id
-                    }
+                    })
                 }
             }
         })
