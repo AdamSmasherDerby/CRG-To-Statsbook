@@ -710,4 +710,8 @@ describe('xlsxWriter', () => {
             expect(values[4][11]).toBeUndefined()
         })
     })
+
+    describe('score and lineup data', () => {
+        
+    })
 })

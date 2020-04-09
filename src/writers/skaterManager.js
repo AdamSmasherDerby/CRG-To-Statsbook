@@ -8,12 +8,17 @@ const teamNames = ['home', 'away']
 
 module.exports = class SkaterManager {
     constructor() {
-        this.crgSkaters = {}
+        this.crgSkaters = null
         this.igrfSkaters = null
+        this.skaters = { home: [], away: [] }
     }
 
     getSkaters() {
-        return this.crgSkaters
+        return this.skaters
+    }
+
+    setSkaters(skaterData) {
+        this.skaters = skaterData
     }
 
     tooManyCrgSkaters() {
@@ -37,8 +42,8 @@ module.exports = class SkaterManager {
             if(this.crgSkaters[teamName].length !== this.igrfSkaters[teamName].length) {
                 result = false
             } else {
-                const common = _.intersectionBy(this.crgSkaters[team], this.igrfSkaters[team], s => s.number)
-               if(common.length !== this.crgSkaters[team].length) {
+                const common = _.intersectionBy(this.crgSkaters[teamName], this.igrfSkaters[teamName], s => s.number)
+               if(common.length !== this.crgSkaters[teamName].length) {
                    result = false
                }
             }
@@ -90,7 +95,7 @@ module.exports = class SkaterManager {
     setIgrf(workbook) {
         this.igrfSkaters = {}
 
-        teamNames.forEach((team, t) => {
+        teamNames.forEach((team) => {
             this.igrfSkaters[team] = []
             const teamSheet = sbTemplate.teams[team].sheetName
             const maxNum = sbTemplate.teams[team].maxNum

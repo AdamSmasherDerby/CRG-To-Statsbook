@@ -7,11 +7,9 @@ const path = require('path')
 const BrowserWindow = remote.BrowserWindow
 const isDev = require('electron-is-dev')
 const formatcrgdata = require('./formatcrgdata')
-const initializeWriter = require('./writers/xlsxWriter')
+const initializeWriter = require('./writers/initializeXlsxWriter')
 const SkaterManager = require('./writers/skaterManager')
-const WorkbookWrapper = require('./writers/workbookWrapper')
 
-const teamNames = ['home','away']
 const skaterManager = new SkaterManager()
 
 let statsbookFileName = 'assets/wftda-statsbook-full-us-letter.xlsx'
@@ -260,6 +258,7 @@ let prepareForNewSb = (outFileName) => {
         editSkatersWindow()
             .then(() => saveStatsbook(true, outFileName))
     } else {
+        skaterManager.setSkaters(skaterManager.crgSkaters)
         saveStatsbook(true, outFileName)
     }
 }
@@ -274,6 +273,7 @@ let prepareForExisting = (outFileName) => {
                     editSkatersWindow()
                     .then(() => saveStatsbook(false, outFileName))
                 } else {
+                    skaterManager.setSkaters(skaterManager.crgSkaters)
                     saveStatsbook(false, outFileName)
                 }
 
@@ -309,12 +309,12 @@ let editSkatersWindow = () => {
             win.webContents.send('send-skater-list', JSON.stringify(skaterManager.crgSkaters), JSON.stringify(skaterManager.igrfSkaters))
         })
 
-        ipc.once('skater-window-closed', (event, outFileName, skaterList) => {
+        ipc.once('skater-window-closed', (event, skaterList) => {
             // When the Edit Skaters dialog is closed, save to the statsbook.
                 if(skaterList == undefined){
                     reject()
                 }
-                skaterManager.setCrg(JSON.parse(skaterList))
+                skaterManager.setSkaters(JSON.parse(skaterList))
                 resolve()
             })
     })
