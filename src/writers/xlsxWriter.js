@@ -176,7 +176,29 @@ class XlsxWriter {
             const lineupCells = initializeCells('lineup', period.period)
 
             period.jams.forEach((jam) => {
-                
+                const jamNumber = jam.jam
+                const starPass = [false, false]
+
+                teamNames.forEach((team, t) => {
+                    const jamTeamData = jam.teams[t]
+                    starPass[t] = jamTeamData.starPass
+
+                })
+
+                if(starPass.includes(true)) {
+                    teamNames.forEach((team, t) => {
+                        if(!starPass[t]) {
+                            advanceRow(scoreCells, team, 1)
+                            advanceRow(lineupCells, team, 1)
+                            scoreSheet.row(scoreCells.jam[team].r).cell(scoreCells.jam[team].c).value('SP*')
+                        }
+                    })
+                }
+
+                teamNames.forEach((team) => {
+                    advanceRow(scoreCells, team, 1)
+                    advanceRow(lineupCells, team, 1)
+                })
             })
         })
         for (let p in crgData.periods) {
@@ -625,10 +647,10 @@ function initializeCells(sheet, period) {
     return result
 }
 
-function advanceRow(cells, count) {
+function advanceRow(cells, team, count) {
     Object.keys(cells).forEach((key) => {
-        cells[key].home.r += count
-        cells[key].away.r += count
+        cells[key][team].r += count
+        cells[key][team].r += count
     })
 }
 
