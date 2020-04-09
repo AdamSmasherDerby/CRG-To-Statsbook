@@ -407,7 +407,62 @@ describe('xlsxWriter', () => {
             expect(values[5][17]).toEqual('?')
         })
 
-        it('handles a missing skater data')
+        it('handles a missing skater data', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'Q' }
+                                ]
+                            },
+                            {
+                                id: 'bbb',
+                                number: '101',
+                                penalties: [
+                                    { period: 1, jam: 3, code: undefined }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                            { 
+                                id: 'ccc',
+                                number: '200',
+                                penalties: [ 
+                                    { period: 1, jam: undefined, code: 'C' },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
+
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('Q')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[6]).toBeUndefined()
+            expect(values[4][3]).toBeUndefined()
+            
+        })
 
         it('handles FO/EXP - FO', () => {
             writer.crgData = {
@@ -458,10 +513,201 @@ describe('xlsxWriter', () => {
             expect(values[4].length).toBe(12)
         })
 
-        it('handles FO/EXP - Specific EXP')
+        it('handles FO/EXP - Specific EXP', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'A' }
+                                ],
+                                fo_exp: {
+                                    period: 1,
+                                    jam: 4,
+                                    code: 'F'
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                        ]
+                    }
+                ]
+            }
 
-        it('handles FO/EXP - General EXP')
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
 
-        it('handles FO/EXP - Second Period FO')
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('A')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[4][11]).toEqual('F')
+            expect(values[5][11]).toEqual(4)
+
+            expect(values[4].length).toBe(12)
+        })
+
+        it('handles FO/EXP - General EXP', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'A' }
+                                ],
+                                fo_exp: {
+                                    period: 1,
+                                    jam: 4,
+                                    code: 'EXP'
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                        ]
+                    }
+                ]
+            }
+
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
+
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('A')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[4][11]).toEqual('A')
+            expect(values[5][11]).toEqual(4)
+
+            expect(values[4].length).toBe(12)
+        })
+
+        it('handles FO/EXP - Unknwon Code', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'A' }
+                                ],
+                                fo_exp: {
+                                    period: 1,
+                                    jam: 4,
+                                    code: 'Q'
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                        ]
+                    }
+                ]
+            }
+
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
+
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('A')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[4][11]).toEqual('??')
+            expect(values[5][11]).toEqual(4)
+
+            expect(values[4].length).toBe(12)
+        })
+
+        it('handles FO/EXP - Second Period FO', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'A' },
+                                    { period: 2, jam: 5, code: 'F' }
+                                ],
+                                fo_exp: {
+                                    period: 2,
+                                    jam: 4,
+                                    code: 'G'
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                        ]
+                    }
+                ]
+            }
+
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
+
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('A')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[4][39]).toEqual('G')
+            expect(values[5][39]).toEqual(4)
+
+            expect(values[4][11]).toBeUndefined()
+        })
     })
 })
