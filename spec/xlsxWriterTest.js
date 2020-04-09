@@ -409,10 +409,59 @@ describe('xlsxWriter', () => {
 
         it('handles a missing skater data')
 
-        it('handles FO/EXP - FO')
+        it('handles FO/EXP - FO', () => {
+            writer.crgData = {
+                teams: [
+                    { 
+                        name: 'Team A', 
+                        skaters: [
+                            {
+                                id: 'aaa',
+                                number: '100',
+                                penalties: [
+                                    { period: 1, jam: 2, code: 'A' }
+                                ],
+                                fo_exp: {
+                                    period: 1,
+                                    jam: 4,
+                                    code: 'FO'
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        name: 'Team B',
+                        skaters: [
+                        ]
+                    }
+                ]
+            }
+
+            skaters.home = [{ id: 'aaa', number: '100' }]
+            skaters.away = []
+
+            writer.penalties()
+
+            const sheets = specWrapper.sheetCache
+            const names = Object.keys(sheets)
+    
+            expect(names).toEqual(['Penalties'])
+
+            const values = sheets['Penalties'].values
+
+            expect(values[4][2]).toEqual('A')
+            expect(values[5][2]).toEqual(2)
+
+            expect(values[4][11]).toEqual('FO')
+            expect(values[5][11]).toEqual(4)
+
+            expect(values[4].length).toBe(12)
+        })
 
         it('handles FO/EXP - Specific EXP')
 
         it('handles FO/EXP - General EXP')
+
+        it('handles FO/EXP - Second Period FO')
     })
 })
