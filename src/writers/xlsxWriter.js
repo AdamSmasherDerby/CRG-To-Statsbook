@@ -24,7 +24,7 @@ class XlsxWriter {
 
 
     writeFile(filename) {
-        return this.workbook.toFileAsync(filename)
+        return this.workbook.toFileAsync(filename).then(() => filename)
     }
 
     gameInfo() {
@@ -177,7 +177,7 @@ class XlsxWriter {
                     
                     getCell(scoreSheet, scoreCells.jam[team]).value(jamNumber)
                     getCell(scoreSheet, scoreCells.jammer[team]).value(jammerNumber)
-                    
+
                     if (Object.prototype.hasOwnProperty.call(jamTeamData, 'trips')) {
                         let scoringTrips = jamTeamData.trips
                         let trip10Points = []
