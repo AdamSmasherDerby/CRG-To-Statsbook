@@ -147,29 +147,12 @@ class XlsxWriter {
         })
     }
 
-    lineupAndScore() {
+    lineupAndScore(skaters) {
         // Process lineups - add jammers to the score sheet and everyone else to the lineup tab
         const scoreSheet = this.workbook.sheet(sbTemplate.score.sheetName)
         const lineupSheet = this.workbook.sheet(sbTemplate.lineups.sheetName)
         const boxCodes = sbTemplate.lineups.boxCodes
-
-
-        let    jamCells = { home: {}, away: {} },
-            jammerCells = { home: {}, away: {} },
-            lineupJammerCells = { home: {}, away: {} },
-            lineupNoPivotCells = { home: {}, away: {} },
-            lineupPivotCells = { home: {}, away: {} },
-            firstTripCells = { home: {}, away: {} },
-            firstLostCells = { home: {}, away: {} },
-            firstLeadCells = { home: {}, away: {} },
-            firstCallCells = { home: {}, away: {} },
-            firstInjCells = { home: {}, away: {} },
-            firstNpCells = { home: {}, away: {} },
-            blockerRe = /Blocker(\d)/,
-            starPassTrip = -1,
-            hasInitialPoints = false,
-            pivotID = undefined,
-            pivotNumber = ''
+        const blockerRe = /Blocker(\d)/
 
         this.crgData.periods.forEach((period) => {
             const scoreCells = initializeCells('score', period.period)
@@ -182,84 +165,23 @@ class XlsxWriter {
                 teamNames.forEach((team, t) => {
                     const jamTeamData = jam.teams[t]
                     starPass[t] = jamTeamData.starPass
+                    const starPassTrip = jamTeamData.starPassTrip
 
-                })
+                    const jammer = jamTeamData.skaters.find((x) => x.position === 'Jammer')
+                    const jammerNumber = getSkaterNumber(skaters, team, jammer)
 
-                if(starPass.includes(true)) {
-                    teamNames.forEach((team, t) => {
-                        if(!starPass[t]) {
-                            advanceRow(scoreCells, team, 1)
-                            advanceRow(lineupCells, team, 1)
-                            scoreSheet.row(scoreCells.jam[team].r).cell(scoreCells.jam[team].c).value('SP*')
-                        }
-                    })
-                }
+                    const pivot = jamTeamData.skaters.find((x) => x.position === 'Pivot')
+                    const pivotNumber = getSkaterNumber(skaters, team, pivot)
 
-                teamNames.forEach((team) => {
-                    advanceRow(scoreCells, team, 1)
-                    advanceRow(lineupCells, team, 1)
-                })
-            })
-        })
-        for (let p in crgData.periods) {
-            // For each period
-            let period = crgData.periods[p].period
-            
+                    const blockers = jamTeamData.skaters.filter((x) => blockerRe.test(x.position)).slice(0,4)
+                    
+                    scoreSheet.row(scoreCells[team].jam.r).cell(scoreCells[team].jam.c).value(jamNumber)
+                    scoreSheet.row(scoreCells[team].jammer.r).cell(scoreCells[team].jammer.c).value(jammerNumber)
 
-
-            // Get the starting cells         
-            teamNames.forEach(team => {
-                jamCells[team] = rowcol(sbTemplate.score[period][team].firstJamNumber)
-                jammerCells[team] = rowcol(sbTemplate.score[period][team].firstJammerNumber)
-                lineupJammerCells[team] = rowcol(sbTemplate.lineups[period][team].firstJammer)
-                lineupPivotCells[team] = { r: lineupJammerCells[team].r, c: lineupJammerCells[team].c + boxCodes + 1 }
-                lineupNoPivotCells[team] = rowcol(sbTemplate.lineups[period][team].firstNoPivot)
-                firstTripCells[team] = rowcol(sbTemplate.score[period][team].firstTrip)
-                firstLostCells[team] = rowcol(sbTemplate.score[period][team].firstLost)
-                firstLeadCells[team] = rowcol(sbTemplate.score[period][team].firstLead)
-                firstCallCells[team] = rowcol(sbTemplate.score[period][team].firstCall)
-                firstInjCells[team] = rowcol(sbTemplate.score[period][team].firstInj)
-                firstNpCells[team] = rowcol(sbTemplate.score[period][team].firstNp)
-            })
-
-            for (let j in crgData.periods[p].jams) {
-                // For each jam
-
-                // Retrieve the common jam number.
-                let jamNumber = crgData.periods[p].jams[j].jam
-                let starPass = [false, false]
-
-                for (let t in teamNames) {
-                    // For each team
-                    let team = teamNames[t]
-                    let jamTeamData = crgData.periods[p].jams[j].teams[t]
-                    starPass[t] = jamTeamData.starPass
-                    starPassTrip = jamTeamData.starPassTrip
-
-                    // Retrieve the jammer number.
-                    let jammerList = jamTeamData.skaters.filter(
-                        x => x.position == 'Jammer'
-                    )
-                    // The jammer ID is undefined if no jammer was entered in this jam
-                    let jammerID = (jammerList.length > 0 ? jammerList[0].id : undefined)
-
-                    // Should return '' for jammer number if the jammer was not entered
-                    // OR if the selected jammer is not present in the skater list.
-                    let jammerNumber =
-                        jammerID && skaters[teamNames[t]].hasOwnProperty(jammerID) ?
-                            skaters[teamNames[t]][jammerID].number : '?'
-                    // If XLSX-populate ever adds support for comments, add code here to
-                    // make a cell comment
-
-                    // Add the jam number and jammer number to scores
-                    scoreSheet.row(jamCells[team].r).cell(jamCells[team].c).value(jamNumber)
-                    scoreSheet.row(jammerCells[team].r).cell(jammerCells[team].c).value(jammerNumber)
-
-                    // Add version 4.0 data to the score sheet, if present
                     if (Object.prototype.hasOwnProperty.call(jamTeamData, 'trips')) {
                         let scoringTrips = jamTeamData.trips
                         let trip10Points = []
-                        hasInitialPoints = scoringTrips.length && scoringTrips[0].score > 0
+                        let hasInitialPoints = scoringTrips.length && scoringTrips[0].score > 0
 
                         // Score Checkboxes for all cases
                         // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
@@ -344,12 +266,12 @@ class XlsxWriter {
 
 
 
-                            if (jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')) {
-                                for (let sym in jammerList[0].boxTripSymbols[0]) {
+                            if (jammer && Object.prototype.hasOwnProperty.call(jammer, 'boxTripSymbols')) {
+                                for (let sym in jammer.boxTripSymbols[0]) {
                                     lineupSheet
                                         .row(lineupJammerCells[team].r)
                                         .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
-                                        .value(jammerList[0].boxTripSymbols[0][sym])
+                                        .value(jammer.boxTripSymbols[0][sym])
                                 }
                             }
 
@@ -364,12 +286,12 @@ class XlsxWriter {
                             scoreSheet.row(firstInjCells[team].r + 1).cell(firstInjCells[team].c).value(jamTeamData.inj ? 'X' : '')
 
                             // Star pass box trips
-                            if (jammerList[0] && jammerList[0].hasOwnProperty('boxTripSymbols')) {
-                                for (let sym in jammerList[0].boxTripSymbols[1]) {
+                            if (jammer && Object.prototype.hasOwnProperty.call(jammer, 'boxTripSymbols')) {
+                                for (let sym in jammer.boxTripSymbols[1]) {
                                     lineupSheet
                                         .row(lineupPivotCells[team].r)
                                         .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
-                                        .value(jammerList[0].boxTripSymbols[1][sym])
+                                        .value(jammer.boxTripSymbols[1][sym])
                                 }
                             }
 
@@ -377,179 +299,107 @@ class XlsxWriter {
 
                     }
 
-                    // Retrieve the pivot number.
-                    let pivotList = jamTeamData.skaters.filter(
-                        x => x.position == 'Pivot'
-                    )
-
-                    if (pivotList.length > 0) {
-                        // If there is a pivot, add them to lineups
-                        pivotID = pivotList[0].id
-                        pivotNumber = pivotID && skaters[teamNames[t]].hasOwnProperty(pivotID)
-                            ? skaters[teamNames[t]][pivotID].number
-                            : ''
-                        // If XLSX-populate ever adds support for comments, change this 
-                        // to make a cell comment.
-                        if (pivotNumber == '' && pivotList[0].comment != '') {
-                            pivotNumber = pivotList[0].comment
-                        }
+                    if (pivot) {
                         lineupSheet
-                            .row(lineupPivotCells[team].r)
-                            .cell(lineupPivotCells[team].c)
+                            .row(lineupCells.pivot[team].r)
+                            .cell(lineupCells.pivot[team].c)
                             .value(pivotNumber)
 
-                        if (pivotList[0].hasOwnProperty('boxTripSymbols')) {
+                        if (pivot.hasOwnProperty('boxTripSymbols')) {
                             // Add pre star pass box trips for the pivot
-                            for (let sym in pivotList[0].boxTripSymbols[0]) {
-                                lineupSheet
-                                    .row(lineupPivotCells[team].r)
-                                    .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
-                                    .value(pivotList[0].boxTripSymbols[0][sym])
+                            for (let sym in pivot.boxTripSymbols[0]) {
+                                let tripOffset = 1 + parseInt(sym)
+                                getCell(lineupSheet, lineupCells.pivot, 0, tripOffset)
+                                    .value(pivot.boxTripSymbols[0][sym])
                             }
 
                             // Add post star pass box trips for the pivot
                             if (starPass[t]) {
-                                for (let sym in pivotList[0].boxTripSymbols[1]) {
-                                    lineupSheet
-                                        .row(lineupJammerCells[team].r + 1)
-                                        .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
-                                        .value(pivotList[0].boxTripSymbols[1][sym])
-                                }
-                            }
-                        }
-                    } else {
-                        pivotID = undefined
-                        pivotNumber = ''
-                    }
-
-                    // Retrieve the blocker numbers
-                    let blockerList = jamTeamData.skaters.filter(
-                        x => blockerRe.test(x.position)
-                    )
-
-                    let firstBlockerOffset = 1
-                    if (blockerList.length > 3 && pivotID == undefined) {
-                        // If there are more than three blockers and the pivot is undefined, start entering blockers in the pivot box
-                        lineupSheet.row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X')
-                        firstBlockerOffset = 0
-                    }
-
-                    for (let b = 0; (b < 4 && b < blockerList.length); b++) {
-                        // Add blockers to statsbook
-                        let blockerID = blockerList[b].id
-                        let blockerNumber = skaters[teamNames[t]].hasOwnProperty(blockerID)
-                            ? skaters[teamNames[t]][blockerID].number
-                            : ''
-                        // If XLSX-populate ever adds support for comments, change this 
-                        // to make a cell comment.
-                        if (blockerNumber == '' && blockerList[b].comment != '') {
-                            blockerNumber = blockerList[b].comment
-                        }
-                        lineupSheet
-                            .row(lineupPivotCells[team].r)
-                            .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1))
-                            .value(blockerNumber)
-
-                        // Box trips
-                        if (blockerList[b].hasOwnProperty('boxTripSymbols')) {
-                            for (let sym in blockerList[b].boxTripSymbols[0]) {
-                                lineupSheet
-                                    .row(lineupPivotCells[team].r)
-                                    .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1) + 1 + parseInt(sym))
-                                    .value(blockerList[b].boxTripSymbols[0][sym])
-                            }
-
-                            if (starPass[t]) {
-                                for (let sym in blockerList[b].boxTripSymbols[1]) {
-                                    lineupSheet
-                                        .row(lineupPivotCells[team].r + 1)
-                                        .cell(lineupPivotCells[team].c + (b + firstBlockerOffset) * (boxCodes + 1) + 1 + parseInt(sym))
-                                        .value(blockerList[b].boxTripSymbols[1][sym])
+                                for (let sym in pivot.boxTripSymbols[1]) {
+                                    let tripOffset = 1 + parseInt(sym)
+                                    getCell(lineupSheet, lineupCells.pivot, 1, tripOffset)
+                                        .value(pivot.boxTripSymbols[1][sym])
                                 }
                             }
                         }
 
-
                     }
 
-                    rewriteLineupRow(team)
+                    if(blockers.length) {
+                        let offset
+                        if(blockers.length === 4 && pivotNumber === '?') {
+                            lineupSheet.row(lineupCells.noPivot[team].r).cell(lineupCells.noPivot[team].c).value('X')
+                            offset = 0
+                        } else {
+                            offset = 1
+                        }
 
-                    // If there's a star pass on THIS team, add an SP and the pivot's number to scores and lineups
-                    if (starPass[t]) {
-                        jamCells[team].r += 1
-                        jammerCells[team].r += 1
-                        lineupJammerCells[team].r += 1
-                        lineupPivotCells[team].r += 1
-                        lineupNoPivotCells[team].r += 1
-                        firstTripCells[team].r += 1
-                        firstLeadCells[team].r += 1
-                        firstLostCells[team].r += 1
-                        firstCallCells[team].r += 1
-                        firstInjCells[team].r += 1
-                        firstNpCells[team].r += 1
+                        blockers.forEach((blocker, b) => {
+                            // Add blockers to statsbook
+                            const blockerNumber = getSkaterNumber(skaters, team, blocker)
+                            const blockerOffset = (b + offset) * (boxCodes + 1)
 
-                        scoreSheet.row(jamCells[team].r).cell(jamCells[team].c).value('SP')
-                        scoreSheet.row(jammerCells[team].r).cell(jammerCells[team].c).value(pivotNumber)
-                        lineupSheet.row(lineupNoPivotCells[team].r).cell(lineupNoPivotCells[team].c).value('X')
-                        lineupSheet.row(lineupPivotCells[team].r).cell(lineupPivotCells[team].c).value(jammerNumber)
-
-                        for (let b = 0; (b < 3 && b < blockerList.length); b++) {
-                            // Add blockers to star pass line
-                            let blockerID = blockerList[b].id
-                            let blockerNumber = skaters[teamNames[t]].hasOwnProperty(blockerID)
-                                ? skaters[teamNames[t]][blockerID].number
-                                : ''
-                            lineupSheet
-                                .row(lineupPivotCells[team].r)
-                                .cell(lineupPivotCells[team].c + (b + 1) * (boxCodes + 1))
+                            getCell(lineupSheet, lineupCells.pivot, 0, blockerOffset)
                                 .value(blockerNumber)
-                        }
+    
+                            // Box trips
+                            if (blocker.hasOwnProperty('boxTripSymbols')) {
+                                for (let sym in blocker.boxTripSymbols[0]) {
+                                    let tripOffset = blockerOffset + 1 + parseInt(sym)
+                                    getCell(lineupSheet, lineupCells.pivot, 0, tripOffset)
+                                        .value(blocker.boxTripSymbols[0][sym])
+                                }
+    
+                                if (starPass[t]) {
+                                    for (let sym in blocker.boxTripSymbols[1]) {
+                                        let tripOffset = blockerOffset + 1 + parseInt(sym)
+                                        getCell(lineupSheet, lineupCells.pivot, 1, tripOffset)
+                                            .value(blocker.boxTripSymbols[1][sym])
+                                    }
+                                }
+                            }
+                        })
 
-                        rewriteLineupRow(team)
+                        rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
                     }
-                }
 
-                // Check for opposite team star passes
-                if (starPass.includes(true)) {
-                    for (let t in teamNames) {
-                        if (!starPass[t]) {
-                            // If one team does NOT have a star pass, but a star pass exists:
-                            let team = teamNames[t]
+                    if(starPass[t]) {
+                        advanceRow(scoreCells, team, 1)
+                        advanceRow(lineupCells, team, 1)
 
-                            jamCells[team].r += 1
-                            jammerCells[team].r += 1
-                            lineupJammerCells[team].r += 1
-                            lineupPivotCells[team].r += 1
-                            lineupNoPivotCells[team].r += 1
-                            firstTripCells[team].r += 1
-                            firstLeadCells[team].r += 1
-                            firstLostCells[team].r += 1
-                            firstCallCells[team].r += 1
-                            firstInjCells[team].r += 1
-                            firstNpCells[team].r += 1
+                        getCell(scoreSheet, scoreCells.jam[team]).value('SP')
+                        getCell(scoreSheet, scoreCells.jammer[team]).value(pivotNumber)
+                        getCell(lineupSheet, lineupCells.noPivot[team]).value('X')
+                        getCell(lineupSheet, lineupCells.pivot).value(jammerNumber)
 
-                            scoreSheet.row(jamCells[team].r).cell(jamCells[team].c).value('SP*')
-                        }
+                        blockers.forEach((blocker, b) => {
+                            // Add blockers to star pass line
+                            const blockerNumber = getSkaterNumber(skaters, team, blocker)
+                            const blockerOffset = (b + 1) * (boxCodes + 1)
+
+                            getCell(lineupSheet, lineupCells.pivot, 0, blockerOffset).value(blockerNumber)
+                        })
+
+                        rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
                     }
+                })
+
+                if(starPass.includes(true)) {
+                    teamNames.forEach((team, t) => {
+                        if(!starPass[t]) {
+                            advanceRow(scoreCells, team, 1)
+                            advanceRow(lineupCells, team, 1)
+                            getCell(scoreSheet,scoreCells.jam[team]).value('SP*')
+                        }
+                    })
                 }
 
-                for (let t in teamNames) {
-                    let team = teamNames[t]
-                    jamCells[team].r += 1
-                    jammerCells[team].r += 1
-                    lineupJammerCells[team].r += 1
-                    lineupPivotCells[team].r += 1
-                    lineupNoPivotCells[team].r += 1
-                    firstTripCells[team].r += 1
-                    firstLeadCells[team].r += 1
-                    firstLostCells[team].r += 1
-                    firstCallCells[team].r += 1
-                    firstInjCells[team].r += 1
-                    firstNpCells[team].r += 1
-                }
-
-            }
-        }
+                teamNames.forEach((team) => {
+                    advanceRow(scoreCells, team, 1)
+                    advanceRow(lineupCells, team, 1)
+                })
+            })
+        })
     }
 
     gameClock() {
@@ -591,24 +441,6 @@ function rowcol(rcstring) {
     return robj
 }
 
-function rewriteLineupRow(sheet, address) {
-    const boxCodes = sbTemplate.lineups.boxCodes
-
-    for (let b = 0; b < 4; b++) {
-        // Rewrite the blocker numbers whether or not values were entered.
-        // This is to account for an Excel bug that breaks conditional formatting.
-        let blockerNumber = sheet
-            .row(address.r)
-            .cell(address.c + b * (boxCodes + 1))
-            .value()
-        blockerNumber = (blockerNumber == undefined ? '' : blockerNumber.toString())
-        sheet
-            .row(address.r)
-            .cell(address.c + b * (boxCodes + 1))
-            .value(blockerNumber)
-    }
-}
-
 const cellTypes = {
     score: [
         { key: 'jam', templateKey: 'firstJamNumber' },
@@ -632,6 +464,30 @@ const cellTypes = {
                 lineupPivotCells[team] = { r: lineupJammerCells[team].r, c: lineupJammerCells[team].c + boxCodes + 1 }
                 lineupNoPivotCells[team] = rowcol(sbTemplate.lineups[period][team].firstNoPivot)
 */
+function getCell(sheet, address, rowOffset = 0, colOffset = 0) {
+    return sheet
+        .row(address.r + rowOffset)
+        .cell(address.c + colOffset)
+}
+
+function rewriteLineupRow(sheet, address) {
+    const boxCodes = sbTemplate.lineups.boxCodes
+
+    for (let b = 0; b < 4; b++) {
+        // Rewrite the blocker numbers whether or not values were entered.
+        // This is to account for an Excel bug that breaks conditional formatting.
+        let blockerNumber = sheet
+            .row(address.r)
+            .cell(address.c + b * (boxCodes + 1))
+            .value()
+        blockerNumber = (blockerNumber == undefined ? '' : blockerNumber.toString())
+        sheet
+            .row(address.r)
+            .cell(address.c + b * (boxCodes + 1))
+            .value(blockerNumber)
+    }
+}
+
 
 function initializeCells(sheet, period) {
     const template = sbTemplate.score[period]
@@ -652,6 +508,21 @@ function advanceRow(cells, team, count) {
         cells[key][team].r += count
         cells[key][team].r += count
     })
+}
+
+function getSkaterNumber(skaters, team, skater) {
+    let number
+    if(skater && skater.id && Object.prototype.hasOwnProperty.call(skaters[team], skater.id)) {
+        number = skaters[team][skater.id].number
+    } else if(skater && skater.comment) {
+        // If XLSX-populate ever adds support for comments, change this 
+        // to make a cell comment.
+        number = skater.comment
+    } else {
+        number = '?'
+    }
+
+    return number
 }
 
 module.exports = initialize
