@@ -7,12 +7,16 @@ const teamNames = ['home', 'away']
 // const periods = [1, 2]
 
 module.exports = class SkaterManager {
-    constructor(crgData) {
-        this.crgData = crgData
+    constructor() {
+        this.crgSkaters = {}
+    }
+
+    getSkaters() {
+        return this.crgSkaters
     }
 
     tooManyCrgSkaters() {
-        const crgSkaters = this.crgSkaters()
+        const crgSkaters = this.crgSkaters
         let tooManySkaters = false
 
         teamNames.forEach((team) => {
@@ -26,14 +30,27 @@ module.exports = class SkaterManager {
     }
 
     compareCrgAndIgrf() {
+        let result = true
 
+        teamNames.forEach((teamName) => {
+            if(this.crgSkaters[teamName].length !== this.igrfSkaters[teamName].length) {
+                result = false
+            } else {
+                const common = _.intersectionBy(this.crgSkaters[team], this.igrfSkaters[team], s => s.number)
+               if(common.length !== this.crgSkaters[team].length) {
+                   result = false
+               }
+            }
+        })
+        
+        return result
     }
 
-    crgSkaters() {
-        const crgSkaters = {}
+    crgSkaters(crgData) {
+        this.crgSkaters = {}
 
-        if (this.crgData.teams) {
-            this.crgData.teams.forEach((crgTeam) => {
+        if (crgData.teams) {
+            crgData.teams.forEach((crgTeam, t) => {
                 const team = []
 
 
@@ -50,14 +67,16 @@ module.exports = class SkaterManager {
                         row: s
                     })
                 })
+
+                this.crgSkaters[teamNames[t]] = team
             })
         }
 
-        return crgSkaters
+        return this.crgSkaters
     }
 
     igrfSkaters(workbook) {
-        const skatersOnIGRF = {}
+        this.skatersOnIGRF = {}
 
         teamNames.forEach((team, t) => {
             skatersOnIGRF[team] = []
@@ -74,7 +93,7 @@ module.exports = class SkaterManager {
                 let scoreboardMatch = this.crgData.teams[t].skaters.find(x => x.number == number)
                 let id = scoreboardMatch != undefined ? scoreboardMatch.id : uuid()
                 if (number != undefined){
-                    skatersOnIGRF[team].push({
+                    this.skatersOnIGRF[team].push({
                         number: number.toString(),
                         name: name,
                         row: s,
@@ -84,6 +103,6 @@ module.exports = class SkaterManager {
             }
         })
 
-        return skatersOnIGRF
+        return this.skatersOnIGRF
     }
 }
