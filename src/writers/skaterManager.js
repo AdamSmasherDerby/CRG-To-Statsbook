@@ -1,4 +1,4 @@
-const sbTemplate = require('../assets/2018statsbook.json')
+const sbTemplate = require('../../assets/2018statsbook.json')
 const rowcol = require('../helpers/rowcol')
 const uuid = require('uuid/v4')
 const _ = require('lodash')
@@ -9,6 +9,7 @@ const teamNames = ['home', 'away']
 module.exports = class SkaterManager {
     constructor() {
         this.crgSkaters = {}
+        this.igrfSkaters = null
     }
 
     getSkaters() {
@@ -46,7 +47,18 @@ module.exports = class SkaterManager {
         return result
     }
 
-    crgSkaters(crgData) {
+    swapCrgTeams(crgData) {
+        [crgData.teams[0], crgData.teams[1]] = [crgData.teams[1], crgData.teams[0]]
+
+        crgData.periods.forEach((period) => {
+            period.jams.forEach((jam) => {
+                [jam.teams[0], jam.teams[1]] = [jam.teams[1], jam.teams[0]]
+            })
+        })
+        this.crgSkaters(crgData)
+    }
+
+    setCrg(crgData) {
         this.crgSkaters = {}
 
         if (crgData.teams) {
@@ -75,11 +87,11 @@ module.exports = class SkaterManager {
         return this.crgSkaters
     }
 
-    igrfSkaters(workbook) {
-        this.skatersOnIGRF = {}
+    setIgrf(workbook) {
+        this.igrfSkaters = {}
 
         teamNames.forEach((team, t) => {
-            skatersOnIGRF[team] = []
+            this.igrfSkaters[team] = []
             const teamSheet = sbTemplate.teams[team].sheetName
             const maxNum = sbTemplate.teams[team].maxNum
 
@@ -90,10 +102,10 @@ module.exports = class SkaterManager {
                 let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
                 let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value() || ''
 
-                let scoreboardMatch = this.crgData.teams[t].skaters.find(x => x.number == number)
+                let scoreboardMatch = this.crgSkaters[team].find(x => x.number === number)
                 let id = scoreboardMatch != undefined ? scoreboardMatch.id : uuid()
                 if (number != undefined){
-                    this.skatersOnIGRF[team].push({
+                    this.igrfSkaters[team].push({
                         number: number.toString(),
                         name: name,
                         row: s,
@@ -103,6 +115,6 @@ module.exports = class SkaterManager {
             }
         })
 
-        return this.skatersOnIGRF
+        return this.igrfSkaters
     }
 }

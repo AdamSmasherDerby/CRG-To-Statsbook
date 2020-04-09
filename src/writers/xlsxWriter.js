@@ -1,5 +1,5 @@
 const XLP = require('xlsx-populate')
-const sbTemplate = require('../assets/2018statsbook.json')
+const sbTemplate = require('../../assets/2018statsbook.json')
 const rowcol = require('../helpers/rowcol')
 const teamNames = ['home', 'away']
 const periods = [1, 2]
@@ -10,15 +10,17 @@ class XlsxWriter {
         this.newBook = newBook
     }
 
-    processGameData(crgData, skaters, version) {
+    processGameData(crgData, skaterManager, version) {
         this.crgData = crgData
+        this.skaterManager = skaterManager
+
         if (this.newBook) {
             this.gameInfo()
         }
 
-        this.skaters(skaters)
-        this.penalties(skaters)
-        this.lineupsAndScore(skaters)
+        this.skaters()
+        this.penalties()
+        this.lineupAndScore()
         this.gameClock()
         this.colophon(version)
     }
@@ -41,8 +43,8 @@ class XlsxWriter {
         })
     }
 
-    skaters(skaters) {
-
+    skaters() {
+        const skaters = this.skaterManager.getSkaters()
 
         teamNames.forEach((team) => {
             const teamSheet = sbTemplate.teams[team].sheetName
@@ -71,14 +73,15 @@ class XlsxWriter {
         })
     }
 
-    penalties(skaters) {
+    penalties() {
+        const skaters = this.skaterManager.getSkaters()
         // Update the penalty data in the statsbook from the CRG data
         const sheet = this.workbook.sheet(sbTemplate.penalties.sheetName)
         const expRe = /EXP-(\w)/
 
         teamNames.forEach((teamName, teamIdx) => {
             const team = skaters[teamName]
-            const crgTeam = this.crgData[teamIdx]
+            const crgTeam = this.crgData.teams[teamIdx]
 
             periods.forEach((period) => {
                 const template = sbTemplate.penalties[period][teamName]
@@ -147,8 +150,9 @@ class XlsxWriter {
         })
     }
 
-    lineupAndScore(skaters) {
+    lineupAndScore() {
         // Process lineups - add jammers to the score sheet and everyone else to the lineup tab
+        const skaters = this.skaterManager.getSkaters()
         const scoreSheet = this.workbook.sheet(sbTemplate.score.sheetName)
         const lineupSheet = this.workbook.sheet(sbTemplate.lineups.sheetName)
         const boxCodes = sbTemplate.lineups.boxCodes
@@ -156,7 +160,7 @@ class XlsxWriter {
 
         this.crgData.periods.forEach((period) => {
             const scoreCells = initializeCells('score', period.period)
-            const lineupCells = initializeCells('lineup', period.period)
+            const lineupCells = initializeCells('lineups', period.period)
 
             period.jams.forEach((jam) => {
                 const jamNumber = jam.jam
@@ -186,13 +190,13 @@ class XlsxWriter {
                         // Score Checkboxes for all cases
                         // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
                         if (jamTeamData.lost) {
-                            getCell(scoreSheet, scoreCells.lost).value('X')
+                            getCell(scoreSheet, scoreCells.lost[team]).value('X')
                         }
                         if (jamTeamData.lead) {
-                            getCell(scoreSheet, scoreCells.lead).value('X')
+                            getCell(scoreSheet, scoreCells.lead[team]).value('X')
                         }
                         if (jamTeamData.call) {
-                            getCell(scoreSheet, scoreCells.call).value('X')
+                            getCell(scoreSheet, scoreCells.call[team]).value('X')
                         }
 
                         // if length > 10 means more than 11 trips
@@ -265,7 +269,7 @@ class XlsxWriter {
                             }
 
 
-                            writeBoxTrips(lineupSheet, lineupCells.jammer, jammer, false, 0)
+                            writeBoxTrips(lineupSheet, lineupCells.jammer[team], jammer, false, 0)
 
                         } else {
                             // Star Pass Score Checkboxes
@@ -299,7 +303,7 @@ class XlsxWriter {
                             .cell(lineupCells.pivot[team].c)
                             .value(pivotNumber)
 
-                        writeBoxTrips(lineupSheet, lineupSheet.pivot, pivot, starPass, 0)
+                        writeBoxTrips(lineupSheet, lineupCells.pivot[team], pivot, starPass, 0)
                     }
 
                     if(blockers.length) {
@@ -316,10 +320,10 @@ class XlsxWriter {
                             const blockerNumber = getSkaterNumber(skaters, team, blocker)
                             const blockerOffset = (b + offset) * (boxCodes + 1)
 
-                            getCell(lineupSheet, lineupCells.pivot, 0, blockerOffset)
+                            getCell(lineupSheet, lineupCells.pivot[team], 0, blockerOffset)
                                 .value(blockerNumber)
     
-                            writeBoxTrips(lineupSheet, lineupCells.pivot, blocker, starPass[t], blockerOffset)
+                            writeBoxTrips(lineupSheet, lineupCells.pivot[team], blocker, starPass[t], blockerOffset)
                         })
 
                         rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
@@ -332,14 +336,14 @@ class XlsxWriter {
                         getCell(scoreSheet, scoreCells.jam[team]).value('SP')
                         getCell(scoreSheet, scoreCells.jammer[team]).value(pivotNumber)
                         getCell(lineupSheet, lineupCells.noPivot[team]).value('X')
-                        getCell(lineupSheet, lineupCells.pivot).value(jammerNumber)
+                        getCell(lineupSheet, lineupCells.pivot[team]).value(jammerNumber)
 
                         blockers.forEach((blocker, b) => {
                             // Add blockers to star pass line
                             const blockerNumber = getSkaterNumber(skaters, team, blocker)
                             const blockerOffset = (b + 1) * (boxCodes + 1)
 
-                            getCell(lineupSheet, lineupCells.pivot, 0, blockerOffset).value(blockerNumber)
+                            getCell(lineupSheet, lineupCells.pivot[team], 0, blockerOffset).value(blockerNumber)
                         })
 
                         rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
@@ -406,10 +410,11 @@ const cellTypes = {
         { key: 'inj', templateKey: 'firstInj' },
         { key: 'np', templateKey: 'firstNp'}
     ],
-    lineup: [ 
+    lineups: [ 
         { key: 'jam', templateKey: 'firstJamNumber' },
         { key: 'jammer', templateKey: 'firstJammer' },
-        { key: 'noPivot', templateKey: 'firstNoPivot' }
+        { key: 'noPivot', templateKey: 'firstNoPivot' },
+        { key: 'pivot', templateKey: 'firstPivot' },
     ]
 }
 
@@ -463,13 +468,13 @@ function rewriteLineupRow(sheet, address) {
 
 
 function initializeCells(sheet, period) {
-    const template = sbTemplate.score[period]
+    const template = sbTemplate[sheet][period]
     const result = {}
 
     cellTypes[sheet].forEach((type) => {
         result[type.key] = { 
-            home: template.home[type.templateKey], 
-            away: template.away[type.templateKey],
+            home: rowcol(template.home[type.templateKey]), 
+            away: rowcol(template.away[type.templateKey]),
         }
     })
 
@@ -479,14 +484,13 @@ function initializeCells(sheet, period) {
 function advanceRow(cells, team, count) {
     Object.keys(cells).forEach((key) => {
         cells[key][team].r += count
-        cells[key][team].r += count
     })
 }
 
 function getSkaterNumber(skaters, team, skater) {
     let number
-    if(skater && skater.id && Object.prototype.hasOwnProperty.call(skaters[team], skater.id)) {
-        number = skaters[team][skater.id].number
+    if(skater && skater.id && skaters[team].find((s) => s.id === skater.id)) {
+        number = skaters[team].find((s) => s.id === skater.id).number
     } else if(skater && skater.comment) {
         // If XLSX-populate ever adds support for comments, change this 
         // to make a cell comment.

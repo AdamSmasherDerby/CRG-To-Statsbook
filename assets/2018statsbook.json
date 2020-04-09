@@ -143,24 +143,28 @@
             "home": {
                 "firstJamNumber": "A4",
                 "firstNoPivot": "B4",
-                "firstJammer": "C4"
+                "firstJammer": "C4",
+                "firstPivot": "G4"
             },
             "away": {
                 "firstJamNumber": "AA4",
                 "firstNoPivot": "AB4",
-                "firstJammer": "AC4"                
+                "firstJammer": "AC4",
+                "firstPivot": "AG4"              
             }
         },
         "2": {
             "home": {
                 "firstJamNumber": "A46",
                 "firstNoPivot": "B46",
-                "firstJammer": "C46"
+                "firstJammer": "C46",
+                "firstPivot": "G46"
             },
             "away": {
                 "firstJamNumber": "AA46",
                 "firstNoPivot": "AB46",
-                "firstJammer": "AC46"                
+                "firstJammer": "AC46",
+                "firstPivot": "AG46"               
             }            
         }
     },
