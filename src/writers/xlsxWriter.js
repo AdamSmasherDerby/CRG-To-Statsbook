@@ -97,29 +97,22 @@ class XlsxWriter {
                     const skaterId = skater.id
                     const crgSkater = crgTeam.skaters.find(s => s.id === skaterId)
 
-                    const penaltyRow = firstPenaltyCell.r + (row * 2)
-                    const jamRow = firstJamCell.r + (row * 2)
-
+                    const rowOffset = row * 2
                     let lastPenaltyCode = 'EXP'
 
                     if (crgSkater && crgSkater.penalties.length) {
-                        const penalties = crgSkater.penalties
+                        const penalties = crgSkater.penalties.slice(0,9)
                         lastPenaltyCode = penalties[penalties.length - 1].code
 
-                        let priorPenalties = penalties.filter(x => x.period < period).length
-
-                        let penaltyCol = firstPenaltyCell.c + priorPenalties
-                        let jamCol = firstJamCell.c + priorPenalties
+                        const priorPenalties = penalties.filter(x => x.period < period).length
 
                         penalties
                             .filter(x => x.period === period)
-                            .forEach((penalty) => {
+                            .forEach((penalty, idx) => {
+                                const colOffset = priorPenalties + idx
 
-                                sheet.row(penaltyRow).cell(penaltyCol).value(penalty.code)
-                                sheet.row(jamRow).cell(jamCol).value(penalty.jam)
-
-                                penaltyCol += 1
-                                jamCol += 1
+                                sheet.getCell(firstPenaltyCell, rowOffset, colOffset).value(penalty.code || '?')
+                                sheet.getCell(firstJamCell, rowOffset, colOffset).value(penalty.jam || '?')
                             })
 
                         if (crgSkater
@@ -142,8 +135,8 @@ class XlsxWriter {
                             }
 
                             let jam = crgSkater.fo_exp.jam
-                            sheet.row(penaltyRow).cell(firstFOCell.c).value(code)
-                            sheet.row(jamRow).cell(firstFOJamCell.c).value(jam)
+                            sheet.getCell(firstFOCell, rowOffset).value(code)
+                            sheet.getCell(firstFOJamCell, rowOffset).value(jam)
                         }
                     }
                 })
