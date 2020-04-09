@@ -250,6 +250,8 @@ class XlsxWriter {
                             row.cell(scoreCells.trip[team].c).formula(value)
                         }
 
+                        writeBoxTrips(lineupSheet, lineupCells, team, jammer, 0)
+                        
                         if (!starPass[t]) {
                             // No Star Pass Scoring and Lineup Data
 
@@ -261,10 +263,6 @@ class XlsxWriter {
                             if (jamTeamData.noInitial && !hasInitialPoints) {
                                 getCell(scoreSheet, scoreCells.np[team]).value('X')
                             }
-
-
-                            writeBoxTrips(lineupSheet, lineupCells.jammer[team], jammer, false, 0)
-
                         } else {
                             // Star Pass Score Checkboxes
                             if (jamTeamData.noInitial) {
@@ -277,16 +275,6 @@ class XlsxWriter {
                             if(jamTeamData.inj) {
                                 getCell(scoreSheet, scoreCells.inj[team]).value('X')
                             }
-
-                            if (jammer && Object.prototype.hasOwnProperty.call(jammer, 'boxTripSymbols')) {
-                                for (let sym in jammer.boxTripSymbols[1]) {
-                                    lineupSheet
-                                        .row(lineupCells.pivot[team].r)
-                                        .cell(lineupCells.pivot[team].c + 1 + parseInt(sym))
-                                        .value(jammer.boxTripSymbols[1][sym])
-                                }
-                            }
-
                         }
 
                     }
@@ -297,7 +285,7 @@ class XlsxWriter {
                             .cell(lineupCells.pivot[team].c)
                             .value(pivotNumber)
 
-                        writeBoxTrips(lineupSheet, lineupCells.pivot[team], pivot, starPass, 0)
+                        writeBoxTrips(lineupSheet, lineupCells, team, pivot, 0)
                     }
 
                     if(blockers.length) {
@@ -317,7 +305,7 @@ class XlsxWriter {
                             getCell(lineupSheet, lineupCells.pivot[team], 0, blockerOffset)
                                 .value(blockerNumber)
     
-                            writeBoxTrips(lineupSheet, lineupCells.pivot[team], blocker, starPass[t], blockerOffset)
+                            writeBoxTrips(lineupSheet, lineupCells, team, blocker, blockerOffset)
                         })
 
                         rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
@@ -420,22 +408,35 @@ function getCell(sheet, address, rowOffset = 0, colOffset = 0) {
         .cell(address.c + colOffset)
 }
 
-function writeBoxTrips(sheet, address, skater, starPass, offset) {
+function writeBoxTrips(sheet, lineupCells, team, skater, offset) {
     // Box trips
     if (Object.prototype.hasOwnProperty.call(skater, 'boxTripSymbols')) {
-        for (let sym in skater.boxTripSymbols[0]) {
-            let tripOffset = offset + 1 + parseInt(sym)
-            getCell(sheet, address, 0, tripOffset)
-                .value(skater.boxTripSymbols[0][sym])
-        }
+        let preSPAddress
+        let postSPAddress
 
-        if (starPass) {
-            for (let sym in skater.boxTripSymbols[1]) {
-                let tripOffset = offset + 1 + parseInt(sym)
-                getCell(sheet, address, 1, tripOffset)
-                    .value(skater.boxTripSymbols[1][sym])
-            }
+        console.log(skater)
+
+        switch(skater.position) {
+            case 'Jammer':
+                preSPAddress = lineupCells.jammer[team]
+                postSPAddress = lineupCells.pivot[team]
+                break
+            case 'Pivot':
+                preSPAddress = lineupCells.pivot[team]
+                postSPAddress = lineupCells.jammer[team]
+                break
+            default:
+                preSPAddress = lineupCells.pivot[team]
+                postSPAddress = lineupCells.pivot[team]
         }
+        skater.boxTripSymbols.forEach((sym) => {
+            const tripOffset = offset + sym.offset + 1
+            const spOffset = sym.sp ? 1 : 0
+            const address = sym.sp ? postSPAddress : preSPAddress
+
+            getCell(sheet, address, spOffset, tripOffset)
+                .value(sym.symbol)
+        })
     }
 }
 

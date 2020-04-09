@@ -100,12 +100,16 @@ module.exports = class Reader400 {
                 id = skaterData.Skater
                 penaltyBox = skaterData.PenaltyBox
                 if (jamTeam.StarPass) {
+                    console.log(skaterData)
+                    const beforeSP = transformBoxTrips(skaterData.BoxTripSymbolsBeforeSP, false)
+                    const afterSP  = transformBoxTrips(skaterData.BoxTripSymbolsAfterSP, true)
                     boxTripSymbols = [
-                        [skaterData.BoxTripSymbolsBeforeSP.trim().split(' ')],
-                        [skaterData.BoxTripSymbolsAfterSP.trim().split(' ')]
+                        ...beforeSP,
+                        ...afterSP
                     ]
+                    console.log(boxTripSymbols)
                 } else {
-                    boxTripSymbols = [skaterData.BoxTripSymbols.trim().split(' ')]
+                    boxTripSymbols = transformBoxTrips(skaterData.BoxTripSymbols, false)
                 }
                 if (skaterData.SkaterNumber == 'n/a') { comment = 'n/a' }
                 if (skaterData.SkaterNumber == '?') { comment = '?' }
@@ -123,7 +127,18 @@ module.exports = class Reader400 {
     }
 }
 
-let msToTimeString = (totalms) => {
+const transformBoxTrips = (trips, sp) => {
+    if(trips === '') {
+        return []
+    } else {
+    return trips.trim().split(' ').map((symbol, offset) => ({ 
+        symbol,
+        offset, 
+        sp }))
+    }
+}
+
+const msToTimeString = (totalms) => {
     // Convert ms as int to mm:ss.sss as string
     const mins = Math.floor(totalms / 60000)
     let secs = Math.floor((totalms % 60000) / 1000)
