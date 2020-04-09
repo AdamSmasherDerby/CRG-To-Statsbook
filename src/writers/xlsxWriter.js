@@ -17,7 +17,7 @@ class XlsxWriter {
 
         this.skaters(skaters)
         this.penalties(skaters)
-        this.lineupsAndScore()
+        this.lineupsAndScore(skaters)
         this.gameClock()
         this.colophon(version)
     }
@@ -175,9 +175,9 @@ class XlsxWriter {
 
                     const blockers = jamTeamData.skaters.filter((x) => blockerRe.test(x.position)).slice(0,4)
                     
-                    scoreSheet.row(scoreCells[team].jam.r).cell(scoreCells[team].jam.c).value(jamNumber)
-                    scoreSheet.row(scoreCells[team].jammer.r).cell(scoreCells[team].jammer.c).value(jammerNumber)
-
+                    getCell(scoreSheet, scoreCells.jam[team]).value(jamNumber)
+                    getCell(scoreSheet, scoreCells.jammer[team]).value(jammerNumber)
+                    
                     if (Object.prototype.hasOwnProperty.call(jamTeamData, 'trips')) {
                         let scoringTrips = jamTeamData.trips
                         let trip10Points = []
@@ -186,13 +186,13 @@ class XlsxWriter {
                         // Score Checkboxes for all cases
                         // (Don't try to be clever with ternary operators - don't even TOUCH cells that need to be empty)
                         if (jamTeamData.lost) {
-                            scoreSheet.row(firstLostCells[team].r).cell(firstLostCells[team].c).value('X')
+                            getCell(scoreSheet, scoreCells.lost).value('X')
                         }
                         if (jamTeamData.lead) {
-                            scoreSheet.row(firstLeadCells[team].r).cell(firstLeadCells[team].c).value('X')
+                            getCell(scoreSheet, scoreCells.lead).value('X')
                         }
                         if (jamTeamData.call) {
-                            scoreSheet.row(firstCallCells[team].r).cell(firstCallCells[team].c).value('X')
+                            getCell(scoreSheet, scoreCells.call).value('X')
                         }
 
                         // if length > 10 means more than 11 trips
@@ -210,25 +210,25 @@ class XlsxWriter {
                             let trip = scoringTrips[t]
 
                             if (trip.tripBy === 'Jammer') {
-                                row = scoreSheet.row(firstTripCells[team].r)
+                                row = scoreSheet.row(scoreCells.trip[team].r)
                             } else {
-                                row = scoreSheet.row(firstTripCells[team].r + 1)
+                                row = scoreSheet.row(scoreCells.trip[team].r + 1)
                             }
 
                             // Add trip scores to sheet for initial jammer
-                            row.cell(firstTripCells[team].c + t - 1).value(scoringTrips[t].score)
+                            row.cell(scoreCells.trip[team].c + t - 1).value(scoringTrips[t].score)
                         }
 
                         if (trip10Points.length) {
                             // If someone starpasses on trip 11+, this logic doesn't work
                             // but also, no guidance is given in the manual on this, so it's #magicland anyways
                             if (trip10Points[0].tripBy === 'Jammer') {
-                                row = scoreSheet.row(firstTripCells[team].r)
+                                row = scoreSheet.row(scoreCells.trip[team].r)
                             } else {
-                                row = scoreSheet.row(firstTripCells[team].r + 1)
+                                row = scoreSheet.row(scoreCells.trip[team].r + 1)
                             }
 
-                            const trip10Cell = row.cell(firstTripCells[team].c + 8)
+                            const trip10Cell = row.cell(scoreCells.trip[team].c + 8)
                             const formula = trip10Points.map(t => t.score).join('+')
                             trip10Cell.formula(formula)
                         }
@@ -236,9 +236,9 @@ class XlsxWriter {
                         if (hasInitialPoints && scoringTrips.length) {
                             let trip = scoringTrips[0]
                             if (trip.tripBy === 'Jammer') {
-                                row = scoreSheet.row(firstTripCells[team].r)
+                                row = scoreSheet.row(scoreCells.trip[team].r)
                             } else {
-                                row = scoreSheet.row(firstTripCells[team].r + 1)
+                                row = scoreSheet.row(scoreCells.trip[team].r + 1)
                             }
 
                             let value = `${scoringTrips[0].score}`
@@ -249,48 +249,42 @@ class XlsxWriter {
                                 value = `${value}+0`
                             }
 
-                            row.cell(firstTripCells[team].c).formula(value)
+                            row.cell(scoreCells.trip[team].c).formula(value)
                         }
 
                         if (!starPass[t]) {
                             // No Star Pass Scoring and Lineup Data
 
                             if (jamTeamData.injury) {
-                                scoreSheet.row(firstInjCells[team].r).cell(firstInjCells[team].c).value('X')
+                                getCell(scoreSheet, scoreCells.inj[team]).value('X')
                             }
 
                             // cannot mark no initial if initial points are present
                             if (jamTeamData.noInitial && !hasInitialPoints) {
-                                scoreSheet.row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
+                                getCell(scoreSheet, scoreCells.np[team]).value('X')
                             }
 
 
-
-                            if (jammer && Object.prototype.hasOwnProperty.call(jammer, 'boxTripSymbols')) {
-                                for (let sym in jammer.boxTripSymbols[0]) {
-                                    lineupSheet
-                                        .row(lineupJammerCells[team].r)
-                                        .cell(lineupJammerCells[team].c + 1 + parseInt(sym))
-                                        .value(jammer.boxTripSymbols[0][sym])
-                                }
-                            }
+                            writeBoxTrips(lineupSheet, lineupCells.jammer, jammer, false, 0)
 
                         } else {
                             // Star Pass Score Checkboxes
                             if (jamTeamData.noInitial) {
-                                scoreSheet.row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
-                                scoreSheet.row(firstNpCells[team].r + 1).cell(firstNpCells[team].c).value('X')
+                                getCell(scoreSheet, scoreCells.np[team]).value('X')
+                                getCell(scoreSheet, scoreCells.np[team], 1).value('X')
                             } else if (starPassTrip == 1) {
-                                scoreSheet.row(firstNpCells[team].r).cell(firstNpCells[team].c).value('X')
+                                getCell(scoreSheet, scoreCells.np[team]).value('X')
                             }
-                            scoreSheet.row(firstInjCells[team].r + 1).cell(firstInjCells[team].c).value(jamTeamData.inj ? 'X' : '')
 
-                            // Star pass box trips
+                            if(jamTeamData.inj) {
+                                getCell(scoreSheet, scoreCells.inj[team]).value('X')
+                            }
+
                             if (jammer && Object.prototype.hasOwnProperty.call(jammer, 'boxTripSymbols')) {
                                 for (let sym in jammer.boxTripSymbols[1]) {
                                     lineupSheet
-                                        .row(lineupPivotCells[team].r)
-                                        .cell(lineupPivotCells[team].c + 1 + parseInt(sym))
+                                        .row(lineupCells.pivot[team].r)
+                                        .cell(lineupCells.pivot[team].c + 1 + parseInt(sym))
                                         .value(jammer.boxTripSymbols[1][sym])
                                 }
                             }
@@ -305,24 +299,7 @@ class XlsxWriter {
                             .cell(lineupCells.pivot[team].c)
                             .value(pivotNumber)
 
-                        if (pivot.hasOwnProperty('boxTripSymbols')) {
-                            // Add pre star pass box trips for the pivot
-                            for (let sym in pivot.boxTripSymbols[0]) {
-                                let tripOffset = 1 + parseInt(sym)
-                                getCell(lineupSheet, lineupCells.pivot, 0, tripOffset)
-                                    .value(pivot.boxTripSymbols[0][sym])
-                            }
-
-                            // Add post star pass box trips for the pivot
-                            if (starPass[t]) {
-                                for (let sym in pivot.boxTripSymbols[1]) {
-                                    let tripOffset = 1 + parseInt(sym)
-                                    getCell(lineupSheet, lineupCells.pivot, 1, tripOffset)
-                                        .value(pivot.boxTripSymbols[1][sym])
-                                }
-                            }
-                        }
-
+                        writeBoxTrips(lineupSheet, lineupSheet.pivot, pivot, starPass, 0)
                     }
 
                     if(blockers.length) {
@@ -342,22 +319,7 @@ class XlsxWriter {
                             getCell(lineupSheet, lineupCells.pivot, 0, blockerOffset)
                                 .value(blockerNumber)
     
-                            // Box trips
-                            if (blocker.hasOwnProperty('boxTripSymbols')) {
-                                for (let sym in blocker.boxTripSymbols[0]) {
-                                    let tripOffset = blockerOffset + 1 + parseInt(sym)
-                                    getCell(lineupSheet, lineupCells.pivot, 0, tripOffset)
-                                        .value(blocker.boxTripSymbols[0][sym])
-                                }
-    
-                                if (starPass[t]) {
-                                    for (let sym in blocker.boxTripSymbols[1]) {
-                                        let tripOffset = blockerOffset + 1 + parseInt(sym)
-                                        getCell(lineupSheet, lineupCells.pivot, 1, tripOffset)
-                                            .value(blocker.boxTripSymbols[1][sym])
-                                    }
-                                }
-                            }
+                            writeBoxTrips(lineupSheet, lineupCells.pivot, blocker, starPass[t], blockerOffset)
                         })
 
                         rewriteLineupRow(lineupSheet, lineupCells.pivot[team])
@@ -468,6 +430,25 @@ function getCell(sheet, address, rowOffset = 0, colOffset = 0) {
     return sheet
         .row(address.r + rowOffset)
         .cell(address.c + colOffset)
+}
+
+function writeBoxTrips(sheet, address, skater, starPass, offset) {
+    // Box trips
+    if (Object.prototype.hasOwnProperty.call(skater, 'boxTripSymbols')) {
+        for (let sym in skater.boxTripSymbols[0]) {
+            let tripOffset = offset + 1 + parseInt(sym)
+            getCell(sheet, address, 0, tripOffset)
+                .value(skater.boxTripSymbols[0][sym])
+        }
+
+        if (starPass) {
+            for (let sym in skater.boxTripSymbols[1]) {
+                let tripOffset = offset + 1 + parseInt(sym)
+                getCell(sheet, address, 1, tripOffset)
+                    .value(skater.boxTripSymbols[1][sym])
+            }
+        }
+    }
 }
 
 function rewriteLineupRow(sheet, address) {
