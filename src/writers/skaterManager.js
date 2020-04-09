@@ -37,7 +37,7 @@ module.exports = class SkaterManager {
                 const team = []
 
 
-                _.orderBy(crgTeam.skaters, (s) => s.number)
+                _.sortBy(crgTeam.skaters, (s) => s.number)
                 .forEach((skater, s) => {
                     const number = skater.number
                     const name = skater.name

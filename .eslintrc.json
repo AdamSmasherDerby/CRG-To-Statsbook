@@ -3,8 +3,10 @@
         "browser": true,
         "node": true,
         "commonjs": true,
-        "es6": true
+        "es6": true,
+        "jasmine": true
     },
+    "plugins": ["jasmine"],
     "extends": "eslint:recommended",
     "globals": {
         "Atomics": "readonly",
