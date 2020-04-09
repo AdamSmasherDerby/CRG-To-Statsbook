@@ -1,5 +1,6 @@
 const XLP = require('xlsx-populate')
 const sbTemplate = require('../assets/2018statsbook.json')
+const rowcol = require('../helpers/rowcol')
 const teamNames = ['home', 'away']
 const periods = [1, 2]
 
@@ -394,14 +395,6 @@ function initialize(filename, newSB) {
         .then((workbook) => new XlsxWriter(workbook, newSB))
 }
 
-function rowcol(rcstring) {
-    // Return row and col as 1 indexed numbers
-    let [, colstr, rowstr] = /([a-zA-Z]+)([\d]+)/.exec(rcstring)
-    let row = parseInt(rowstr)
-    let col = colstr.split('').reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0)
-    let robj = { r: row, c: col }
-    return robj
-}
 
 const cellTypes = {
     score: [
