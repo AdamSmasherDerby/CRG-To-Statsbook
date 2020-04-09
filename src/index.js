@@ -32,16 +32,25 @@ let crgFilename = '',
 
 ipc.on('do-version-check', (event, version) => {
     let tagURL = 'https://api.github.com/repos/AdamSmasherDerby/CRG-To-Statsbook/tags'
-    $.getJSON(tagURL, {_: new Date().getTime()})
-        .done(function (json) {
-            let latestVersion = json[0].name
-            currentVersion = 'v' + version
-            if (latestVersion != currentVersion) {
-                newVersionWarningBox.innerHTML = `New version available: ${latestVersion} (Current Version: ${currentVersion})</BR>` +
-                    '<A HREF="https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases/" target="_system">Download Here</a>'
+    fetch(tagURL)
+        .then((response) => {
+            if(response.ok) {
+                return response.json()
+            } else {
+                throw new Error(`recieve a response code of ${response.status}`)
             }
         })
-        .fail(function () {console.log('Update check not performed: no connection')})
+        .then((json) => {
+            let latestVersion = json[0].name
+                currentVersion = 'v' + version
+                if (latestVersion != currentVersion) {
+                    newVersionWarningBox.innerHTML = `New version available: ${latestVersion} (Current Version: ${currentVersion})</BR>` +
+                    '<A HREF="https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases/" target="_system">Download Here</a>'
+                }
+        })
+        .catch(() => {
+            console.error('Update check not performed: no connection')
+        })
 })
 
 ipc.on('set-paper-size', (event, size) => {
@@ -62,8 +71,7 @@ fileSelect.onclick = () => {
 
 fileSelect.onchange = (e) => {
 // When a CRG file is selected by clicking.
-    
-    $('*:focus').blur()
+
 
     if (e.target.value == ''){
         return false
@@ -168,9 +176,16 @@ let createSaveArea = () => {
     rightBox.innerHTML += '<div class="col-12 text-center">or</div>'
 
     let sbBox = document.createElement('div')
-    $(sbBox).attr({'class':'col-md-10','id':'drag-sb-file'})
+    sbBox.className = 'col-10'
+    sbBox.id = 'drag-sb-file'
+
     let inputArea = document.createElement('input')
-    $(inputArea).attr({'type':'file','name':'sbfile', 'id': 'sbfile-select','class':'inputfile','accept':'.xlsx'})
+    inputArea.setAttribute('type','file')
+    inputArea.setAttribute('name','sbfile')
+    inputArea.setAttribute('accept', '.xlsx')
+    inputArea.id = 'sbfile-select'
+    inputArea.className = 'inputfile'
+
     let sbInputLabel = document.createElement('label')
     sbInputLabel.setAttribute('for','sbfile-select')
     sbInputLabel.innerHTML = 'Choose an existing StatsBook<BR><span class="box__dragndrop">or drag one here.</span>'
@@ -194,8 +209,6 @@ let createSaveArea = () => {
                 return
             }
             prepareForNewSb(fileName)        
-            $('*:focus').blur()
-
         })
     }
 
@@ -206,8 +219,6 @@ let createSaveArea = () => {
 
     sbFileSelect.onchange = (e) => {
     // When 'Select Existing Statsbook File' is clicked
-
-        $('*:focus').blur()
 
         if (e.target.value == ''){
             return false
