@@ -27,6 +27,7 @@ module.exports = class Reader395 {
         jamList.push({
             jam: jamNumber,
             jamLength: msToTimeString(jamLengthMS),
+            jamLengthSeconds: Math.round(jamLengthMS / 1000),
             teams: [{
                 team: '1',
                 jamScore: teamOne.JamScore,

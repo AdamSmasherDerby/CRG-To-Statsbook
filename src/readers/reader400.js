@@ -67,6 +67,7 @@ module.exports = class Reader400 {
         jamList.push({
             jam: jamNumber,
             jamLength: msToTimeString(durationMs),
+            jamLengthSeconds: Math.round(durationMs / 1000),
             teams: teams
         })
     }

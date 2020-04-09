@@ -22,10 +22,18 @@ exports.makecrgdata = (fileData, crgFilename) => {
         // CRG formats prior to 3.9.5.  fileData is simply returned as is.
         crgData = fileData
         crgData.version = version
+
+        crgData.periods.forEach((period) => {
+            period.jams.forEach((jam) => {
+                jam.jamLengthSeconds = parseJamTime(jam)
+            })
+        })
+
     } else {
+        const reader = readerProvider.getReader(version)
         // Determine version
         crgData.version = version
-        const reader = readerProvider.getReader(version)
+        
 
         let sb = {}
         let keys = Object.keys(fileData.state)
@@ -121,4 +129,11 @@ exports.makecrgdata = (fileData, crgFilename) => {
         
     } 
     return crgData
+}
+
+function parseJamTime(jam) {
+    const timeRe = /(\d):(\d\d)(\.\d+)*/
+    const rawJamTime = jam.jamLength
+    const jamTimeReResult = timeRe.exec(rawJamTime)
+    return (parseInt(jamTimeReResult[1]) * 60 + parseInt(jamTimeReResult[2]))
 }
