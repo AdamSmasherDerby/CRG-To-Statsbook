@@ -9,6 +9,7 @@ const isDev = require('electron-is-dev')
 const formatcrgdata = require('./formatcrgdata')
 const initializeWriter = require('./writers/xlsxWriter')
 const SkaterManager = require('./writers/skaterManager')
+const WorkbookWrapper = require('./writers/workbookWrapper')
 
 const teamNames = ['home','away']
 const skaterManager = new SkaterManager()
@@ -257,7 +258,7 @@ let prepareForNewSb = (outFileName) => {
     if (skaterManager.tooManyCrgSkaters()){
         // With a new Statsbook, only call the edit skaters window if there are too many skaters in CRG
         editSkatersWindow()
-            .then((skaters) => saveStatsbook(true, outFileName))
+            .then(() => saveStatsbook(true, outFileName))
     } else {
         saveStatsbook(true, outFileName)
     }
@@ -329,7 +330,8 @@ let saveStatsbook = (newSB, outFileName) => {
 
     initializeWriter(inFileName, newSB)
         .then((writer) => {
-            writer.processGameData(crgData, skaterManager, currentVersion)
+            writer.loadGameData(crgData, skaterManager, currentVersion)
+            writer.processGameData()
             return writer.writeFile(outFileName)
         }).then((filename) => {
             ipc.send('write-complete',filename)
