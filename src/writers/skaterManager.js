@@ -55,20 +55,22 @@ module.exports = class SkaterManager {
     igrfSkaters(workbook) {
         const skatersOnIGRF = {}
 
-        for(let t in teamNames) {
-            skatersOnIGRF[teamNames[t]] = {}
-            let teamName = teamNames[t]
-            let teamSheet = sbTemplate.teams[teamName].sheetName
-            let numberCell = rowcol(sbTemplate.teams[teamNames[t]].firstNumber)
-            let nameCell = rowcol(sbTemplate.teams[teamNames[t]].firstName)
-            for(let s=0; s < sbTemplate.teams[teamNames[t]].maxNum; s++){
+        teamNames.forEach((team, t) => {
+            skatersOnIGRF[team] = {}
+            const teamSheet = sbTemplate.teams[team].sheetName
+            const maxNum = sbTemplate.teams[team].maxNum
+
+            const numberCell = rowcol(sbTemplate.teams[team].firstNumber)
+            const nameCell = rowcol(sbTemplate.teams[team].firstName)
+
+            for(let s=0; s < maxNum; s++) {
                 let number = workbook.sheet(teamSheet).row(numberCell.r + s).cell(numberCell.c).value()
-                let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value()
-                name = (name == undefined ? '' : name)
+                let name = workbook.sheet(teamSheet).row(nameCell.r + s).cell(nameCell.c).value() || ''
+
                 let scoreboardMatch = this.crgData.teams[t].skaters.find(x => x.number == number)
                 let id = scoreboardMatch != undefined ? scoreboardMatch.id : uuid()
                 if (number != undefined){
-                    skatersOnIGRF[teamNames[t]][id]={
+                    skatersOnIGRF[team][id] = {
                         number: number.toString(),
                         name: name,
                         row: s,
@@ -76,8 +78,8 @@ module.exports = class SkaterManager {
                     }
                 }
             }
-        }
-    
+        })
+
         return skatersOnIGRF
     }
 }
