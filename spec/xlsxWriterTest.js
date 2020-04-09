@@ -451,7 +451,6 @@ describe('xlsxWriter', () => {
 
             const sheets = specWrapper.sheetCache
             const names = Object.keys(sheets)
-    
             expect(names).toEqual(['Penalties'])
 
             const values = sheets['Penalties'].values
@@ -711,7 +710,21 @@ describe('xlsxWriter', () => {
         })
     })
 
-    describe('score and lineup data', () => {
+    describe('score scenarios', () => {
+        it('normal jam')
+        it('no points')
+        it('no points, but made it to trip 2')
+        it('initial trip points + reg points')
+        it('initial trip points + no additional points')
+        it('10+ scoring trips')
+        it('10+ scorint trips + initial trip points')
+        it('star pass during scoring trip')
+        it('star pass during initial trip')
+        it('star pass during initial + initial trip points (how??)')
+        it('star pass and 10+ scoring trips')
+    })
+
+    describe('lineup scenarios', () => {
         
     })
 })
