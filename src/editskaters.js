@@ -16,7 +16,7 @@ let crgData = {},
     skatersOnIGRF = {},
     CRGSkaterNumbers = [],
     IGRFSkaterNumbers = []
-let outFileName = ''
+
 
 cancelBtn.addEventListener('click', closeWindow)
 cancelBtn2.addEventListener('click', closeWindow)
@@ -28,13 +28,10 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
     let table = document.createElement('table')
     table.setAttribute('class','table')
 
-    for (let t in crgData.teams){
-    // For each team
+    teamNames.forEach((teamName, t) => {
+        CRGSkaterNumbers[t] = Object.values(crgData[teamName].map((v) => v.number))
+        IGRFSkaterNumbers[t] = !skatersOnIGRF ? [] : skatersOnIGRF[teamName].map((v) => v.number)
 
-        // Get the list of all numbers in both locations.
-        CRGSkaterNumbers[t] = Object.values(crgData.teams[t].skaters.map((v) => v.number))
-        IGRFSkaterNumbers[t] = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
-            : Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number))
         let concatNumbers = CRGSkaterNumbers[t].concat(IGRFSkaterNumbers[t])
         let numberSet = new Set(concatNumbers)
         let allNumbers = [...numberSet]
@@ -44,7 +41,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
         let tableHeader = document.createElement('tr')
 
         let tableHeaderCell = document.createElement('th')
-        tableHeaderCell.appendChild(document.createTextNode(crgData.teams[t].name))
+        tableHeaderCell.appendChild(document.createTextNode(teamName))
         tableHeaderCell.setAttribute('colspan',2)
         tableHeader.appendChild(tableHeaderCell)
 
@@ -124,13 +121,13 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
 
             if(IGRFSkaterNumbers[t].includes(number)){
             // If the skater is on the IGRF, use the name from there
-                skater = Object.values(skatersOnIGRF[teamNames[t]]).find(x => x.number == number)
+                skater = skatersOnIGRF[teamName].find(x => x.number == number)
                 name = skater.name
                 inIGRF = true
             }
             if(CRGSkaterNumbers[t].includes(number)){
                 inCRG = true
-                skater = crgData.teams[t].skaters.find(x => x.number == number)
+                skater = crgData[teamName].find(x => x.number == number)
                 if(!inIGRF){
                 // If the skater is NOT on the IGRF, use the name from the scorebord
                     name = skater.name
@@ -182,7 +179,7 @@ let makeSkaterTable = (crgData, skatersOnIGRF) => {
             
             table.appendChild(tableRow)
         }
-    }
+    })
 
     countChecks()
     return table
@@ -268,7 +265,7 @@ let toggleIGRF = (event) => {
 function closeWindow () {
 // Close the window 
     let window = remote.getCurrentWindow()
-    ipc.send('skater-window-closed', outFileName, undefined)
+    ipc.send('skater-window-closed', undefined)
     window.close()
 }
 
@@ -277,11 +274,11 @@ function returnSkaterList () {
     let window = remote.getCurrentWindow()
     let skaterList = {}  
 
-    for (let t in teamNames){
-        let CRGSkaterNumbers = Object.values(crgData.teams[t].skaters.map((v) => v.number))
-        let IGRFSkaterNumbers = (jQuery.isEmptyObject(skatersOnIGRF) ? [] 
-            : Object.values(skatersOnIGRF[teamNames[t]]).map((v) => v.number))
-        let team = {}
+    teamNames.forEach((teamName, t) => {
+        let CRGSkaterNumbers = crgData[teamName].map((v) => v.number)
+        let IGRFSkaterNumbers = (!skatersOnIGRF) ? [] : skatersOnIGRF[teamName].map((v) => v.number)
+        let team = []
+        
         let checkedNumbers = Array
             .from(document.getElementsByName(`checklist${t}`))
             .filter(x => x.checked)
@@ -289,27 +286,23 @@ function returnSkaterList () {
         checkedNumbers.sort()
 
         if (checkedNumbers.length === 0) {
-            if (confirm(`No skaters selected from ${crgData.teams[t].name}. Continue?`)) {
-                // This does nothing.
-                Function.prototype
-            } else {
+            if (!confirm(`No skaters selected from ${teamName}. Continue?`)) {
                 return
             }
         }
 
-        for (let n in checkedNumbers){
-            let number = checkedNumbers[n],
-                IGRFskater = {},
+        checkedNumbers.forEach((number, row) => {
+            let IGRFskater = {},
                 CRGskater = {},
                 name = '',
                 id = ''
 
             if(CRGSkaterNumbers.includes(number)){
-                CRGskater = crgData.teams[t].skaters.find(x => x.number == number)
+                CRGskater = crgData[teamName].find(x => x.number === number)
             }
 
             if(IGRFSkaterNumbers.includes(number)){
-                IGRFskater = Object.values(skatersOnIGRF[teamNames[t]]).find(x => x.number == number)
+                IGRFskater = skatersOnIGRF[teamName].find(x => x.number === number)
             }
 
             // Get the skater name - priority to the name on the IGRF
@@ -318,23 +311,23 @@ function returnSkaterList () {
             // Take the unique ID from the CRG data if present, assign one otherwise
             id = (CRGSkaterNumbers.includes(number) ? CRGskater.id : uuid())
 
-            team[id] = {
+            team.push({
                 name: name,
                 number: number,
-                row: parseInt(n)
-            }
+                id,
+                row,
+            })
 
-        }
+        })
 
-        skaterList[teamNames[t]] = team
-    }
+        skaterList[teamName] = team
+    })
 
-    ipc.send('skater-window-closed', outFileName, JSON.stringify(skaterList))
+    ipc.send('skater-window-closed', JSON.stringify(skaterList))
     window.close()
 }
 
-ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON, outFile) => {
-    outFileName = outFile
+ipc.on('send-skater-list', (event, crgJSON, skatersOnIGRFJSON) => {
     crgData = JSON.parse(crgJSON)
     skatersOnIGRF = JSON.parse(skatersOnIGRFJSON)
     skaterTableDiv.appendChild(makeSkaterTable(crgData, skatersOnIGRF))

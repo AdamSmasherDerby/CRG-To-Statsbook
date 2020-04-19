@@ -5,9 +5,9 @@ module.exports = class ReaderProvider {
     getVersion(fileData) {
         let version
 
-        if (Object.prototype.hasOwnProperty.call(fileData, 'identifier')) {
+        if (fileData && Object.prototype.hasOwnProperty.call(fileData, 'identifier')) {
             version = 'v3.0.0'
-        } else if (Object.prototype.hasOwnProperty.call(fileData, 'state')) {
+        } else if (fileData && Object.prototype.hasOwnProperty.call(fileData, 'state')) {
             if(Object.prototype.hasOwnProperty.call(fileData.state, 'ScoreBoard.Version(release)')) {
                 version = fileData.state['ScoreBoard.Version(release)']
             } else {

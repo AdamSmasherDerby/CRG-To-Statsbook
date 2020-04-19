@@ -10,12 +10,17 @@ let menu,
     aboutWin,
     completeWin
 
+app.allowRendererProcessReuse = true
+
 let createWindow = () => {
     win = new BrowserWindow({
         title: 'CRG Data Tool',
         icon: __dirname + '/build/flamingo-white.png',
         width: 800, 
-        height: 650
+        height: 650,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
 
     win.loadURL(url.format({
@@ -147,7 +152,10 @@ let openAbout = () => {
         width: 300,
         height: 300,
         x: win.getPosition()[0] + 250,
-        y: win.getPosition()[1] + 150
+        y: win.getPosition()[1] + 150,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
 
     aboutWin.setMenu(null)
@@ -189,7 +197,10 @@ let openComplete = (outFileName) => {
         width: 600,
         height: 300,
         x: win.getPosition()[0] + 100,
-        y: win.getPosition()[1] + 150
+        y: win.getPosition()[1] + 150,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
 
     completeWin.setMenu(null)
