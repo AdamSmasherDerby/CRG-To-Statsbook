@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const semver = require('semver')
 const ReaderProvider = require('./readers/readerProvider')
 
 exports.makecrgdata = (fileData, crgFilename) => {
@@ -34,13 +35,15 @@ exports.makecrgdata = (fileData, crgFilename) => {
         // Determine version
         crgData.version = version
         
-
         let sb = {}
         let keys = Object.keys(fileData.state)
         let values = Object.values(fileData.state)
-        let id, team, penaltyNumber, idIndex, skater, penalty
+        let id, team, penaltyNumber, idIndex, skater, penalty, rosterNumber
         let skaterIndices = {}
         let skaterRE = /Team\((\d)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)\.Number/
+        if (semver.gt(version,'4.1.0')){
+            skaterRE = /Team\((\d)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)\.RosterNumber/
+        }
         let penaltyRE = /Team\((\d)\)\.Skater\((\w+-\w+-\w+-\w+-\w+)\)\.Penalty\((\d)\)\.Id/
         let jamStartRE = /Period\((\d)\)\.Jam\((\d+)\)\.PeriodClockElapsedStart/
 
@@ -59,9 +62,14 @@ exports.makecrgdata = (fileData, crgFilename) => {
             if (match != undefined) {
                 team = match[1]
                 id = match[2]
+                if (semver.gt(version,'4.1.0')){
+                    rosterNumber = sb[`Team(${team})`][`Skater(${id})`].RosterNumber
+                } else {
+                    rosterNumber = sb[`Team(${team})`][`Skater(${id})`].Number
+                }
                 idIndex = crgData.teams[parseInt(team) - 1].skaters.push(
                     {
-                        number: sb[`Team(${team})`][`Skater(${id})`].Number,
+                        number: rosterNumber,
                         penalties: [],
                         name: sb[`Team(${team})`][`Skater(${id})`].Name,
                         id: id,
