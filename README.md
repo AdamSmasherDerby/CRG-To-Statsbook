@@ -96,3 +96,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Make the exporter tolerant of negative jam durations.
 * 2.3.2 - March 11, 2020
     * Fix bug with box trip symbols in jams with a star pass.
+* 2.4.0 - April 12, 2021
+    * Add compatibility with CRG 4.1.1 and up
