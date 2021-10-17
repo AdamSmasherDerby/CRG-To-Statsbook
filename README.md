@@ -98,3 +98,5 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Fix bug with box trip symbols in jams with a star pass.
 * 2.4.0 - April 12, 2021
     * Add compatibility with CRG 4.1.1 and up
+* 2.4.1 - October 17, 2021
+    * Fix issue resulting from CRG reording save file.

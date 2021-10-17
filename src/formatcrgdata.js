@@ -55,7 +55,7 @@ exports.makecrgdata = (fileData, crgFilename) => {
         sb = sb.ScoreBoard
 
         for (let k in keys){
-        // Populate skaters and penalties
+        // Populate skaters 
 
             // If this line is a skaterId line, add their data to crgData
             let match = skaterRE.exec(keys[k])
@@ -80,8 +80,13 @@ exports.makecrgdata = (fileData, crgFilename) => {
                 skaterIndices[id] = idIndex - 1
             }
 
+        }
+
+        for (let k in keys) {
+        //populate penalties
+            
             // If this line is a penalty ID line, add it to the entry for that skater
-            match = penaltyRE.exec(keys[k])
+            let match = penaltyRE.exec(keys[k])
             if (match != undefined) {
                 team = match[1]
                 id = match[2]
