@@ -1,4 +1,6 @@
-CRG Data Tool is a utility for converting output Game Data files from CRG Scoreboard and to WFTDA StatsBooks.  It can either generate a new statsbook based on a template or repopulate an existing statsbook file.  If there is a conflict between your scoreboard data and an existing statsbook file, it will attempt to help you resolve the conflict.
+**This tool is no longer being updated.** Now that CRG 5.x natively supports statsbook export, this tool is obsolete, and will no longer be updated.  It will continue to be supported for users of older versions.
+
+CRG Data Tool is a utility for converting output Game Data files from CRG Scoreboard 3.x and 4.x to WFTDA StatsBooks.  It can either generate a new statsbook based on a template or repopulate an existing statsbook file.  If there is a conflict between your scoreboard data and an existing statsbook file, it will attempt to help you resolve the conflict.
 
 **Note:** It is important to open the generated spreadsheet in a compatiable spreadsheet program BEFORE either feeding it to the statsbook checker or submitting it to WFTDA.  There are formulas in the spreadsheet that will not execute unless the file is opened.  (For example, there won't be any jam numbers in the lineup tab.)
 
