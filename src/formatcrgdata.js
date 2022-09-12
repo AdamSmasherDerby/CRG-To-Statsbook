@@ -14,10 +14,17 @@ exports.makecrgdata = (fileData, crgFilename) => {
             skaters: []
         }],
         periods: [],
-        version: ''
+        version: '',
+        tooRecent: false
     }
 
     const version = readerProvider.getVersion(fileData)
+
+    if (semver.gte(version,'5.0.0')){
+        crgData.version = version
+        crgData.tooRecent = true
+        return crgData
+    }
 
     if (version === 'v3.0.0'){
         // CRG formats prior to 3.9.5.  fileData is simply returned as is.

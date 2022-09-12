@@ -130,6 +130,11 @@ let readCRGData = (e) => {
     let fileData = JSON.parse(e.target.result)
     crgData = formatcrgdata.makecrgdata(fileData, crgFilename)
 
+    if (crgData.tooRecent) {
+        fileInfoBox.innerHTML = `<strong>Note:</strong> ${crgFilename} was created with version ${crgData.version} of CRG Scoreboard.  This utility only supports CRG versions prior to 5.  Please use the scoreboard export function of CRG itself.`
+        return
+    }
+
     skaterManager.setCrg(crgData)
 
     // Update the "File Information" box
