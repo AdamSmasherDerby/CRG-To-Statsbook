@@ -60,7 +60,8 @@ module.exports = class SkaterManager {
                 [jam.teams[0], jam.teams[1]] = [jam.teams[1], jam.teams[0]]
             })
         })
-        this.crgSkaters(crgData)
+
+        //this.crgSkaters(crgData)
     }
 
     setCrg(crgData) {

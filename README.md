@@ -102,5 +102,7 @@ https://github.com/AdamSmasherDerby/CRG-To-Statsbook/releases
     * Add compatibility with CRG 4.1.1 and up
 * 2.4.1 - October 17, 2021
     * Fix issue resulting from CRG reording save file.
-* 2.4.2 - September 11, 2021
+* 2.4.2 - September 11, 2022
     * Will now throw an explicit error when fed a statsbook file from CRG 5.0.0 and up.
+* 2.4.3 - November 13, 2022
+    * Fix "switch teams" button.
